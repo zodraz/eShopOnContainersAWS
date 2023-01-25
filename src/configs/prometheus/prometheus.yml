@@ -1,0 +1,34 @@
+global:
+  scrape_interval:     3s # By default, scrape targets every 5 seconds.
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  # external_labels:
+  #   monitor: 'nats-openrmf-server'
+
+# A scrape configuration containing exactly one endpoint to scrape:
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'eshop'
+    scheme: http
+    metrics_path: /metrics
+    # metrics_path defaults to '/metrics'
+    static_configs:
+    # replace the IP with your local IP for development
+    # localhost is not it, as that is w/in the container :)
+    - targets:
+        - host.docker.internal:5105
+        - host.docker.internal:5103
+        - host.docker.internal:5101
+        - host.docker.internal:5102
+        - host.docker.internal:5111
+        - host.docker.internal:5110
+        - host.docker.internal:5108
+        - host.docker.internal:5109
+        - host.docker.internal:5113
+        - host.docker.internal:5121
+        - host.docker.internal:5112
+        - host.docker.internal:5107
+        - host.docker.internal:5104
+        - host.docker.internal:5100
+        - host.docker.internal:5114

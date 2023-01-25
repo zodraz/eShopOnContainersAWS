@@ -1,0 +1,110 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <DebugType>portable</DebugType>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+    <AssemblyName>Microsoft.eShopOnContainers.Services.Marketing.API</AssemblyName>
+    <PackageId>Microsoft.eShopOnContainers.Services.Marketing.API</PackageId>
+    <UserSecretsId>aspnet-Marketing.API-20161122013619</UserSecretsId>
+    <DockerComposeProjectPath>..\..\..\..\docker-compose.dcproj</DockerComposeProjectPath>
+    <GenerateErrorForMissingTargetingPacks>false</GenerateErrorForMissingTargetingPacks>
+    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+  </PropertyGroup>
+  
+  
+  <ItemGroup>
+    <Folder Include="Infrastructure\MarketingMigrations\" />
+    <Content Include="Pics\**\*;">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Compile Remove="Connected Services\**" />
+    <Content Remove="Connected Services\**" />
+    <EmbeddedResource Remove="Connected Services\**" />
+    <None Remove="Connected Services\**" />
+    <Folder Include="Infrastructure\MarketingMigrations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.2" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.2.30" />
+    <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.2.51" />
+    <PackageReference Include="AspNetCore.HealthChecks.DynamoDb" Version="6.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.Aws.S3" Version="6.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.Aws.SecretsManager" Version="6.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Aws.Sns" Version="6.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Aws.Sqs" Version="6.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.MongoDb" Version="3.0.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.0.3" />
+    <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="3.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="3.0.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.19.4" />
+    <PackageReference Include="Kralizek.Extensions.Configuration.AWSSecretsManager" Version="1.6.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.HealthChecks" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.0" />
+    <PackageReference Include="MongoDB.Bson" Version="2.10.0" />
+    <PackageReference Include="MongoDB.Driver.Core" Version="2.10.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.10.0" />
+    <PackageReference Include="OpenTelemetry" Version="1.2.0" />
+    <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.1.0" />
+    <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.AWS" Version="1.0.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.2.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="1.2.0-rc5" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.2.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.0.0-rc8" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.0.0-rc8" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.3" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.0.0-rc8" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
+    <PackageReference Include="prometheus-net.AspNetCore.Grpc" Version="6.0.0" />
+    <PackageReference Include="prometheus-net.AspNetCore.HealthChecks" Version="6.0.0" />
+    <PackageReference Include="Rebus" Version="7.0.0-rc1" />
+    <PackageReference Include="Rebus.Autofac" Version="8.0.0" />
+    <PackageReference Include="Rebus.Diagnostics" Version="0.0.4" />
+    <PackageReference Include="Rebus.FleetManager" Version="6.2.0" />
+    <PackageReference Include="Rebus.OpenTelemetry" Version="0.0.4" />
+    <PackageReference Include="Rebus.RabbitMq" Version="7.3.5" />
+    <PackageReference Include="Rebus.Serilog" Version="7.0.0" />
+    <PackageReference Include="Rebus.ServiceProvider" Version="8.0.0-b06" />
+    <PackageReference Include="Rebus.SqlServer" Version="7.3.0-b3" />
+    <PackageReference Include="Serilog.AspNetCore" Version="4.1.1-dev-00229" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.1-dev-00787" />
+    <PackageReference Include="Serilog.Enrichers.Span" Version="2.3.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0-dev-00291" />
+    <PackageReference Include="Serilog.Sinks.AwsCloudWatch" Version="4.0.171" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1-dev-00876" />
+    <PackageReference Include="Serilog.Sinks.Http" Version="8.0.0-beta.9" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="4.1.0-dev-00166" />
+    <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.1.3" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.1-dev-00216" />
+    <PackageReference Include="Serilog.Sinks.Grafana.Loki" Version="7.1.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00834" />
+    <PackageReference Include="Serilog.Sinks.Http" Version="5.2.0" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="4.1.0-dev-00166" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\EventBus\EventBus\EventBus.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\EventBus\Rebus.AwsSnsAndSqs\Rebus.AwsSnsAndSqs.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\EventBus\Rebus.Extensions.SharedNothing\Rebus.Extensions.SharedNothing.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\WebHostCustomization\WebHost.Customization\WebHost.Customization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Pics\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,302 @@
+version: '3.4'
+
+services:
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - 4566:4566
+    environment:
+      - SERVICES=s3,sns,sqs,secretsmanager,dynamodb,cloudfront,cloudwatch,logs
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - ./.localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  loki: 
+    image: grafana/loki:2.4.1
+    container_name: loki
+    ports:
+      - "3100:3100"
+      
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: jaeger
+    restart: unless-stopped
+    ports:
+      - 5775:5775/udp
+      - 5778:5778
+      - 6831:6831/udp
+      - 6832:6832/udp
+      - 9411:9411
+      - 14268:14268
+      - 16686:16686 # Jaeger UI
+
+  otel-collector:
+    image: amazon/aws-otel-collector:latest
+    command: --config /config/otel-collector-config.yml
+    volumes:
+      - ./configs/otel-collector:/config
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+    ports:
+      - "4317:4317"   # OTLP gRPC receiver
+      - "35670:55679" # zpages extension
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:8.3.3
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+    volumes:
+        - ./configs/grafana/provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+        - ./configs/grafana/provisioning/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+        - ./configs/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+        prometheus:
+            condition: service_healthy
+    healthcheck:
+        test: wget -q --tries=1 -O- http://localhost:3000/
+        interval: 3s
+        timeout: 3s
+        retries: 10
+        start_period: 10s
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    ports:
+      - 9090:9090
+    volumes:
+      - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    healthcheck:
+        test: wget -q --tries=1 -O- http://localhost:9090/
+        interval: 3s
+        timeout: 3s
+        retries: 10
+        start_period: 10s
+
+  seq:
+    container_name: seq
+    image: datalust/seq:latest
+
+  sqldata:
+    container_name: mssql
+    image: mcr.microsoft.com/mssql/server:2019-latest 
+
+  nosqldata:
+    container_name: mongo
+    image: mongo
+
+  basketdata:
+    container_name: redis
+    image: redis:alpine
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+
+  identity-api:
+    image: ${REGISTRY:-eshop}/identity.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Identity/Identity.API/Dockerfile
+    restart: always
+    depends_on:
+      - sqldata
+
+  basket-api:
+    image: ${REGISTRY:-eshop}/basket.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Basket/Basket.API/Dockerfile
+    restart: always
+    depends_on:
+      - basketdata
+      - identity-api
+      - rabbitmq
+
+  catalog-api:
+    image: ${REGISTRY:-eshop}/catalog.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Catalog/Catalog.API/Dockerfile
+    restart: always
+    depends_on:
+      - sqldata
+      - rabbitmq
+
+  ordering-api:
+    image: ${REGISTRY:-eshop}/ordering.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.API/Dockerfile
+    restart: always
+    depends_on:
+      - sqldata
+      - rabbitmq
+
+  ordering-backgroundtasks:
+    image: ${REGISTRY:-eshop}/ordering.backgroundtasks:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.BackgroundTasks/Dockerfile
+    restart: always
+    depends_on:
+      - sqldata
+      - rabbitmq
+
+  marketing-api:
+    image: ${REGISTRY:-eshop}/marketing.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Marketing/Marketing.API/Dockerfile
+    depends_on:
+      - sqldata
+      - nosqldata
+      - identity-api
+      - rabbitmq
+
+  payment-api:
+    image: ${REGISTRY:-eshop}/payment.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Payment/Payment.API/Dockerfile
+    restart: always
+    depends_on:
+      - rabbitmq
+
+  locations-api:
+    image: ${REGISTRY:-eshop}/locations.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Location/Locations.API/Dockerfile
+    depends_on:
+      - nosqldata
+      - rabbitmq
+
+  webhooks-api:
+    image: ${REGISTRY:-eshop}/webhooks.api:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Webhooks/Webhooks.API/Dockerfile
+    restart: always
+    depends_on:
+      - sqldata
+
+  #mobileshoppingapigw:
+  #  image: envoyproxy/envoy:v1.11.1
+  #  restart: always
+
+  #mobilemarketingapigw:
+  #  image: envoyproxy/envoy:v1.11.1
+
+  #mobileshoppingagg:
+  #  image: ${REGISTRY:-eshop}/mobileshoppingagg:${PLATFORM:-linux}-${TAG:-latest}
+  #  build:
+  #    context: .
+  #    dockerfile: ApiGateways/Mobile.Bff.Shopping/aggregator/Dockerfile
+  #  restart: always
+  #  depends_on:
+  #    - nosqldata
+  #    - sqldata
+  #    - identity-api
+  #    - rabbitmq
+  #    - ordering-api
+  #    - catalog-api
+  #    - basket-api
+
+  webshoppingagg:
+    image: ${REGISTRY:-eshop}/webshoppingagg:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: ApiGateways/Web.Bff.Shopping/aggregator/Dockerfile
+    restart: always
+    depends_on:
+      - nosqldata
+      - sqldata
+      - identity-api
+      - rabbitmq
+      - ordering-api
+      - catalog-api
+      - basket-api
+
+  ordering-signalrhub:
+    image: ${REGISTRY:-eshop}/ordering.signalrhub:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Ordering/Ordering.SignalrHub/Dockerfile
+    restart: always
+    depends_on:
+      - nosqldata
+      - sqldata
+      - identity-api
+      - rabbitmq
+      - ordering-api
+      - catalog-api
+      - basket-api
+
+  webstatus:
+    image: ${REGISTRY:-eshop}/webstatus:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Web/WebStatus/Dockerfile
+    restart: always
+
+  webspa:
+    image: ${REGISTRY:-eshop}/webspa:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Web/WebSPA/Dockerfile
+      args:
+        NODE_IMAGE: ${NODE_IMAGE:-node:12.0}
+    restart: always
+    depends_on:
+      - webshoppingagg
+      - webshoppingapigw
+
+  webmvc:
+    image: ${REGISTRY:-eshop}/webmvc:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Web/WebMVC/Dockerfile
+    restart: always
+    depends_on:
+      - webshoppingagg
+      - webshoppingapigw
+
+  webhooks-client:
+    image: ${REGISTRY:-eshop}/webhooks.client:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Web/WebhookClient/Dockerfile
+    restart: always
+    depends_on:
+      - webhooks-api
+
+  webshoppingapigw:
+    image: envoyproxy/envoy:v1.11.1
+    restart: always
+
+  webmarketingapigw:
+    image: envoyproxy/envoy:v1.11.1
+
+  #fleetmanager:
+  #  image: "mookid8000/fleetmanager:4.28.6"
+  #  restart: "unless-stopped"
+  #  ports: 
+  #    - "5000:5000" 
+  #  volumes:
+  #    - servicebus_directory:/usr/share/servicebus
+  #  logging:
+  #    driver: "json-file"
+  #    options:
+  #      max-size: "50m"  
