@@ -1,5 +1,5 @@
 from aws_solutions_constructs.aws_route53_alb import Route53ToAlb
-from aws_solutions_constructs.aws_wafwebacl_alb import WafwebaclToAlbProps, WafwebaclToAlb
+from aws_solutions_constructs.aws_wafwebacl_alb import WafwebaclToAlb
 from aws_cdk import (aws_route53 as route53, Stack)
 from constructs import Construct
 

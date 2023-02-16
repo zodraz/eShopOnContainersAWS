@@ -8,9 +8,9 @@ from aws_cdk import (
     aws_iam as iam,
     custom_resources as custom_resources
 )
-import os
 
 from constructs import Construct
+
 
 class EKSLogsObjectResource(Construct):
     """EKS SDK updateClusterConfig

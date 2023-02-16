@@ -1,19 +1,17 @@
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Amazon.XRay.Recorder.Handlers.AwsSdk;
+using AWS.Lambda.Powertools.Logging;
+using AWS.Lambda.Powertools.Tracing;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using OpenTelemetry;
 using OpenTelemetry.Contrib.Extensions.AWSXRay.Trace;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Net;
-using Amazon.XRay.Recorder.Handlers.AwsSdk;
-using AWS.Lambda.Powertools.Logging;
-using AWS.Lambda.Powertools.Tracing;
-using AWS.Lambda.Powertools.Metrics;
-using System.Diagnostics;
-using OpenTelemetry.Metrics;
 using System.Reflection;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
@@ -46,7 +44,6 @@ namespace Marketing.Functions
                     .AddXRayTraceId()
                     .AddAWSInstrumentation()
                     .AddHttpClientInstrumentation()
-                    ////////////.AddAWSLambdaConfigurations()
                     .AddOtlpExporter(options =>
                     {
                         options.Endpoint = new Uri(LambdaConfiguration.Configuration["OtlpEndpoint"]);
@@ -97,7 +94,6 @@ namespace Marketing.Functions
         /// <returns>The API Gateway response.</returns>
         [Logging(LogEvent = true)]
         [Tracing(CaptureMode = TracingCaptureMode.ResponseAndError)]
-        [Metrics(CaptureColdStart = true)]
         public async Task<APIGatewayProxyResponse> FunctionHandler(APIGatewayHttpApiV2ProxyRequest request, ILambdaContext context)
         {
             var requestContextRequestId = request.RequestContext.RequestId;
@@ -138,25 +134,7 @@ namespace Marketing.Functions
                 });
             try
             {
-                // Add Metric to capture the amount of time 
-                Metrics.PushSingleMetric(
-                    metricName: "GetCampaignHtml",
-                    value: 1,
-                    unit: MetricUnit.Count,
-                    service: "Marketing.Functions",
-                    defaultDimensions: new Dictionary<string, string>
-                    {
-                        { "Metric Type", "Single" }
-                    });
-
-                var watch = Stopwatch.StartNew();
-
                 htmlResponse = await GetCampaignHtml(htmlResponse, campaignId, cnnString);
-
-                watch.Stop();
-
-                Metrics.AddMetric("ElapsedExecutionTime", watch.ElapsedMilliseconds, MetricUnit.Milliseconds);
-                Metrics.AddMetric("SuccessfulGetCampaignHtml", 1, MetricUnit.Count);
 
                 return new APIGatewayProxyResponse
                 {

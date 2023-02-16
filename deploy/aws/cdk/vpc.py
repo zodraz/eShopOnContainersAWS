@@ -1,15 +1,10 @@
-from aws_cdk import (aws_ec2 as ec2, core)
-
-ec2_type = "t3.micro"
-key_name = "id_rsa"  # Setup key_name for EC2 instance login
-
-with open("./user_data/bastion.sh") as f:
-    user_data = f.read()
+from aws_cdk import aws_ec2 as ec2, Stack, Tag, CfnOutput
+from constructs import Construct
 
 
-class VpcStack(core.Stack):
+class VpcStack(Stack):
 
-    def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         # Either create a new VPC with the options below OR import an existing one by name
@@ -18,6 +13,7 @@ class VpcStack(core.Stack):
                 self.vpc = ec2.Vpc(
                     self,
                     "VPC",
+                    # vpc_name="vpc-eu-central-1-eshop-aws"
                     # We are choosing to spread our VPC across 3 availability zones
                     max_azs=3,
                     nat_gateways=self.node.try_get_context(
@@ -29,7 +25,7 @@ class VpcStack(core.Stack):
                     ip_addresses=ec2.IpAddresses.cidr(
                         self.node.try_get_context("vpc_cidr")),
                     subnet_configuration=[
-                        # 3 x Public Subnets (1 per AZ) with 64 IPs each for our ALBs and NATs
+                        # 3 x Public Subnets (1 per AZ) with 256 IPs each for our ALBs and NATs
                         ec2.SubnetConfiguration(
                             subnet_type=ec2.SubnetType.PUBLIC,
                             name="Public",
@@ -107,52 +103,53 @@ class VpcStack(core.Stack):
         #     enable_dns_support=True
         # )
 
-        core.Tag(key="Application", value=self.stack_name) \
-            .add(self.vpc, key="Application", value=self.stack_name)
-        # core.Tag("Network", "Public").add(vpc)
+        Tag(key="Application", value=self.stack_name)
+        Tag("Network", "Public")
         # core.Tag("Name", "VPCName-Environment").add(vpc)
         # core.Tag("Environment", "Environment").add(vpc)
 
-        bastion = ec2.BastionHostLinux(
-            self,
-            id="BastionHost",
-            vpc=self.vpc,
-            instance_name="BastionHost",
-            instance_type=ec2.InstanceType(ec2_type),
-            subnet_selection=ec2.SubnetSelection(
-                subnet_type=ec2.SubnetType.PUBLIC))
-        bastion.allow_ssh_access_from(ec2.Peer.any_ipv4())
+        # bastion = ec2.BastionHostLinux(
+        #     self,
+        #     id="BastionHost",
+        #     vpc=self.vpc,
+        #     instance_name="BastionHost",
+        #     instance_type=ec2.InstanceType(ec2_type),
+        #     subnet_selection=ec2.SubnetSelection(
+        #         subnet_type=ec2.SubnetType.PUBLIC))
+        # bastion.allow_ssh_access_from(ec2.Peer.any_ipv4())
 
-        # Setup key_name for EC2 instance login if you don't use Session Manager
-        #bastion.instance.instance.add_property_override("KeyName", key_name)
+        # # Setup key_name for EC2 instance login if you don't use Session Manager
+        # #bastion.instance.instance.add_property_override("KeyName", key_name)
 
-        ec2.CfnEIP(self,
-                   id="BastionHostEIP",
-                   domain="vpc",
-                   instance_id=bastion.instance_id)
+        # ec2.CfnEIP(self,
+        #            id="BastionHostEIP",
+        #            domain="vpc",
+        #            instance_id=bastion.instance_id)
 
-        core.CfnOutput(
+        CfnOutput(
             self,
             id="VPCId",
             value=self.vpc.vpc_id,
             description="VPC ID",
             export_name=f"{self.region}:{self.account}:{self.stack_name}:vpc-id"
         )
+        
+        # self.vpc.private_subnets
 
-        core.CfnOutput(
-            self,
-            id="BastionPrivateIP",
-            value=bastion.instance_private_ip,
-            description="BASTION Private IP",
-            export_name=
-            f"{self.region}:{self.account}:{self.stack_name}:bastion-private-ip"
-        )
+        # core.CfnOutput(
+        #     self,
+        #     id="BastionPrivateIP",
+        #     value=bastion.instance_private_ip,
+        #     description="BASTION Private IP",
+        #     export_name=
+        #     f"{self.region}:{self.account}:{self.stack_name}:bastion-private-ip"
+        # )
 
-        core.CfnOutput(
-            self,
-            id="BastionPublicIP",
-            value=bastion.instance_public_ip,
-            description="BASTION Public IP",
-            export_name=
-            f"{self.region}:{self.account}:{self.stack_name}:bastion-public-ip"
-        )
+        # core.CfnOutput(
+        #     self,
+        #     id="BastionPublicIP",
+        #     value=bastion.instance_public_ip,
+        #     description="BASTION Public IP",
+        #     export_name=
+        #     f"{self.region}:{self.account}:{self.stack_name}:bastion-public-ip"
+        # )

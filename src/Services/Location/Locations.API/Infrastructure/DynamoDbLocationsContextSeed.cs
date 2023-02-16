@@ -26,7 +26,7 @@
             if (locationSettings.LocalStack.UseLocalStack)
             {
                 dynamoDbConfig.ServiceURL = locationSettings.LocalStack.LocalStackUrl;
-                CreateTableIfNeeded(client);
+                await CreateTableIfNeeded(client);
             }
 
             ctx = new DynamoDBContext(client);
@@ -35,7 +35,7 @@
 
             var request = new ScanRequest("Locations") { Select = Select.COUNT };
 
-            var result = client.ScanAsync(request, cancellationToken).Result;
+            var result = await client.ScanAsync(request, cancellationToken);
 
             var totalCount = result.Count;
 
@@ -361,11 +361,11 @@
             };
         }
 
-        static void CreateTableIfNeeded(AmazonDynamoDBClient client)
+        static async Task CreateTableIfNeeded(AmazonDynamoDBClient client)
         {
             // Initial value for the first page of table names.
 
-            bool exists = ExistsTable(client, "Locations");
+            bool exists = await ExistsTable(client, "Locations");
 
             if (!exists)
             {
@@ -395,10 +395,10 @@
                     }
                 };
 
-                var response = client.CreateTableAsync(request);
+                var response = await client.CreateTableAsync(request);
             }
 
-            exists = ExistsTable(client, "UserLocations");
+            exists = await ExistsTable(client, "UserLocations");
 
             if (!exists)
             {
@@ -428,11 +428,11 @@
                     }
                 };
 
-                var response = client.CreateTableAsync(request);
+                var response = await client.CreateTableAsync(request);
             }
         }
 
-        static bool ExistsTable(AmazonDynamoDBClient client, string table)
+        static async Task<bool> ExistsTable(AmazonDynamoDBClient client, string table)
         {
             string lastEvaluatedTableName = null;
             bool exists = false;
@@ -445,7 +445,7 @@
                     ExclusiveStartTableName = lastEvaluatedTableName
                 };
 
-                var response = client.ListTablesAsync(request).Result;
+                var response = await client.ListTablesAsync(request);
                 var result = response.TableNames;
                 exists = result.Contains(table);
                 lastEvaluatedTableName = response.LastEvaluatedTableName;

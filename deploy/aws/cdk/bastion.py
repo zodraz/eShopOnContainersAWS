@@ -1,14 +1,7 @@
 from aws_cdk import (
-    # Duration,
     Stack,
-    aws_rds as rds,
     aws_ec2 as ec2,
     aws_iam as iam,
-    aws_cloudwatch as cloudwatch,
-    aws_secretsmanager as secretsmanager,
-    aws_elasticache as elasticache,
-    RemovalPolicy,
-    Duration,
     CfnOutput)
 
 from constructs import Construct
@@ -16,8 +9,8 @@ from constructs import Construct
 
 class BastionStack(Stack):
 
-    def __init__(self, scope: Construct, construct_id: str, vpc,
-                 **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, vpc, cluster_admin_role,
+                 cluster_security_group, cluster_name, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         if self.node.try_get_context("deploy_bastion") == "True":
@@ -51,8 +44,11 @@ class BastionStack(Stack):
                                                        allow_all_outbound=True)
 
             # Add a rule to allow our new SG to talk to the EKS control plane
-            eks_cluster.cluster_security_group.add_ingress_rule(
+            cluster_security_group.add_ingress_rule(
                 bastion_security_group, ec2.Port.all_traffic())
+            
+            
+            bastion_security_group.node.add_dependency(cluster_security_group)
 
             # Create our EC2 instance for bastion
             bastion_instance = ec2.Instance(
@@ -93,20 +89,19 @@ class BastionStack(Stack):
                 "yum install nodejs git -y")
             bastion_instance.user_data.add_commands(
                 'su -c "aws eks update-kubeconfig --name ' +
-                eks_cluster.cluster_name + " --region " + self.region +
+                cluster_name + " --region " + self.region +
                 '" ssm-user')
 
             # Wait to deploy Bastion until cluster is up and we're deploying manifests/charts to it
             # This could be any of the charts/manifests I just picked this one as almost everybody will want it
-            bastion_instance.node.add_dependency(metricsserver_chart)
+            # bastion_instance.node.add_dependency(metricsserver_chart)
 
             CfnOutput(
                 self,
                 id="BastionPrivateIP",
                 value=bastion_instance.instance_private_ip,
                 description="BASTION Private IP",
-                export_name=
-                f"{self.region}:{self.account}:{self.stack_name}:bastion-private-ip"
+                export_name=f"{self.region}:{self.account}:{self.stack_name}:bastion-private-ip"
             )
 
             CfnOutput(
@@ -114,6 +109,5 @@ class BastionStack(Stack):
                 id="BastionPublicIP",
                 value=bastion_instance.instance_public_ip,
                 description="BASTION Public IP",
-                export_name=
-                f"{self.region}:{self.account}:{self.stack_name}:bastion-public-ip"
+                export_name=f"{self.region}:{self.account}:{self.stack_name}:bastion-public-ip"
             )

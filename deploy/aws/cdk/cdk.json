@@ -89,6 +89,31 @@
     "deploy_grafana_for_amp": "True",
     "fargate_only_cluster": "False",
     "fargate_logs_to_cloudwatch": "False",
-    "fargate_logs_to_managed_opensearch": "False"
+    "fargate_logs_to_managed_opensearch": "False",
+    "vpc_cidr_mask_sqlserver":"10.0.1.0/24",
+    "redis_node_quantity": 1,
+    "ecr_repo_name": "aspnet6containerwebapi",
+    "ecr_image_tag": "aspnetcorefunction-f7ec2953ce7d-latest",
+    "deploy_documentdb": "True",
+    "deploy_dynamodb": "True",
+    "deploy_rabbitmq": "True",
+    "deploy_rabbitmq_as_cluster": "False",
+    "vpc_cidr_mask_rabbitmq":"10.0.1.0/24",
+    "vpc_cidr_mask_docdb":"10.0.1.0/24",
+    "secrets_manager_appsettings_files": {
+       "Production/EshopBasketApi":  "../../../src/Services/Basket/Basket.API/appsettings.Production.json",
+       "Production/EshopCatalogApi":  "../../../src/Services/Catalog/Catalog.API/appsettings.Production.json",
+       "Production/EshopIdentityApi":  "../../../src/Services/Identity/Identity.API/appsettings.Production.json",
+       "Production/EshopLocationsApi":  "../../../src/Services/Locations/Locations.API/appsettings.Production.json",
+       "Production/EshopMarketingApi":  "../../../src/Services/Marketing/Marketing.API/appsettings.Production.json",
+       "Production/EshopOrderingApi":  "../../../src/Services/Ordering/Ordering.API/appsettings.Production.json",
+       "Production/EshopPaymentApi":  "../../../src/Services/Payment/Payment.API/appsettings.Production.json",
+       "Production/EshopWebhooksApi":  "../../../src/Services/Webhooks/Webhooks.API/appsettings.Production.json",
+       "Production/EshopWebhookClient":  "../../../src/Web/WebhookClient/appsettings.Production.json",
+       "Production/EshopWebMVC":  "../../../src/Web/WebMVC/appsettings.Production.json",
+       "Production/EshopWebSPA":  "../../../src/Web/WebSPA/appsettings.Production.json",
+       "Production/EshopWebStatus":  "../../../src/Web/WebStatus/appsettings.Production.json"
+    },
+    "s3_images_path":  "../../../src/Services/Catalog/Catalog.API/Pics"
   }
 }
