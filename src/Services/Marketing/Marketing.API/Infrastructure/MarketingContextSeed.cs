@@ -1,5 +1,8 @@
 ﻿namespace Microsoft.eShopOnContainers.Services.Marketing.API.Infrastructure
 {
+    using Amazon.DynamoDBv2;
+    using Amazon.DynamoDBv2.DataModel;
+    using Amazon.DynamoDBv2.Model;
     using Microsoft.eShopOnContainers.Services.Marketing.API.Model;
     using Microsoft.Extensions.Logging;
     using Polly;
@@ -12,12 +15,25 @@
 
     public class MarketingContextSeed
     {
-        public async Task SeedAsync(MarketingContext context,ILogger<MarketingContextSeed> logger,int retries = 3)
+        public async Task SeedAsync(MarketingContext context,ILogger<MarketingContextSeed> logger, MarketingSettings marketingSettings, int retries = 3)
         {
             var policy = CreatePolicy(retries, logger, nameof(MarketingContextSeed));
 
             await policy.ExecuteAsync(async () =>
             {
+                var dynamoDbConfig = new AmazonDynamoDBConfig
+                {
+                    RegionEndpoint = marketingSettings.AWSOptions.Region
+                };
+
+                var client = new AmazonDynamoDBClient(dynamoDbConfig);
+
+                if (marketingSettings.LocalStack.UseLocalStack)
+                {
+                    dynamoDbConfig.ServiceURL = marketingSettings.LocalStack.LocalStackUrl;
+                    await CreateTableIfNeeded(client);
+                }
+
                 if (!context.Campaigns.Any())
                 {
                     await context.Campaigns.AddRangeAsync(
@@ -80,6 +96,66 @@
                         logger.LogWarning(exception, "[{prefix}] Exception {ExceptionType} with message {Message} detected on attempt {retry} of {retries}", prefix, exception.GetType().Name, exception.Message, retry, retries);
                     }
                 );
+        }
+
+        private async Task CreateTableIfNeeded(AmazonDynamoDBClient client)
+        {
+            // Initial value for the first page of table names.
+
+            bool exists = await ExistsTable(client, "MarketingData");
+
+            if (!exists)
+            {
+                var request = new CreateTableRequest
+                {
+                    TableName = "MarketingData",
+                    AttributeDefinitions = new List<AttributeDefinition>()
+                    {
+                        new AttributeDefinition
+                        {
+                          AttributeName = "UserId",
+                          AttributeType = "S"
+                        }
+                    },
+                    KeySchema = new List<KeySchemaElement>()
+                    {
+                        new KeySchemaElement
+                        {
+                            AttributeName = "UserId",
+                            KeyType = "HASH"  //Partition key
+                        }
+                    },
+                    ProvisionedThroughput = new ProvisionedThroughput
+                    {
+                        ReadCapacityUnits = 10,
+                        WriteCapacityUnits = 5
+                    }
+                };
+
+                var response = await client.CreateTableAsync(request);
+            }
+        }
+
+        private async Task<bool> ExistsTable(AmazonDynamoDBClient client, string table)
+        {
+            string lastEvaluatedTableName = null;
+            bool exists;
+            do
+            {
+                // Create a request object to specify optional parameters.
+                var request = new ListTablesRequest
+                {
+                    Limit = 10, // Page size.
+                    ExclusiveStartTableName = lastEvaluatedTableName
+                };
+
+                var response = await client.ListTablesAsync(request);
+                var result = response.TableNames;
+                exists = result.Contains(table);
+                lastEvaluatedTableName = response.LastEvaluatedTableName;
+
+            } while (lastEvaluatedTableName != null && !exists);
+            return exists;
         }
     }
 }

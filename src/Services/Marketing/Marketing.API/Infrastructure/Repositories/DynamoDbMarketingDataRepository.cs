@@ -17,12 +17,13 @@ namespace Microsoft.eShopOnContainers.Services.Marketing.API.Infrastructure.Repo
                 RegionEndpoint = marketingSettings.AWSOptions.Region
             };
 
+            var client = new AmazonDynamoDBClient(dynamoDbConfig);
+
             if (marketingSettings.LocalStack.UseLocalStack)
             {
                 dynamoDbConfig.ServiceURL = marketingSettings.LocalStack.LocalStackUrl;
             }
-
-            var client = new AmazonDynamoDBClient(dynamoDbConfig);
+           
             _context = new DynamoDBContext(client);
         }
 

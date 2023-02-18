@@ -3,6 +3,7 @@ using Amazon.DynamoDBv2.DocumentModel;
 using Locations.API.Model.Core;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.eShopOnContainers.Services.Locations.API.Model
 {
@@ -28,7 +29,7 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API.Model
 
 		public DynamoDBEntry ToEntry(object value)
 		{
-			AreaLocationPolygonConverter areaLocationPolygonConverter = value as AreaLocationPolygonConverter;
+			AreaLocationPolygon areaLocationPolygonConverter = (AreaLocationPolygon) value;
 			if (areaLocationPolygonConverter == null) return null;
 
 

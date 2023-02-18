@@ -24,7 +24,7 @@
     "build:dev:watch": "npm run build:dev && ng build --watch",
     "build:prod": "ng build --prod --aot --extract-css",
     "lint:sass": "sass-lint -c .sass-lint.yml Client/**/*.scss --verbose",
-    "lint:ts": "tslint -c tslint.json Client/**/*.ts"
+    "lint:ts": "sass-lint -c .sass-lint.yml Client/**/*.scss --verbose"
   },
   "dependencies": {
     "@angular-devkit/schematics": "^11.0.4",

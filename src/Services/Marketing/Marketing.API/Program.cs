@@ -30,13 +30,16 @@
                 Log.Information("Configuring web host ({ApplicationContext})...", AppName);
                 var host = BuildWebHost(configuration, args);
 
+                var marketingSettings = configuration.Get<MarketingSettings>();
+                marketingSettings.AWSOptions = configuration.GetAWSOptions();
+
                 Log.Information("Applying migrations ({ApplicationContext})...", AppName);
                 host.MigrateDbContext<MarketingContext>((context, services) =>
                 {
                     var logger = services.GetService<ILogger<MarketingContextSeed>>();
 
                     new MarketingContextSeed()
-                        .SeedAsync(context, logger)
+                        .SeedAsync(context, logger, marketingSettings)
                         .Wait();
                 });
 

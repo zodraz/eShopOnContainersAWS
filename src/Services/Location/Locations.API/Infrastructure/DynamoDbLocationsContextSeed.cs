@@ -410,8 +410,13 @@
                         new AttributeDefinition
                         {
                           AttributeName = "UserId",
-                          AttributeType = "N"
-                        }
+                          AttributeType = "S"
+                        },
+                        //new AttributeDefinition
+                        //{
+                        //  AttributeName = "LocationId",
+                        //  AttributeType = "N"
+                        //}
                     },
                     KeySchema = new List<KeySchemaElement>()
                     {
@@ -419,7 +424,12 @@
                         {
                             AttributeName = "UserId",
                             KeyType = "HASH"  //Partition key
-                        }
+                        },
+                        //new KeySchemaElement
+                        //{
+                        //    AttributeName = "LocationId",
+                        //    KeyType = "RANGE"  //Range key
+                        //}
                     },
                     ProvisionedThroughput = new ProvisionedThroughput
                     {
@@ -435,7 +445,7 @@
         static async Task<bool> ExistsTable(AmazonDynamoDBClient client, string table)
         {
             string lastEvaluatedTableName = null;
-            bool exists = false;
+            bool exists;
             do
             {
                 // Create a request object to specify optional parameters.

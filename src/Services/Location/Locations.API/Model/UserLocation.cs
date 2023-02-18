@@ -16,7 +16,8 @@
         [DynamoDBHashKey]
         public string UserId { get; set; }
 
-        [DynamoDBRangeKey]
+        //[DynamoDBRangeKey]
+        [DynamoDBProperty]
         public int LocationId { get; set; }
 
         [DynamoDBProperty]

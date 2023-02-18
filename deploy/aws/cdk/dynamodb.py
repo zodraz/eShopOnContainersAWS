@@ -13,15 +13,15 @@ class DynamoDBStack(Stack):
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        if (self.node.try_get_context("deploy_documentdb") == "True"):  
+        if (self.node.try_get_context("deploy_documentdb") == "True"):
             # Locations table
 
             locations_table = dynamodb.Table(self, "Locations",
-                                            table_name="Locations",
-                                            partition_key=dynamodb.Attribute(name="LocationId",
-                                                                            type=dynamodb.AttributeType.NUMBER),
-                                            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-                                            removal_policy=RemovalPolicy.DESTROY)
+                                             table_name="Locations",
+                                             partition_key=dynamodb.Attribute(name="LocationId",
+                                                                              type=dynamodb.AttributeType.NUMBER),
+                                             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+                                             removal_policy=RemovalPolicy.DESTROY)
 
             # locations_table.(dynamodb.Attribute(
             #     name="Code", type=dynamodb.AttributeType.STRING))
@@ -34,13 +34,13 @@ class DynamoDBStack(Stack):
 
             # User locations table
             user_locations_table = dynamodb.Table(self, "UserLocations",
-                                                table_name="UserLocations",
-                                                partition_key=dynamodb.Attribute(name="UserId",
-                                                                                type=dynamodb.AttributeType.NUMBER),
-                                                sort_key=dynamodb.Attribute(name="LocationId",
-                                                                            type=dynamodb.AttributeType.NUMBER),
-                                                billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-                                                removal_policy=RemovalPolicy.DESTROY)
+                                                  table_name="UserLocations",
+                                                  partition_key=dynamodb.Attribute(name="UserId",
+                                                                                   type=dynamodb.AttributeType.NUMBER),
+                                                  # sort_key=dynamodb.Attribute(name="LocationId",
+                                                  #                             type=dynamodb.AttributeType.NUMBER),
+                                                  billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+                                                  removal_policy=RemovalPolicy.DESTROY)
 
             # user_locations_table.add_global_secondary_index(
             #     index_name="UserIdGSI",
@@ -54,18 +54,17 @@ class DynamoDBStack(Stack):
 
             # MarketingData table
             marketing_data_table = dynamodb.Table(self, "MarketingData",
-                                                table_name="MarketingData",
-                                                partition_key=dynamodb.Attribute(name="UserId",
-                                                                                type=dynamodb.AttributeType.NUMBER),
-                                                billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-                                                removal_policy=RemovalPolicy.DESTROY)
+                                                  table_name="MarketingData",
+                                                  partition_key=dynamodb.Attribute(name="UserId",
+                                                                                   type=dynamodb.AttributeType.NUMBER),
+                                                  billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+                                                  removal_policy=RemovalPolicy.DESTROY)
 
             # marketing_data_table.add_attribute(dynamodb.Attribute(
             #     name="Locations", type=dynamodb.AttributeType.MAP))
             # marketing_data_table.add_attribute(dynamodb.Attribute(
             #     name="UpdateDate", type=dynamodb.AttributeType.STRING))
-            
-            
+
             # Create a DynamoDB table using a CloudFormation template
             # table = dynamodb.CfnTable(
             #     self, "MyTable",

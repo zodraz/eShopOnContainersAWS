@@ -35,13 +35,25 @@ namespace Marketing.FunctionalTests
 
             var testServer =  new TestServer(hostBuilder);
 
+            var marketingSettings = new MarketingSettings()
+            {
+                LocalStack = new LocalStack()
+                {
+                    UseLocalStack = false
+                },
+                AWSOptions = new Amazon.Extensions.NETCore.Setup.AWSOptions()
+                {
+                    Region = Amazon.RegionEndpoint.EUCentral1
+                }
+            };
+
             testServer.Host
                .MigrateDbContext<MarketingContext>((context, services) =>
                {
                    var logger = services.GetService<ILogger<MarketingContextSeed>>();
 
                    new MarketingContextSeed()
-                       .SeedAsync(context, logger)
+                       .SeedAsync(context, logger, marketingSettings)
                        .Wait();
                });
 
