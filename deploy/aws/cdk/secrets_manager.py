@@ -2,7 +2,7 @@ from constructs import Construct
 import json
 
 from aws_cdk import (
-    aws_secretsmanager as secretsmanager,SecretValue,
+    aws_secretsmanager as secretsmanager, SecretValue,
     Stack
 )
 
@@ -16,10 +16,9 @@ class SecretsManagerStack(Stack):
         appsettings_files = self.node.try_get_context(
             "secrets_manager_appsettings_files")
 
-        for key,file_path in appsettings_files.items():
+        for key, file_path in appsettings_files.items():
             with open(file_path) as f:
                 secrets = json.load(f)
-                print(secrets)
             secretsmanager.CfnSecret(
                 self,
                 key,

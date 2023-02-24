@@ -104,7 +104,6 @@
        "Production/EshopBasketApi":  "../../../src/Services/Basket/Basket.API/appsettings.Production.json",
        "Production/EshopCatalogApi":  "../../../src/Services/Catalog/Catalog.API/appsettings.Production.json",
        "Production/EshopIdentityApi":  "../../../src/Services/Identity/Identity.API/appsettings.Production.json",
-       "Production/EshopLocationsApi":  "../../../src/Services/Locations/Locations.API/appsettings.Production.json",
        "Production/EshopMarketingApi":  "../../../src/Services/Marketing/Marketing.API/appsettings.Production.json",
        "Production/EshopOrderingApi":  "../../../src/Services/Ordering/Ordering.API/appsettings.Production.json",
        "Production/EshopPaymentApi":  "../../../src/Services/Payment/Payment.API/appsettings.Production.json",

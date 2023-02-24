@@ -2,6 +2,7 @@
 using Amazon.SimpleNotificationService;
 using Amazon.SQS;
 using Autofac;
+using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using HealthChecks.UI.Client;
 using Locations.API;
@@ -190,7 +191,14 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
 
             if (locationSettings.UseAWS)
             {
-                DynamoDbLocationsContextSeed.SeedAsync(locationSettings, loggerFactory).Wait();
+                if (locationSettings.UseDocumentDb)
+                {
+                    LocationsContextSeed.SeedAsync(app, loggerFactory).Wait(); ;
+                }
+                else
+                {
+                    DynamoDbLocationsContextSeed.SeedAsync(locationSettings, loggerFactory).Wait();
+                }
             }
             else
             {
