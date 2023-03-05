@@ -5,8 +5,6 @@ from aws_cdk import (
     Stack
 )
 
-PROJECT_CODE = 'eshop_aws'
-
 
 class ElasticCacheRedisStack(Stack):
 
@@ -16,56 +14,66 @@ class ElasticCacheRedisStack(Stack):
 
         security_group = ec2.SecurityGroup(
             scope=self,
-            id=f"{PROJECT_CODE}_security_group",
+            id=f"RedisSecurityGroup",
             vpc=vpc,
         )
 
-        private_subnets_ids = [ps.subnet_id for ps in vpc.private_subnets]
-        
-        print("-------------------------------------")
-        for ps in private_subnets_ids:
-            print(ps)
-            
-        print("--------------------------------------")
+        security_group.add_ingress_rule(
+            peer=ec2.Peer.ipv4(self.node.try_get_context(
+                "vpc_cidr_mask_redis")),
+            description="Allow Redis connection",
+            connection=ec2.Port.tcp(6379)
+        )
 
-        # cache_subnet_group = aws_elasticache.CfnSubnetGroup(
-        #     scope=self,
-        #     id=f"{PROJECT_CODE}_cache_subnet_group",
-        #     cache_subnet_group_name=f"{PROJECT_CODE}_cache_subnet_group",
-        #     subnet_ids=private_subnets_ids,
-        #     description="subnet group for redis"
-        # )
+        if self.node.try_get_context("vpc_only_public") == "False":
+            subnets_ids = [ps.subnet_id for ps in vpc.private_subnets]
+        else:
+            subnets_ids = [ps.subnet_id for ps in vpc.public_subnets]
 
-        # redis_cluster = aws_elasticache.CfnCacheCluster(
-        #     scope=self,
-        #     id=f"{PROJECT_CODE}_redis",
-        #     engine="redis",
-        #     cache_node_type="cache.t2.small",
-        #     num_cache_nodes=self.node.try_get_context(
-        #         "redis_node_quantity"),
-        #     cluster_name="eshop-aws-redis",
-        #     vpc_security_group_ids=[security_group.security_group_id],
-        #     cache_subnet_group_name=cache_subnet_group.ref)
+        cache_subnet_group = aws_elasticache.CfnSubnetGroup(
+            scope=self,
+            id=f"RedisCacheSubnetGroup",
+            cache_subnet_group_name=f"EshopRedisCacheSubnetGroup",
+            subnet_ids=subnets_ids,
+            description="subnet group for redis"
+        )
 
-        # redis_cluster.add_depends_on(cache_subnet_group)
+        if self.node.try_get_context("deploy_redis_as_replication_group") == "False":
+            redis_cluster = aws_elasticache.CfnCacheCluster(
+                scope=self,
+                id="EshopRedis",
+                engine="redis",
+                cache_node_type="cache.t2.small",
+                num_cache_nodes=self.node.try_get_context(
+                    "redis_node_quantity"),
+                cluster_name="eshop-aws-redis",
+                transit_encryption_enabled=True,
+                vpc_security_group_ids=[security_group.security_group_id],
+                cache_subnet_group_name=cache_subnet_group.ref)
 
-        # cache_parameter_group_name = "default.redis5.0"
+            redis_cluster.add_depends_on(cache_subnet_group)
+        else:
+            cache_parameter_group_name = "default.redis5.0"
 
-        # redis_replication = aws_elasticache.CfnReplicationGroup(self,
-        #                                                         f"{PROJECT_CODE}-replication-group",
-        #                                                         replication_group_description=f"{PROJECT_CODE}-replication group",
-        #                                                         cache_node_type="cache.t3.micro",
-        #                                                         cache_parameter_group_name=cache_parameter_group_name,
-        #                                                         security_group_ids=[
-        #                                                             security_group],
-        #                                                         cache_subnet_group_name=cache_subnet_group.cache_subnet_group_name,
-        #                                                         automatic_failover_enabled=True,
-        #                                                         auto_minor_version_upgrade=True,
-        #                                                         engine="redis",
-        #                                                         engine_version="5.0.4",
-        #                                                         # node_group_configuration
-        #                                                         num_node_groups=1,  # shard  should be 3
-        #                                                         replicas_per_node_group=1  # one replica
-        #                                                         )
+            redis_replication = aws_elasticache.CfnReplicationGroup(self,
+                                                                    "EshopRedis",
+                                                                    replication_group_id="eshop-aws-redis",
+                                                                    replication_group_description=f"eshop-aws-replication group",
+                                                                    cache_node_type="cache.t3.small",
+                                                                    cache_parameter_group_name=cache_parameter_group_name,
+                                                                    security_group_ids=[
+                                                                        security_group.security_group_id],
+                                                                    cache_subnet_group_name=cache_subnet_group.cache_subnet_group_name,
+                                                                    automatic_failover_enabled=True,
+                                                                    auto_minor_version_upgrade=True,
+                                                                    multi_az_enabled=True,
+                                                                    engine="redis",
+                                                                    engine_version="5.0.6",
+                                                                    num_node_groups=1,
+                                                                    replicas_per_node_group=self.node.try_get_context(
+                                                                        "redis_node_quantity"),
+                                                                    at_rest_encryption_enabled=True,
+                                                                    transit_encryption_enabled=True
+                                                                    )
 
-        # redis_replication.add_depends_on(cache_subnet_group)
+            redis_replication.add_depends_on(cache_subnet_group)

@@ -31,8 +31,9 @@
                 if (marketingSettings.LocalStack.UseLocalStack)
                 {
                     dynamoDbConfig.ServiceURL = marketingSettings.LocalStack.LocalStackUrl;
-                    await CreateTableIfNeeded(client);
                 }
+
+                await CreateTableIfNeeded(client);
 
                 if (!context.Campaigns.Any())
                 {

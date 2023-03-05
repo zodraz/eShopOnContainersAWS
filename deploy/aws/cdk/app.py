@@ -1,11 +1,9 @@
 from aws_cdk import (App, Environment)
 import os
 from eks_cluster import EKSClusterStack
-from bastion import BastionStack
 from vpc import VpcStack
 from rds_sqlserver import RDSSQLServerStack
 from cloudfront_s3 import CloudFrontS3Stack
-from dynamodb import DynamoDBStack
 from elasticcache_redis import ElasticCacheRedisStack
 from lambda_function_url import LambdaFunctionUrlStack
 from documentdb import DocumentDbStack
@@ -35,16 +33,12 @@ rds_sqlserver = RDSSQLServerStack(
 
 # Note that if we didn't pass through the ACCOUNT and REGION from these environment variables that
 # it won't let us create 3 AZs and will only create a max of 2 - even when we ask for 3 in eks_vpc
-# eks_cluster_stack = EKSClusterStack(app,
-#                                     "EKSClusterStack",
-#                                     vpc.vpc,
-#                                     env=environment)
-# bastion = BastionStack(app, "BastionStack", vpc.vpc, eks_cluster_stack.cluster_admin_role,
-#                        eks_cluster_stack.cluster_security_group, eks_cluster_stack.cluster_name, env=environment)
+eks_cluster_stack = EKSClusterStack(app,
+                                    "EKSClusterStack",
+                                    vpc.vpc,
+                                    env=environment)
 
 cloudfrontS3 = CloudFrontS3Stack(app, "CloudFrontS3Stack", env=environment)
-
-dynamodb = DynamoDBStack(app, "DynamoDBStack", env=environment)
 
 elastic_cache_redis = ElasticCacheRedisStack(
     app, "ElasticCacheRedisStack", vpc.vpc, env=environment)

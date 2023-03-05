@@ -15,7 +15,7 @@ class AmazonMQRabbitMQStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         if (self.node.try_get_context("deploy_rabbitmq") == "True"):
-        
+
             mq_group = ec2.SecurityGroup(self, 'mq_group', vpc=vpc)
             bastion_to_mq_group = ec2.SecurityGroup(
                 self, 'bastion_to_mq_group', vpc=vpc)
@@ -30,16 +30,16 @@ class AmazonMQRabbitMQStack(Stack):
             mq_group.add_ingress_rule(peer=ec2.Peer.ipv4(self.node.try_get_context(
                 "vpc_cidr_mask_rabbitmq")),
                 connection=ec2.Port.tcp(443),
-                description='allow communication on ActiveMQ console port within VPC')
+                description='allow communication on RabbitMQ console port within VPC')
             mq_group.add_ingress_rule(peer=mq_group,
-                                    connection=ec2.Port.all_tcp(),
-                                    description='allow communication from nlb and other brokers')
+                                      connection=ec2.Port.all_tcp(),
+                                      description='allow communication from nlb and other brokers')
 
             # allow SSH to bastion from anywhere (for debugging)
             # bastion_to_mq_group.add_ingress_rule(connection=ec2.Port.all_tcp())
 
             CfnOutput(self, 'bastionToMQGroupSGID',
-                    value=bastion_to_mq_group.security_group_id)
+                      value=bastion_to_mq_group.security_group_id)
 
             mq_username = 'admin'
             mq_password = 'password1234'
@@ -52,43 +52,48 @@ class AmazonMQRabbitMQStack(Stack):
                                                         username=mq_username,
                                                         password=mq_password)
 
+            if self.node.try_get_context("vpc_only_public") == "False":
+                subnet_ids = vpc.select_subnets(
+                    subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS).subnet_ids
+            else:
+                subnet_ids = vpc.select_subnets(
+                    subnet_type=ec2.SubnetType.PUBLIC).subnet_ids
+
             if (self.node.try_get_context("deploy_rabbitmq") == "True"):
-            
+
                 mq_instance = amazonmq.CfnBroker(self, 'mq_instance',
-                                                auto_minor_version_upgrade=False,
-                                                broker_name='eshopRabbitMQ',
-                                                deployment_mode='CLUSTER_MULTI_AZ', 
-                                                engine_type='RABBITMQ',
-                                                engine_version='3.10.10',
-                                                host_instance_type='mq.m5.large',
-                                                publicly_accessible=False,
-                                                users=[mq_master],
-                                                subnet_ids=vpc.select_subnets(
-                                                    subnet_type=ec2.SubnetType.PRIVATE_ISOLATED).subnet_ids,
-                                                security_groups=[
-                                                    mq_group.security_group_id],
-                                                logs=amazonmq.CfnBroker.LogListProperty(
-                                                    general=True
-                                                ))
-                
+                                                 auto_minor_version_upgrade=False,
+                                                 broker_name='eshopRabbitMQ',
+                                                 deployment_mode='CLUSTER_MULTI_AZ',
+                                                 engine_type='RABBITMQ',
+                                                 engine_version='3.10.10',
+                                                 host_instance_type='mq.m5.large',
+                                                 publicly_accessible=False,
+                                                 users=[mq_master],
+                                                 subnet_ids=subnet_ids,
+                                                 security_groups=[
+                                                     mq_group.security_group_id],
+                                                 logs=amazonmq.CfnBroker.LogListProperty(
+                                                     general=True
+                                                 ))
+
             else:
                 mq_instance = amazonmq.CfnBroker(self, 'mq_instance',
-                                                auto_minor_version_upgrade=False,
-                                                broker_name='eshopRabbitMQ',
-                                                deployment_mode='SINGLE_INSTANCE',
-                                                engine_type='RABBITMQ',
-                                                engine_version='3.10.10',
-                                                host_instance_type='mq.m3.small',
-                                                publicly_accessible=False,
-                                                users=[mq_master],
-                                                subnet_ids=vpc.select_subnets(
-                                                    subnet_type=ec2.SubnetType.PRIVATE_ISOLATED).subnet_ids,
-                                                security_groups=[
-                                                    mq_group.security_group_id],
-                                                logs=amazonmq.CfnBroker.LogListProperty(
-                                                    general=True
-                                                ))
-                                            
+                                                 auto_minor_version_upgrade=False,
+                                                 broker_name='eshopRabbitMQ',
+                                                 deployment_mode='SINGLE_INSTANCE',
+                                                 engine_type='RABBITMQ',
+                                                 engine_version='3.10.10',
+                                                 host_instance_type='mq.m3.small',
+                                                 publicly_accessible=False,
+                                                 users=[mq_master],
+                                                 subnet_ids=subnet_ids,
+                                                 security_groups=[
+                                                     mq_group.security_group_id],
+                                                 logs=amazonmq.CfnBroker.LogListProperty(
+                                                     general=True
+                                                 ))
+
             #    storage_type=ebs,
             #    tags=[amazonmq.CfnBroker.TagsEntryProperty(
             #         key="key",

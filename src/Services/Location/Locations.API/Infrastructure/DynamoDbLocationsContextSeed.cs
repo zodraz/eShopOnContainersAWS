@@ -25,9 +25,10 @@
 
             if (locationSettings.LocalStack.UseLocalStack)
             {
-                dynamoDbConfig.ServiceURL = locationSettings.LocalStack.LocalStackUrl;
-                await CreateTableIfNeeded(client);
+                dynamoDbConfig.ServiceURL = locationSettings.LocalStack.LocalStackUrl;           
             }
+
+            await CreateTableIfNeeded(client);
 
             ctx = new DynamoDBContext(client);
           

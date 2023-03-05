@@ -38,13 +38,12 @@ class RDSSQLServerStack(Stack):
             connection=ec2.Port.tcp(1433))
 
         # DB Subnet Group
-
-        if self.node.try_get_context("create_vpc_nat_gateway") == "True":
+        if self.node.try_get_context("vpc_only_public") == "False":
             vpc_subnet = ec2.SubnetSelection(
                 subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)
         else:
             vpc_subnet = ec2.SubnetSelection(
-                subnet_type=ec2.SubnetType.PRIVATE_ISOLATED)
+                subnet_type=ec2.SubnetType.PUBLIC)
 
         db_subnet_group = rds.SubnetGroup(self, "DBSubnet",
                                           vpc=vpc,
@@ -54,64 +53,66 @@ class RDSSQLServerStack(Stack):
                                           vpc_subnets=vpc_subnet
                                           )
 
-        rds_db = rds.DatabaseInstance(
-            self,
-            "RDSQLServer",
-            engine=rds.DatabaseInstanceEngine.sql_server_ex(
-                version=rds.SqlServerEngineVersion.VER_15),
-            vpc=vpc,
-            credentials=rds.Credentials.from_password(
-                db_user, db_password.secret_value),
-            instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3,
-                                              ec2.InstanceSize.SMALL),
-            security_groups=[db_security_group],
-            subnet_group=db_subnet_group,
-            multi_az=False,
-            vpc_subnets=vpc_subnet,
-            deletion_protection=False,
-            delete_automated_backups=True,
-            backup_retention=Duration.days(0),
-            removal_policy=RemovalPolicy.DESTROY,
-            cloudwatch_logs_exports=["error"],
-        )
+        if self.node.try_get_context("deploy_rds_sqlserver_as_cluster") == "False":
 
-        # Add alarm for high CPU
-        cloudwatch.Alarm(self,
-                         id="HighCPU",
-                         metric=rds_db.metric_cpu_utilization(),
-                         threshold=90,
-                         evaluation_periods=1)
+            rds_db = rds.DatabaseInstance(
+                self,
+                "RDSQLServer",
+                engine=rds.DatabaseInstanceEngine.sql_server_ex(
+                    version=rds.SqlServerEngineVersion.VER_15),
+                vpc=vpc,
+                credentials=rds.Credentials.from_password(
+                    db_user, db_password.secret_value),
+                instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3,
+                                                  ec2.InstanceSize.SMALL),
+                security_groups=[db_security_group],
+                subnet_group=db_subnet_group,
+                multi_az=False,
+                vpc_subnets=vpc_subnet,
+                deletion_protection=False,
+                delete_automated_backups=True,
+                backup_retention=Duration.days(0),
+                removal_policy=RemovalPolicy.DESTROY,
+                cloudwatch_logs_exports=["error"],
+            )
 
-        CfnOutput(
-            self,
-            id="RDSQLServer Instance ARN",
-            value= rds_db.instance_arn,
-            description="The ARN of RDS SQL Server",
-            export_name="RDSSQLServerARN"
-        )
-        
+            # Add alarm for high CPU
+            cloudwatch.Alarm(self,
+                             id="HighCPU",
+                             metric=rds_db.metric_cpu_utilization(),
+                             threshold=90,
+                             evaluation_periods=1)
 
-        # instance_props = rds.InstanceProps(
-        #     vpc=vpc,
-        #     security_groups=[db_security_group],
-        #     vpc_subnets=ec2.SubnetSelection(
-        #         subnet_type=ec2.SubnetType.ISOLATED))
+            CfnOutput(
+                self,
+                id="RDSQLServer Instance ARN",
+                value=rds_db.instance_arn,
+                description="The ARN of RDS SQL Server",
+                export_name="RDSSQLServerARN"
+            )
 
-        # rds_cluster = rds.DatabaseCluster(
-        #     self,
-        #     "RDS-cluster",
-        #     cluster_identifier="ecs-sample-db-cluster",
-        #     instance_props=instance_props,
-        #     engine=rds.DatabaseClusterEngine.aurora_mysql(
-        #         version=rds.AuroraMysqlEngineVersion.VER_2_07_1),
-        #     credentials=rds.Credentials.from_password(
-        #         db_user, db_password.secret_value),
-        #     default_database_name="sample",
-        #     instances=1,
-        #     subnet_group=db_subnet_group,
-        #     removal_policy=RemovalPolicy.DESTROY,
-        #     deletion_protection=False)
+        else:
 
-        # CfnOutput(self,
-        #           "RDS_cluster_endpoint",
-        #           value=rds_cluster.cluster_endpoint.hostname)
+            instance_props = rds.InstanceProps(
+                vpc=vpc,
+                security_groups=[db_security_group],
+                vpc_subnets=vpc_subnet)
+
+            rds_cluster = rds.DatabaseCluster(
+                self,
+                "RDSCluster",
+                cluster_identifier="eshop-db-sqlserver-cluster",
+                instance_props=instance_props,
+                engine=rds.DatabaseInstanceEngine.sql_server_ee(
+                    version=rds.SqlServerEngineVersion.VER_15),
+                credentials=rds.Credentials.from_password(
+                    db_user, db_password.secret_value),
+                instances=self.node.try_get_context(
+                    "rds_sqlserver_node_quantity"),
+                subnet_group=db_subnet_group,
+                removal_policy=RemovalPolicy.DESTROY,
+                deletion_protection=False)
+
+            CfnOutput(self,
+                      "RDS Cluster Endpoint",
+                      value=rds_cluster.cluster_endpoint.hostname)

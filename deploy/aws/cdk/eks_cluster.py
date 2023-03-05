@@ -54,80 +54,64 @@ class EKSClusterStack(Stack):
                 role_arn=self.node.try_get_context("existing_admin_role_arn"),
             )
         # Create an EKS Cluster
+        if self.node.try_get_context("vpc_only_public") == "True":
+            vpc_subnets = [ec2.SubnetSelection(
+                subnet_type=ec2.SubnetType.PUBLIC)]
+            endpoint_access = eks.EndpointAccess.PUBLIC
+        else:
+            vpc_subnets = [ec2.SubnetSelection(
+                subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)]
+            endpoint_access = eks.EndpointAccess.PRIVATE
 
         eks_cluster = eks.Cluster(
             self,
             "cluster",
             vpc=vpc,
             masters_role=self.cluster_admin_role,
-            # Make our cluster's control plane accessible only within our private VPC
-            # This means that we'll have to ssh to a jumpbox/bastion or set up a VPN to manage it
-            endpoint_access=eks.EndpointAccess.PRIVATE,
+            endpoint_access=endpoint_access,
             version=eks.KubernetesVersion.of(
                 self.node.try_get_context("eks_version")),
             default_capacity=0,
-            kubectl_layer= lambda_layer_kubectl.KubectlLayer(self,"kubectl"))
-            # vpc_subnets=[ec2.SubnetType.PRIVATE_WITH_EGRESS])
+            vpc_subnets=vpc_subnets)
 
-        
-        
-
-        # if self.node.try_get_context("create_vpc_nat_gateway") == "True":
-        #     eks_cluster = eks.Cluster(
-        #         self,
-        #         "cluster",
-        #         vpc=vpc,
-        #          masters_role=self.cluster_admin_role,
-        #         # Make our cluster's control plane accessible only within our private VPC
-        #         # This means that we'll have to ssh to a jumpbox/bastion or set up a VPN to manage it
-        #         endpoint_access=eks.EndpointAccess.PRIVATE,
-        #         version=eks.KubernetesVersion.of(
-        #             self.node.try_get_context("eks_version")),
-        #         default_capacity=0,
-        #         vpc_subnets=[ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)])
-        # else:
-        #     eks_cluster = eks.Cluster(
-        #         self,
-        #         "cluster",
-        #         vpc=vpc,
-        #         masters_role=cluster_admin_role,
-        #         # Make our cluster's control plane accessible only within our private VPC
-        #         # This means that we'll have to ssh to a jumpbox/bastion or set up a VPN to manage it
-        #         endpoint_access=eks.EndpointAccess.PRIVATE,
-        #         version=eks.KubernetesVersion.of(
-        #             self.node.try_get_context("eks_version")),
-        #         default_capacity=0)
-        #     # vpc_subnets=[ec2.SubnetSelection(subnet_type=ec2.SubnetType.PRIVATE_ISOLATED)])
-        #     # vpc_subnets=[
-        #     #     ec2.SubnetSelection(
-        #     #         subnet_type=ec2.SubnetType.pr)
-        #     # ])
-            
         cluster_pod_role = iam.Role(
-                self,
-                "ClusterPodRole",
-                assumed_by=iam.AnyPrincipal()
-                )
+            self,
+            "ClusterPodRole",
+            assumed_by=iam.AnyPrincipal()
+        )
 
-        amazon_dynamodb_full_access = iam.ManagedPolicy.from_aws_managed_policy_name("AmazonDynamoDBFullAccess")    
+        amazon_dynamodb_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+            "AmazonDynamoDBFullAccess")
         cluster_pod_role.add_managed_policy(amazon_dynamodb_full_access)
-        
+
         if self.node.try_get_context("deploy_dynamodb") == "True":
-            amazon_doc_db_full_access = iam.ManagedPolicy.from_aws_managed_policy_name("AmazonDocDBFullAccess")
+            amazon_doc_db_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+                "AmazonDocDBFullAccess")
             cluster_pod_role.add_managed_policy(amazon_doc_db_full_access)
-            
+
         if self.node.try_get_context("deploy_rabbitmq") == "True":
-            amazon_mq_full_access = iam.ManagedPolicy.from_aws_managed_policy_name("AmazonMQFullAccess")
-            cluster_pod_role.add_managed_policy(amazon_mq_full_access)  
-            
-        amazon_elastic_cache_full_access = iam.ManagedPolicy.from_aws_managed_policy_name("AmazonElastiCacheFullAccess")    
-        cluster_pod_role.add_managed_policy(amazon_elastic_cache_full_access) 
-        
-        amazon_rds_full_access = iam.ManagedPolicy.from_aws_managed_policy_name("AmazonRDSFullAccess")    
-        cluster_pod_role.add_managed_policy(amazon_rds_full_access) 
-        
+            amazon_mq_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+                "AmazonMQFullAccess")
+            cluster_pod_role.add_managed_policy(amazon_mq_full_access)
+
+        amazon_elastic_cache_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+            "AmazonElastiCacheFullAccess")
+        cluster_pod_role.add_managed_policy(amazon_elastic_cache_full_access)
+
+        amazon_rds_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+            "AmazonRDSFullAccess")
+        cluster_pod_role.add_managed_policy(amazon_rds_full_access)
+
+        amazon_sqs_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+            "AmazonSQSFullAccess")
+        cluster_pod_role.add_managed_policy(amazon_sqs_full_access)
+
+        amazon_sns_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+            "AmazonSNSFullAccess")
+        cluster_pod_role.add_managed_policy(amazon_sns_full_access)
+
         cluster_pod_role_arn = cluster_pod_role.role_arn
-        
+
         eks_service_account = eks_cluster.add_service_account("eshop-aws-eks-service-account",
                                                               annotations={
                                                                   "eks.amazonaws.com/role-arn": cluster_pod_role_arn
@@ -144,8 +128,7 @@ class EKSClusterStack(Stack):
                     "AmazonEKSFargatePodExecutionRolePolicy")
             ],
         )
-        
-     
+
         # Enable control plane logging (via ekslogs_custom_resource.py)
         # This requires a custom resource until that has CloudFormation Support
         # TODO: remove this when no longer required when CF support launches
@@ -478,7 +461,7 @@ class EKSClusterStack(Stack):
             awslbcontroller_chart = eks_cluster.add_helm_chart(
                 "aws-load-balancer-controller",
                 chart="aws-load-balancer-controller",
-                version="1.2.7",
+                version="1.4.8",
                 release="awslbcontroller",
                 repository="https://aws.github.io/eks-charts",
                 namespace="kube-system",
@@ -1408,7 +1391,7 @@ class EKSClusterStack(Stack):
             csi_secrets_store_chart = eks_cluster.add_helm_chart(
                 "csi-secrets-store",
                 chart="secrets-store-csi-driver",
-                version="0.3.0",
+                version="1.0.0",
                 release="csi-secrets-store",
                 repository="https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts",
                 namespace="kube-system",
@@ -1548,7 +1531,7 @@ class EKSClusterStack(Stack):
             kubecost_chart = eks_cluster.add_helm_chart(
                 "kubecost",
                 chart="cost-analyzer",
-                version="1.87.0",
+                version="1.100.2",
                 repository="https://kubecost.github.io/cost-analyzer/",
                 namespace="kube-system",
                 release="kubecost",
