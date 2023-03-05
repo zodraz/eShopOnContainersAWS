@@ -6,7 +6,7 @@ EXPOSE 80
 
 WORKDIR /src
 COPY ["BuildingBlocks/EventBus/EventBus/EventBus.csproj", "BuildingBlocks/EventBus/EventBus/"]
-COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
+COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
 COPY ["BuildingBlocks/WebHostCustomization/WebHost.Customization/WebHost.Customization.csproj", "BuildingBlocks/WebHostCustomization/WebHost.Customization/"]
 COPY ["Services/Ordering/Ordering.Domain/Ordering.Domain.csproj", "Services/Ordering/Ordering.Domain/"]
 COPY ["Services/Ordering/Ordering.Infrastructure/Ordering.Infrastructure.csproj", "Services/Ordering/Ordering.Infrastructure/"]

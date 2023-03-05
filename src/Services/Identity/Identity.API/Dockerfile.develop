@@ -6,7 +6,7 @@ EXPOSE 80
 
 WORKDIR /src
 COPY ["Services/Identity/Identity.API/Identity.API.csproj", "Services/Identity/Identity.API/"]
-COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
+COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
 COPY ["BuildingBlocks/WebHostCustomization/WebHost.Customization/WebHost.Customization.csproj", "BuildingBlocks/WebHostCustomization/WebHost.Customization/"]
 COPY ["NuGet.config", "NuGet.config"]
 

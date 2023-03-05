@@ -6,7 +6,7 @@ EXPOSE 80
 
 WORKDIR /src
 COPY ["src/BuildingBlocks/EventBus/EventBus/EventBus.csproj", "src/BuildingBlocks/EventBus/EventBus/"]
-COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
+COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
 COPY ["src/Services/Ordering/Ordering.SignalrHub/Ordering.SignalrHub.csproj", "src/Services/Ordering/Ordering.SignalrHub/"]
 COPY ["src/NuGet.config", "src/NuGet.config"]
 

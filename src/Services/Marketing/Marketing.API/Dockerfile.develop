@@ -7,7 +7,7 @@ EXPOSE 80
 WORKDIR /src
 COPY [Services/Marketing/Marketing.API/Marketing.API.csproj", "Services/Marketing/Marketing.API/"]
 COPY [BuildingBlocks/EventBus/EventBus/EventBus.csproj", "BuildingBlocks/EventBus/EventBus/"]
-COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
+COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
 COPY [BuildingBlocks/WebHostCustomization/WebHost.Customization/WebHost.Customization.csproj", "BuildingBlocks/WebHostCustomization/WebHost.Customization/"]
 RUN dotnet restore Services/Marketing/Marketing.API/Marketing.API.csproj -nowarn:msb3202,nu1503
 COPY . .

@@ -12,7 +12,7 @@ COPY "eShopOnContainers-ServicesAndWebApps.sln" "eShopOnContainers-ServicesAndWe
 COPY "ApiGateways/Mobile.Bff.Shopping/aggregator/Mobile.Shopping.HttpAggregator.csproj" "ApiGateways/Mobile.Bff.Shopping/aggregator/Mobile.Shopping.HttpAggregator.csproj"
 COPY "ApiGateways/Web.Bff.Shopping/aggregator/Web.Shopping.HttpAggregator.csproj" "ApiGateways/Web.Bff.Shopping/aggregator/Web.Shopping.HttpAggregator.csproj"
 COPY "BuildingBlocks/EventBus/EventBus/EventBus.csproj" "BuildingBlocks/EventBus/EventBus/EventBus.csproj"
-COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
+COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
 COPY "BuildingBlocks/WebHostCustomization/WebHost.Customization/WebHost.Customization.csproj" "BuildingBlocks/WebHostCustomization/WebHost.Customization/WebHost.Customization.csproj"
 COPY "Services/Basket/Basket.API/Basket.API.csproj" "Services/Basket/Basket.API/Basket.API.csproj"
 COPY "Services/Basket/Basket.FunctionalTests/Basket.FunctionalTests.csproj" "Services/Basket/Basket.FunctionalTests/Basket.FunctionalTests.csproj"

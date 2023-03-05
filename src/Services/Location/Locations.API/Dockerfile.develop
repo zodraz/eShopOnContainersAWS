@@ -7,7 +7,7 @@ EXPOSE 80
 WORKDIR /src
 COPY ["Services/Location/Locations.API/Locations.API.csproj", "Services/Location/Locations.API/"]
 COPY ["BuildingBlocks/EventBus/EventBus/EventBus.csproj", "BuildingBlocks/EventBus/EventBus/"]
-COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
+COPY "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj" "BuildingBlocks/EventBus/Rebus.Extensions.SharedNothing/Rebus.Extensions.SharedNothing.csproj"
 RUN dotnet restore Services/Location/Locations.API/Locations.API.csproj -nowarn:msb3202,nu1503
 COPY . .
 WORKDIR "/src/Services/Location/Locations.API"
