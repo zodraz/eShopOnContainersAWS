@@ -165,6 +165,17 @@ services:
       - identity-api
       - rabbitmq
 
+  marketing-function:
+    image: ${REGISTRY:-eshop}/marketing.function:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Marketing/Infrastructure/Lambdas/Marketing.Functions/src/Marketing.Functions/Dockerfile
+    depends_on:
+      - sqldata
+      - nosqldata
+      - identity-api
+      - rabbitmq
+
   payment-api:
     image: ${REGISTRY:-eshop}/payment.api:${PLATFORM:-linux}-${TAG:-latest}
     build:
