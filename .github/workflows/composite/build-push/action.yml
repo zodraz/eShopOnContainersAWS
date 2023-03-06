@@ -97,10 +97,10 @@ runs:
     run: sudo -E docker images
     working-directory: ./src
 
-  - name: Docker push ${{ inputs.service }}
-    shell: bash
-    run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
-    working-directory: ./src
+  # - name: Docker push ${{ inputs.service }}
+  #   shell: bash
+  #   run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
+  #   working-directory: ./src
   
   - name: Docker push ${{ inputs.service }}
     shell: bash
