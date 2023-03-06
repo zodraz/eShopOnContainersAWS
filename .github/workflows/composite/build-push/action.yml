@@ -69,7 +69,7 @@ runs:
   - name: Run Trivy vulnerability scanner
     uses: aquasecurity/trivy-action@master
     with:
-       image-ref: '${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}'
+       image-ref: '${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}'
        format: 'table'
        ignore-unfixed: true
        exit-code: '1'
@@ -84,13 +84,13 @@ runs:
       sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
     working-directory: ./src
 
-  - name: Docker tag for ECR on Linux ${{ inputs.service }}
-    shell: bash
-    run: |
-      IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
-      echo "IMAGE_ID: $IMAGE_ID"
-      sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
-    working-directory: ./src
+  # - name: Docker tag for ECR on Linux ${{ inputs.service }}
+  #   shell: bash
+  #   run: |
+  #     IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
+  #     echo "IMAGE_ID: $IMAGE_ID"
+  #     sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
+  #   working-directory: ./src
 
   - name: Docker list images
     shell: bash
