@@ -66,15 +66,15 @@ runs:
     with:
       repository: ${{ inputs.registry_endpoint }}/${{ inputs.service }}
 
-  # - name: Run Trivy vulnerability scanner
-  #   uses: aquasecurity/trivy-action@master
-  #   with:
-  #      image-ref: '${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}'
-  #      format: 'table'
-  #      ignore-unfixed: true
-  #      exit-code: '1'
-  #      vuln-type: 'os,library'
-  #      severity: 'CRITICAL,HIGH'
+  - name: Run Trivy vulnerability scanner
+    uses: aquasecurity/trivy-action@master
+    with:
+       image-ref: '${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}'
+       format: 'table'
+       ignore-unfixed: true
+       exit-code: '1'
+       vuln-type: 'os,library'
+       severity: 'CRITICAL,HIGH'
 
   - name: Docker tag for ECR ${{ inputs.service }}
     shell: bash
