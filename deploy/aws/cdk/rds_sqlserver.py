@@ -74,6 +74,7 @@ class RDSSQLServerStack(Stack):
                 backup_retention=Duration.days(0),
                 removal_policy=RemovalPolicy.DESTROY,
                 cloudwatch_logs_exports=["error"],
+
             )
 
             # Add alarm for high CPU

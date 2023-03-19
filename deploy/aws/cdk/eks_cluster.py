@@ -13,7 +13,7 @@ Have a look there for many options you can change to customise this template for
 from aws_cdk import (aws_ec2 as ec2, aws_eks as eks, aws_iam as iam,
                      aws_opensearchservice as opensearch, aws_logs as logs,
                      aws_certificatemanager as cm, CfnOutput,
-                     RemovalPolicy, Stack, lambda_layer_kubectl)
+                     RemovalPolicy, Stack, aws_route53 as route53)
 from constructs import Construct
 import yaml
 
@@ -484,6 +484,9 @@ class EKSClusterStack(Stack):
             externaldns_service_account = eks_cluster.add_service_account(
                 "external-dns", name="external-dns", namespace="kube-system")
 
+            zone = route53.HostedZone.from_lookup(
+                self, 'HostedZone', domain_name=self.node.try_get_context("dns_domain"))
+
             # Create the PolicyStatements to attach to the role
             # See https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/aws.md#iam-policy
             # NOTE that this will give External DNS access to all Route53 zones
@@ -520,6 +523,8 @@ class EKSClusterStack(Stack):
                 namespace="kube-system",
                 values={
                     "provider": "aws",
+                    "domain-filter":  self.node.try_get_context("dns_domain"),
+                    "txt-owner-id": zone.hosted_zone_id,
                     "aws": {
                         "region": self.region
                     },

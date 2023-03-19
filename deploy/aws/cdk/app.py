@@ -7,9 +7,10 @@ from cloudfront_s3 import CloudFrontS3Stack
 from elasticcache_redis import ElasticCacheRedisStack
 from lambda_function_url import LambdaFunctionUrlStack
 from documentdb import DocumentDbStack
-from waf_alb import WAFALBStack
+# from waf_alb import WAFALBStack
 from amq_rabbitmq import AmazonMQRabbitMQStack
 from secrets_manager import SecretsManagerStack
+from route53 import Route53Stack
 
 app = App()
 if app.node.try_get_context("account").strip() != "":
@@ -26,7 +27,11 @@ else:
 
 environment = Environment(account=account, region=region)
 
-vpc = VpcStack(scope=app, id="VPCStack", env=environment)
+route53 = Route53Stack(app, "Route53Stack", env=environment)
+
+cloudfrontS3 = CloudFrontS3Stack(app, "CloudFrontS3Stack", env=environment)
+
+vpc = VpcStack(app, id="VPCStack", env=environment)
 
 rds_sqlserver = RDSSQLServerStack(
     app, "SQLServerStack", vpc.vpc, env=environment)
@@ -37,8 +42,6 @@ eks_cluster_stack = EKSClusterStack(app,
                                     "EKSClusterStack",
                                     vpc.vpc,
                                     env=environment)
-
-cloudfrontS3 = CloudFrontS3Stack(app, "CloudFrontS3Stack", env=environment)
 
 elastic_cache_redis = ElasticCacheRedisStack(
     app, "ElasticCacheRedisStack", vpc.vpc, env=environment)

@@ -119,6 +119,11 @@
        "Production/EshopWebStatus":  "../../../src/Web/WebStatus/appsettings.Production.json"
     },
     "s3_images_path":  "../../../src/Services/Catalog/Catalog.API/Pics",
-    "documentdb_quantity": 3
+    "documentdb_quantity": 3,
+    "create_new_dns_domain": "True",
+    "dns_domain":"eshoponcontainersaws.com",
+    "create_new_certificate":"False",
+    "use_certificate":"True",
+    "certificate_dns_domain_arn":"arn:aws:acm:us-east-1:791977570179:certificate/79902415-03bb-4e62-a2aa-ac8b20a449a3"
   }
 }

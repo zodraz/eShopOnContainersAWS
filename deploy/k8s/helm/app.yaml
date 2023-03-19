@@ -9,6 +9,8 @@ app:                                                    # app global settings
       catalog: catalog-api                              # ingress entry for catalog api
       ordering: ordering-api                            # ingress entry for ordering api
       identity: identity                                # ingress entry for identity api
+      marketing: marketing                              # ingress entry for marketing api
+      locations: locations                              # ingress entry for locations api
       mvc: webmvc                                       # ingress entry for web mvc
       spa: ""                                           # ingress entry for web spa
       status: webstatus                                 # ingress entry for web status
@@ -26,6 +28,8 @@ app:                                                    # app global settings
       orderingbackgroundtasks: ordering-backgroundtasks # service name for orderingbackgroundtasks
       orderingsignalrhub: ordering-signalrhub           # service name for orderingsignalrhub
       identity: identity-api                            # service name for identity api
+      marketing: marketing-api                          # ingress entry for marketing api
+      locations: locations-api                          # ingress entry for locations api
       mvc: webmvc                                       # service name for web mvc
       spa: webspa                                       # service name for web spa
       status: webstatus                                 # service name for web status

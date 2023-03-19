@@ -3,5 +3,13 @@
     "eu-central-1a",
     "eu-central-1b",
     "eu-central-1c"
-  ]
+  ],
+  "hosted-zone:account=791977570179:domainName=eshoponcontainers.com:region=eu-central-1": {
+    "Id": "/hostedzone/Z07240073NZNE3DTEYGCC",
+    "Name": "eshoponcontainers.com."
+  },
+  "hosted-zone:account=791977570179:domainName=eshoponcontainersaws.com:region=eu-central-1": {
+    "Id": "/hostedzone/Z03646201FUJZFN174YS3",
+    "Name": "eshoponcontainersaws.com."
+  }
 }

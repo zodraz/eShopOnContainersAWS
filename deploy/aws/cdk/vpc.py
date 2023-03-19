@@ -1,4 +1,4 @@
-from aws_cdk import aws_ec2 as ec2, Stack, Tag, CfnOutput
+from aws_cdk import aws_ec2 as ec2, Stack, CfnOutput
 from constructs import Construct
 
 
