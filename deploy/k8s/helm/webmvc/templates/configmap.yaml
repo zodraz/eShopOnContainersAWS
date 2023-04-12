@@ -14,11 +14,21 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  all__InstrumentationKey: "{{ .Values.inf.appinsights.key }}"
-  all__UseAzureServiceBus: "{{ .Values.inf.eventbus.useAzure }}"
   webmvc__keystore: {{ .Values.inf.redis.keystore.constr }}
   internalurls__apigwws: http://{{ .Values.app.svc.webshoppingapigw }}
   internalurls__identity__hc: http://{{ .Values.app.svc.identity }}/hc
   urls__apigwws: {{ $protocol }}://{{ $webshoppingapigw }}
   urls__mvc: {{ $protocol }}://{{ $mvc }}
   urls__IdentityUrl: {{ $protocol }}://{{ $identity }}
+  all__Serilog__SeqServerUrl:  {{ .Values.inf.serilog.seqServerUrl }}
+  all__Serilog__LogstashgUrl:  {{ .Values.inf.serilog.logstashgUrl }}
+  all__Serilog__LokiUrl:  {{ .Values.inf.serilog.lokiUrl }}
+  all__Jaeger__Host: {{ .Values.inf.jaeger.host }}
+  all__Jaeger__Port: {{ .Values.inf.jaeger.port }}
+  all__UseAWS: {{ .Values.inf.useAWS }}
+  all__UseVault: {{ .Values.inf.useVault }}
+  all__OtlpEndpoint: {{ .Values.inf.otlpEndpoint }}
+  all__LocalStack__UseLocalStack: {{ .Values.inf.localstack.useLocalStack }}
+  all__LocalStack__LocalStackUrl: {{ .Values.inf.localstack.localStackUrl }}
+  all__AWS__Profile: {{ .Values.inf.aws.profile }}
+  all__AWS__Region: {{ .Values.inf.aws.region }}

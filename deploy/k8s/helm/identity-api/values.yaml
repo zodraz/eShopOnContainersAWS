@@ -1,5 +1,5 @@
 replicaCount: 1
-clusterName: eshop-aks
+clusterName: eshop-eks
 pathBase: /identity
 
 image:
@@ -34,8 +34,6 @@ env:
       key: identity__ConnectionString
     - name: DPConnectionString
       key: identity__keystore
-    - name: ApplicationInsights__InstrumentationKey
-      key: all__InstrumentationKey
     - name: MvcClient
       key: mvc_e
     - name: SpaClient
@@ -54,16 +52,45 @@ env:
       key: webhooksapi_e
     - name: WebhooksWebClient
       key: webhooksweb_e
-    - name: EnableDevspaces
-      key: enableDevspaces
+    - name: Serilog__SeqServerUrl
+      key: all__Serilog__SeqServerUrl
+    - name: Serilog__LogstashgUrl
+      key:  all__Serilog__LogstashgUrl
+    - name: Serilog__LokiUrl
+      key:  all__Serilog__LokiUrl
+    - name: Jaeger__Host
+      key: all__Jaeger__Host
+    - name: Jaeger__Port
+      key: all__Jaeger__Port
+    - name: UseAWS
+      key: all__UseAWS
+    - name: UseVault
+      key: all__UseVault
+    - name: OtlpEndpoint
+      key: all__OtlpEndpoint
+    - name: LocalStack__UseLocalStack
+      key: all__LocalStack__UseLocalStack
+    - name: LocalStack__LocalStackUrl
+      key: all__LocalStack__LocalStackUrl
+    - name: AWS__Profile
+      key: all__AWS__Profile
+    - name: AWS__Region
+      key: all__AWS__Region
   values:
+    - name: TokenLifetimeMinutes
+      value: 120
+    - name: PermanentTokenLifetimeDays
+      value: 365
+    - name: UseCustomizationData
+      value: false
     - name: ASPNETCORE_ENVIRONMENT
       value: Development
     - name: OrchestratorType
       value: 'K8S'
     - name: IsClusterEnv
       value: 'True'
-
+    - name:  Vault__SecretGroups
+      value: EshopIdentityApi
 probes:
   liveness:
     path: /liveness

@@ -1,5 +1,5 @@
 replicaCount: 1
-clusterName: eshop-aks
+clusterName: eshop-eks
 pathBase: /ordering-signalrhub
 
 image:
@@ -36,22 +36,72 @@ env:
   urls:
   # configmap declares variables which value is taken from the config map defined in template configmap.yaml (name is name of var and key the key in configmap).
   configmap:
-    - name: ApplicationInsights__InstrumentationKey
-      key: all__InstrumentationKey
-    - name: EventBusConnection
-      key: all__EventBusConnection
-    - name: AzureServiceBusEnabled
-      key: all__UseAzureServiceBus
     - name: IdentityUrl
       key: urls__IdentityUrl
     - name: SignalrStoreConnectionString
       key: signalr__StoreConnectionString
+    - name: Serilog__SeqServerUrl
+      key: all__Serilog__SeqServerUrl
+    - name: Serilog__LogstashgUrl
+      key:  all__Serilog__LogstashgUrl
+    - name: Serilog__LokiUrl
+      key:  all__Serilog__LokiUrl
+    - name: Jaeger__Host
+      key: all__Jaeger__Host
+    - name: Jaeger__Port
+      key: all__Jaeger__Port
+    - name: EventBus__Host
+      key: all__EventBus__Host
+    - name: EventBus__UserName
+      key: all__EventBus__UserName
+    - name: EventBus__Password
+      key: all__EventBus__Password
+    - name: EventBus__IsSecure
+      key: all__EventBus__IsSecure
+    - name: EventBus__PersistenceEnabled
+      key: all__EventBus__PersistenceEnabled
+    - name: EventBus__OutboxEnabled
+      key: all__EventBus__OutboxEnabled
+    - name: EventBus__RabbitMQEnabled
+      key: all__EventBus__RabbitMQEnabled
+    - name: EventBus__RetryCount
+      key: all__EventBus__RetryCount
+    - name: EventBus__AuditEnabled
+      key: all__EventBus__AuditEnabled
+    - name: EventBus__FleetManager__Enabled
+      key: all__EventBus__FleetManager__Enabled
+    - name: EventBus__FleetManager__Url
+      key: all__EventBus__FleetManager__Url
+    - name: EventBus__FleetManager__ApiKey
+      key: all__EventBus__FleetManager__ApiKey
+    - name: UseAWS
+      key: all__UseAWS
+    - name: UseVault
+      key: all__UseVault
+    - name: OtlpEndpoint
+      key: all__OtlpEndpoint
+    - name: LocalStack__UseLocalStack
+      key: all__LocalStack__UseLocalStack
+    - name: LocalStack__LocalStackUrl
+      key: all__LocalStack__LocalStackUrl
+    - name: AWS__Profile
+      key: all__AWS__Profile
+    - name: AWS__Region
+      key: all__AWS__Region
       # values define environment variables with a fixed value (no configmap involved) (name is name of var, and value is its value)
   values:
+    - name: EventBus__EndpointName
+      value: OrderingSignalR
+    - name: UseCustomizationData
+      value: false
     - name: ASPNETCORE_ENVIRONMENT
       value: Development
     - name: OrchestratorType
       value: 'K8S'
-    - name: IsClusterEnv
-      values: 'True'
+    - name: PORT
+      value: "80"
+    - name: GRPC_PORT
+      value: "81"
+    - name:  Vault__SecretGroups
+      value: EshopSignalR
 

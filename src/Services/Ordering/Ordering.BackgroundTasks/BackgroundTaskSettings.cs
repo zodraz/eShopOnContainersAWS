@@ -7,7 +7,5 @@
         public int GracePeriodTime { get; set; }
 
         public int CheckUpdateTime { get; set; }
-
-        public string SubscriptionClientName { get; set; }
     }
 }

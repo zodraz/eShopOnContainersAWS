@@ -1,5 +1,5 @@
 replicaCount: 1
-clusterName: eshop-aks
+clusterName: eshop-eks
 pathBase: /
 
 image:
@@ -30,10 +30,10 @@ env:
   urls:
   # configmap declares variables which value is taken from the config map defined in template configmap.yaml (name is name of var and key the key in configmap).
   configmap:
-    - name: ApplicationInsights__InstrumentationKey
-      key: all__InstrumentationKey
     - name: DPConnectionString
       key: webspa__keystore
+    - name: MarketingUrl
+      key: internalurls__apigwws
     - name: PurchaseUrl
       key: urls__apigwws
     - name: CallBackUrl
@@ -44,8 +44,36 @@ env:
       key: internalurls__identity__hc      
     - name: SignalrHubUrl
       key: urls__apigwws
+    - name: Serilog__SeqServerUrl
+      key: all__Serilog__SeqServerUrl
+    - name: Serilog__LogstashgUrl
+      key:  all__Serilog__LogstashgUrl
+    - name: Serilog__LokiUrl
+      key:  all__Serilog__LokiUrl
+    - name: Jaeger__Host
+      key: all__Jaeger__Host
+    - name: Jaeger__Port
+      key: all__Jaeger__Port
+    - name: UseAWS
+      key: all__UseAWS
+    - name: UseVault
+      key: all__UseVault
+    - name: OtlpEndpoint
+      key: all__OtlpEndpoint
+    - name: LocalStack__UseLocalStack
+      key: all__LocalStack__UseLocalStack
+    - name: LocalStack__LocalStackUrl
+      key: all__LocalStack__LocalStackUrl
+    - name: AWS__Profile
+      key: all__AWS__Profile
+    - name: AWS__Region
+      key: all__AWS__Region
       # values define environment variables with a fixed value (no configmap involved) (name is name of var, and value is its value)
   values:
+    - name: ActivateCampaignDetailFunction
+      value: false
+    - name: UseCustomizationData
+      value: false
     - name: ASPNETCORE_ENVIRONMENT
       value: Development
     - name: ASPNETCORE_URLS

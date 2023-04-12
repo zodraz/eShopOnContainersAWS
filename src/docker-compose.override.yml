@@ -183,8 +183,6 @@ services:
       - Jaeger__Host=${ESHOP_JAEGER_HOST}
       - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseCustomizationData=True
-      - CheckUpdateTime=30000
-      - GracePeriodTime=1
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopOrderingApi}
