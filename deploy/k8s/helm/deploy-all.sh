@@ -179,33 +179,33 @@ if [[ $use_local_k8s ]]; then
   dns="localhost"
 fi
 
-if [[ $dns == "aks" ]]; then
-  echo "#################### Begin AKS discovery based on the --dns aks setting. ####################"
-  if [[ -z $aks_name ]] || [[ -z $aks_rg ]]; then
-    echo "Error: When using -dns aks, MUST set -aksName and -aksRg too."
-    echo ''
-    usage
-    exit 1
-  fi
+# if [[ $dns == "aks" ]]; then
+#   echo "#################### Begin AKS discovery based on the --dns aks setting. ####################"
+#   if [[ -z $aks_name ]] || [[ -z $aks_rg ]]; then
+#     echo "Error: When using -dns aks, MUST set -aksName and -aksRg too."
+#     echo ''
+#     usage
+#     exit 1
+#   fi
 
-  echo "Getting AKS cluster $aks_name  AKS (in resource group $aks_rg)"
-  # JMESPath queries are case sensitive and httpapplicationrouting can be lowercase sometimes
-  jmespath_dnsqueries=(\
-    addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName \
-    addonProfiles.httpapplicationrouting.config.HTTPApplicationRoutingZoneName \
-  )
-  for q in "${jmespath_dnsqueries[@]}"
-  do
-    dns="$(az aks show -n $aks_name -g $aks_rg --query $q -o tsv)"
-    if [[ -n $dns ]]; then break; fi
-  done
-  if [[ -z $dns ]]; then
-    echo "Error: when getting DNS of AKS $aks_name (in resource group $aks_rg). Please ensure AKS has httpRouting enabled AND Azure CLI is logged in and is of version 2.0.37 or higher."
-    exit 1
-  fi
-  echo "DNS base found is $dns. Will use $aks_name.$dns for the app!"
-  dns="$aks_name.$dns"
-fi
+#   echo "Getting AKS cluster $aks_name  AKS (in resource group $aks_rg)"
+#   # JMESPath queries are case sensitive and httpapplicationrouting can be lowercase sometimes
+#   jmespath_dnsqueries=(\
+#     addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName \
+#     addonProfiles.httpapplicationrouting.config.HTTPApplicationRoutingZoneName \
+#   )
+#   for q in "${jmespath_dnsqueries[@]}"
+#   do
+#     dns="$(az aks show -n $aks_name -g $aks_rg --query $q -o tsv)"
+#     if [[ -n $dns ]]; then break; fi
+#   done
+#   if [[ -z $dns ]]; then
+#     echo "Error: when getting DNS of AKS $aks_name (in resource group $aks_rg). Please ensure AKS has httpRouting enabled AND Azure CLI is logged in and is of version 2.0.37 or higher."
+#     exit 1
+#   fi
+#   echo "DNS base found is $dns. Will use $aks_name.$dns for the app!"
+#   dns="$aks_name.$dns"
+# fi
 
 # Initialization & check commands
 if [[ -z $dns ]]; then
@@ -225,8 +225,7 @@ fi
 
 echo "#################### Begin $app_name installation using Helm ####################"
 infras=(sql-data nosql-data rabbitmq keystore-data basket-data)
-charts=(eshop-common basket-api catalog-api identity-api mobileshoppingagg ordering-api ordering-backgroundtasks ordering-signalrhub payment-api webmvc webshoppingagg webspa webstatus webhooks-api webhooks-web)
-gateways=(apigwms apigwws)
+charts=(eshop-common apigwmm apigwms apigwwm apigwws basket-api catalog-api identity-api locations-api marketing-api mobileshoppingagg ordering-api ordering-backgroundtasks ordering-signalrhub payment-api webmvc webshoppingagg webspa webstatus webhooks-api webhooks-web)
 
 if [[ !$skip_infrastructure ]]; then
   for infra in "${infras[@]}"

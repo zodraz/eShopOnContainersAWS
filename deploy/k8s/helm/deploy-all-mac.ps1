@@ -65,21 +65,21 @@ if ($useLocalk8s -eq $true) {
     $dns="localhost"
 }
 
-if ($externalDns -eq "aks") {
-    if  ([string]::IsNullOrEmpty($aksName) -or [string]::IsNullOrEmpty($aksRg)) {
-        Write-Host "Error: When using -dns aks, MUST set -aksName and -aksRg too." -ForegroundColor Red
-        exit 1
-    }
-    Write-Host "Getting DNS of AKS of AKS $aksName (in resource group $aksRg)..." -ForegroundColor Green
-    $dns = $(az aks show -n $aksName  -g $aksRg --query addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName)
-    if ([string]::IsNullOrEmpty($dns)) {
-        Write-Host "Error getting DNS of AKS $aksName (in resource group $aksRg). Please ensure AKS has httpRouting enabled AND Azure CLI is logged & in version 2.0.37 or higher" -ForegroundColor Red
-        exit 1
-    }
-    $dns = $dns -replace '[\"]'
-    Write-Host "DNS base found is $dns. Will use $appName.$dns for the app!" -ForegroundColor Green
-    $dns = "$appName.$dns"
-}
+# if ($externalDns -eq "aks") {
+#     if  ([string]::IsNullOrEmpty($aksName) -or [string]::IsNullOrEmpty($aksRg)) {
+#         Write-Host "Error: When using -dns aks, MUST set -aksName and -aksRg too." -ForegroundColor Red
+#         exit 1
+#     }
+#     Write-Host "Getting DNS of AKS of AKS $aksName (in resource group $aksRg)..." -ForegroundColor Green
+#     $dns = $(az aks show -n $aksName  -g $aksRg --query addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName)
+#     if ([string]::IsNullOrEmpty($dns)) {
+#         Write-Host "Error getting DNS of AKS $aksName (in resource group $aksRg). Please ensure AKS has httpRouting enabled AND Azure CLI is logged & in version 2.0.37 or higher" -ForegroundColor Red
+#         exit 1
+#     }
+#     $dns = $dns -replace '[\"]'
+#     Write-Host "DNS base found is $dns. Will use $appName.$dns for the app!" -ForegroundColor Green
+#     $dns = "$appName.$dns"
+# }
 
 # Initialization & check commands
 if ([string]::IsNullOrEmpty($dns)) {
@@ -120,8 +120,8 @@ if (-not [string]::IsNullOrEmpty($registry)) {
 Write-Host "Begin eShopOnContainers installation using Helm" -ForegroundColor Green
 
 $infras = ("sql-data", "nosql-data", "rabbitmq", "keystore-data", "basket-data")
-$charts = ("eshop-common", "basket-api","catalog-api", "identity-api", "mobileshoppingagg","ordering-api","ordering-backgroundtasks","ordering-signalrhub", "payment-api", "webmvc", "webshoppingagg", "webspa", "webstatus", "webhooks-api", "webhooks-web")
-$gateways = ("apigwms", "apigwws")
+$charts = ("eshop-common", "basket-api","catalog-api", "identity-api", "locations-api", "marketing-api", "mobileshoppingagg","ordering-api","ordering-backgroundtasks","ordering-signalrhub", "payment-api", "webmvc", "webshoppingagg", "webspa", "webstatus", "webhooks-api", "webhooks-web")
+$gateways = ("apigwmm", "apigwms", "apigwwm", "apigwws")
 
 if ($deployInfrastructure) {
     foreach ($infra in $infras) {

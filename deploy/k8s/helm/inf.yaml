@@ -17,6 +17,8 @@ inf:
       db: CatalogDb         # Catalog API SQL db name
     ordering:               # inf.sql.ordering: settings for the ordering-api sql (user, pwd, db)
       db: OrderingDb        # Ordering API SQL db name
+    marketing:
+      db: MarketingDb       # Marketing API SQL db name
     identity:
       db: IdentityDb        # Ordering API SQL db name
     webhooks:
@@ -25,6 +27,10 @@ inf:
       db: SignalRHubDb      # SignalR db name
   mongo:
     host: #my-nosql-data    # Uncomment to use specify custom mongo host. By default nosql-data is used
+    locations:
+      database: LocationsDb
+    marketing:
+      database: MarketingDb
   redis:                    # inf.redis defines the redis' connection strings
     basket:     
       svc: basket-data      # Name of k8s svc for basket redis     
