@@ -28,30 +28,30 @@ class Route53Stack(Stack):
             description="Hosted Zone Id"
         )
 
-        CfnOutput(
-            self,
-            id="NameServer0",
-            value=Fn.select(0, zone.hosted_zone_name_servers),
-            description="NameServer 0"
-        )
+        # CfnOutput(
+        #     self,
+        #     id="NameServer0",
+        #     value=Fn.select(0, zone.hosted_zone_name_servers),
+        #     description="NameServer 0"
+        # )
 
-        CfnOutput(
-            self,
-            id="NameServe1",
-            value=Fn.select(1, zone.hosted_zone_name_servers),
-            description="NameServer 1"
-        )
+        # CfnOutput(
+        #     self,
+        #     id="NameServe1",
+        #     value=Fn.select(1, zone.hosted_zone_name_servers),
+        #     description="NameServer 1"
+        # )
 
-        CfnOutput(
-            self,
-            id="NameServer2",
-            value=Fn.select(2, zone.hosted_zone_name_servers),
-            description="NameServer 2"
-        )
+        # CfnOutput(
+        #     self,
+        #     id="NameServer2",
+        #     value=Fn.select(2, zone.hosted_zone_name_servers),
+        #     description="NameServer 2"
+        # )
 
-        CfnOutput(
-            self,
-            id="NameServer3",
-            value=Fn.select(3, zone.hosted_zone_name_servers),
-            description="NameServer 3"
-        )
+        # CfnOutput(
+        #     self,
+        #     id="NameServer3",
+        #     value=Fn.select(3, zone.hosted_zone_name_servers),
+        #     description="NameServer 3"
+        # )
