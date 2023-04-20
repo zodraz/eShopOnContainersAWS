@@ -6,7 +6,7 @@ inputs:
     description: "Service to build"
     required: true
   registry_endpoint:
-    description: "Image registry repo e.g. myacr.azureacr.io/eshop"
+    description: "Image registry repo e.g. aws_account_id.dkr.ecr.region.amazonaws.com/eshop"
     required: true
   dotnet_version:
     description: "Version of dotnet to use for testing"
