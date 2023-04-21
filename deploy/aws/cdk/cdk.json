@@ -94,7 +94,7 @@
     "vpc_cidr_mask_sqlserver":"10.0.1.0/24",  
     "ecr_repo_name": "791977570179.dkr.ecr.eu-central-1.amazonaws.com/marketing-function",
     "ecr_image_tag": "linux-master",
-    "deploy_documentdb": "False",
+    "deploy_documentdb": "True",
     "deploy_dynamodb": "True",  
     "deploy_rds_sqlserver_as_cluster": "False",
     "rds_sqlserver_node_quantity": 3,
