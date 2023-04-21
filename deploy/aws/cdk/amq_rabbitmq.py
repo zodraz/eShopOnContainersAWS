@@ -53,13 +53,13 @@ class AmazonMQRabbitMQStack(Stack):
                                                         password=mq_password)
 
             if self.node.try_get_context("vpc_only_public") == "False":
-                subnet_ids = vpc.select_subnets(
-                    subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS).subnet_ids
+                vpc_subnet_id = [vpc.private_subnets[0].subnet_id]
             else:
-                subnet_ids = vpc.select_subnets(
-                    subnet_type=ec2.SubnetType.PUBLIC).subnet_ids
+                vpc_subnet_id = [vpc.public_subnets[0].subnet_id]
 
-            if (self.node.try_get_context("deploy_rabbitmq") == "True"):
+            print(vpc_subnet_id)
+
+            if (self.node.try_get_context("deploy_rabbitmq_as_cluster") == "True"):
 
                 mq_instance = amazonmq.CfnBroker(self, 'mq_instance',
                                                  auto_minor_version_upgrade=False,
@@ -70,7 +70,7 @@ class AmazonMQRabbitMQStack(Stack):
                                                  host_instance_type='mq.m5.large',
                                                  publicly_accessible=False,
                                                  users=[mq_master],
-                                                 subnet_ids=subnet_ids,
+                                                 subnet_ids=vpc_subnet_id,
                                                  security_groups=[
                                                      mq_group.security_group_id],
                                                  logs=amazonmq.CfnBroker.LogListProperty(
@@ -84,10 +84,10 @@ class AmazonMQRabbitMQStack(Stack):
                                                  deployment_mode='SINGLE_INSTANCE',
                                                  engine_type='RABBITMQ',
                                                  engine_version='3.10.10',
-                                                 host_instance_type='mq.m3.small',
+                                                 host_instance_type='mq.t3.micro',
                                                  publicly_accessible=False,
                                                  users=[mq_master],
-                                                 subnet_ids=subnet_ids,
+                                                 subnet_ids=vpc_subnet_id,
                                                  security_groups=[
                                                      mq_group.security_group_id],
                                                  logs=amazonmq.CfnBroker.LogListProperty(
