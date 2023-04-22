@@ -36,11 +36,13 @@ class AmazonMQRabbitMQStack(Stack):
                                       connection=ec2.Port.all_tcp(),
                                       description='allow communication from nlb and other brokers')
 
-            if self.node.try_get_context("vpc_only_public") == "True":
-                mq_group.add_ingress_rule(peer=ec2.Peer.any_ipv4(),
-                                          connection=ec2.Port.tcp(443),
-                                          description='allow communication on RabbitMQ console port on https from public internet')
+            rabbit_public_access = False
 
+            mq_security_groups = [mq_group.security_group_id]
+
+            if self.node.try_get_context("vpc_only_public") == "True":
+                rabbit_public_access = True
+                mq_security_groups = None
             # allow SSH to bastion from anywhere (for debugging)
             # bastion_to_mq_group.add_ingress_rule(connection=ec2.Port.all_tcp())
 
@@ -74,11 +76,10 @@ class AmazonMQRabbitMQStack(Stack):
                                                      engine_type='RABBITMQ',
                                                      engine_version='3.10.10',
                                                      host_instance_type='mq.m5.large',
-                                                     publicly_accessible=False,
+                                                     publicly_accessible=rabbit_public_access,
                                                      users=[mq_master],
                                                      subnet_ids=vpc_subnets,
-                                                     security_groups=[
-                                                         mq_group.security_group_id],
+                                                     security_groups=mq_security_groups,
                                                      logs=amazonmq.CfnBroker.LogListProperty(
                                                          general=True
                                                      ))
@@ -97,11 +98,10 @@ class AmazonMQRabbitMQStack(Stack):
                                                      engine_type='RABBITMQ',
                                                      engine_version='3.10.10',
                                                      host_instance_type='mq.t3.micro',
-                                                     publicly_accessible=False,
+                                                     publicly_accessible=rabbit_public_access,
                                                      users=[mq_master],
                                                      subnet_ids=vpc_subnets,
-                                                     security_groups=[
-                                                         mq_group.security_group_id],
+                                                     security_groups=mq_security_groups,
                                                      logs=amazonmq.CfnBroker.LogListProperty(
                                                          general=True
                                                      ))

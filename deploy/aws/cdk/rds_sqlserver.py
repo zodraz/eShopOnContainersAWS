@@ -41,6 +41,8 @@ class RDSSQLServerStack(Stack):
                     "vpc_cidr_mask_sqlserver")),
                 description="SQL Server",
                 connection=ec2.Port.tcp(1433))
+
+            db_public_access = False
         else:
             vpc_subnet = ec2.SubnetSelection(
                 subnet_type=ec2.SubnetType.PUBLIC)
@@ -49,6 +51,8 @@ class RDSSQLServerStack(Stack):
                 peer=ec2.Peer.any_ipv4(),
                 description="SQL Server",
                 connection=ec2.Port.tcp(1433))
+
+            db_public_access = True
 
         db_subnet_group = rds.SubnetGroup(self, "DBSubnet",
                                           vpc=vpc,
@@ -73,6 +77,7 @@ class RDSSQLServerStack(Stack):
                 security_groups=[db_security_group],
                 subnet_group=db_subnet_group,
                 multi_az=False,
+                publicly_accessible=db_public_access,
                 vpc_subnets=vpc_subnet,
                 deletion_protection=False,
                 delete_automated_backups=True,
@@ -105,6 +110,7 @@ class RDSSQLServerStack(Stack):
                     version=rds.SqlServerEngineVersion.VER_15),
                 vpc=vpc,
                 multi_az=True,
+                publicly_accessible=db_public_access,
                 credentials=rds.Credentials.from_password(
                     db_user, db_password.secret_value),
                 instance_type=ec2.InstanceType.of(ec2.InstanceClass.M5,
@@ -130,7 +136,7 @@ class RDSSQLServerStack(Stack):
                 "RDSReadReplica1",
                 source_database_instance=rds_db,
                 vpc=vpc,
-                multi_az=True,
+                publicly_accessible=db_public_access,
                 instance_type=ec2.InstanceType.of(ec2.InstanceClass.M5,
                                                   ec2.InstanceSize.XLARGE),
                 security_groups=[db_security_group],
@@ -146,7 +152,7 @@ class RDSSQLServerStack(Stack):
                 "RDSReadReplica2",
                 source_database_instance=rds_db,
                 vpc=vpc,
-                multi_az=True,
+                publicly_accessible=db_public_access,
                 instance_type=ec2.InstanceType.of(ec2.InstanceClass.M5,
                                                   ec2.InstanceSize.XLARGE),
                 security_groups=[db_security_group],
