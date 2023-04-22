@@ -44,10 +44,8 @@ class ElasticCacheRedisStack(Stack):
                 id="EshopRedis",
                 engine="redis",
                 cache_node_type="cache.t2.small",
-                num_cache_nodes=self.node.try_get_context(
-                    "redis_node_quantity"),
+                num_cache_nodes=1,
                 cluster_name="eshop-aws-redis",
-                transit_encryption_enabled=True,
                 vpc_security_group_ids=[security_group.security_group_id],
                 cache_subnet_group_name=cache_subnet_group.ref)
 

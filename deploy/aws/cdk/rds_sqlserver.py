@@ -31,19 +31,24 @@ class RDSSQLServerStack(Stack):
                                               vpc=vpc,
                                               allow_all_outbound=True)
 
-        db_security_group.add_ingress_rule(
-            peer=ec2.Peer.ipv4(self.node.try_get_context(
-                "vpc_cidr_mask_sqlserver")),
-            description="SQL Server",
-            connection=ec2.Port.tcp(1433))
-
         # DB Subnet Group
         if self.node.try_get_context("vpc_only_public") == "False":
             vpc_subnet = ec2.SubnetSelection(
                 subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)
+
+            db_security_group.add_ingress_rule(
+                peer=ec2.Peer.ipv4(self.node.try_get_context(
+                    "vpc_cidr_mask_sqlserver")),
+                description="SQL Server",
+                connection=ec2.Port.tcp(1433))
         else:
             vpc_subnet = ec2.SubnetSelection(
                 subnet_type=ec2.SubnetType.PUBLIC)
+
+            db_security_group.add_ingress_rule(
+                peer=ec2.Peer.any_ipv4(),
+                description="SQL Server",
+                connection=ec2.Port.tcp(1433))
 
         db_subnet_group = rds.SubnetGroup(self, "DBSubnet",
                                           vpc=vpc,
@@ -73,8 +78,7 @@ class RDSSQLServerStack(Stack):
                 delete_automated_backups=True,
                 backup_retention=Duration.days(0),
                 removal_policy=RemovalPolicy.DESTROY,
-                cloudwatch_logs_exports=["error"],
-
+                cloudwatch_logs_exports=["error"]
             )
 
             # Add alarm for high CPU
@@ -94,26 +98,61 @@ class RDSSQLServerStack(Stack):
 
         else:
 
-            instance_props = rds.InstanceProps(
-                vpc=vpc,
-                security_groups=[db_security_group],
-                vpc_subnets=vpc_subnet)
-
-            rds_cluster = rds.DatabaseCluster(
+            rds_db = rds.DatabaseInstance(
                 self,
-                "RDSCluster",
-                cluster_identifier="eshop-db-sqlserver-cluster",
-                instance_props=instance_props,
+                "RDSQLServer",
                 engine=rds.DatabaseInstanceEngine.sql_server_ee(
                     version=rds.SqlServerEngineVersion.VER_15),
+                vpc=vpc,
+                multi_az=True,
                 credentials=rds.Credentials.from_password(
                     db_user, db_password.secret_value),
-                instances=self.node.try_get_context(
-                    "rds_sqlserver_node_quantity"),
+                instance_type=ec2.InstanceType.of(ec2.InstanceClass.M5,
+                                                  ec2.InstanceSize.XLARGE),
+                license_model=rds.LicenseModel.LICENSE_INCLUDED,
+                security_groups=[db_security_group],
                 subnet_group=db_subnet_group,
+                vpc_subnets=vpc_subnet,
+                deletion_protection=False,
                 removal_policy=RemovalPolicy.DESTROY,
-                deletion_protection=False)
+                cloudwatch_logs_exports=["error"]
+            )
 
-            CfnOutput(self,
-                      "RDS Cluster Endpoint",
-                      value=rds_cluster.cluster_endpoint.hostname)
+            # Add alarm for high CPU
+            cloudwatch.Alarm(self,
+                             id="HighCPU",
+                             metric=rds_db.metric_cpu_utilization(),
+                             threshold=90,
+                             evaluation_periods=1)
+
+            replica_db1 = rds.DatabaseInstanceReadReplica(
+                self,
+                "RDSReadReplica1",
+                source_database_instance=rds_db,
+                vpc=vpc,
+                multi_az=True,
+                instance_type=ec2.InstanceType.of(ec2.InstanceClass.M5,
+                                                  ec2.InstanceSize.XLARGE),
+                security_groups=[db_security_group],
+                subnet_group=db_subnet_group,
+                vpc_subnets=vpc_subnet,
+                deletion_protection=False,
+                removal_policy=RemovalPolicy.DESTROY,
+                cloudwatch_logs_exports=["error"]
+            )
+
+            replica_db2 = rds.DatabaseInstanceReadReplica(
+                self,
+                "RDSReadReplica2",
+                source_database_instance=rds_db,
+                vpc=vpc,
+                multi_az=True,
+                instance_type=ec2.InstanceType.of(ec2.InstanceClass.M5,
+                                                  ec2.InstanceSize.XLARGE),
+                security_groups=[db_security_group],
+                subnet_group=db_subnet_group,
+                vpc_subnets=vpc_subnet,
+                deletion_protection=False,
+                removal_policy=RemovalPolicy.DESTROY,
+                cloudwatch_logs_exports=["error"]
+            )
