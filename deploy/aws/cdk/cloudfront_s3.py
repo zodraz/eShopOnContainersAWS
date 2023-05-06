@@ -146,13 +146,39 @@ class CloudFrontS3Stack(Stack):
         #     ],
         # )
 
+        logs_bucket = s3.Bucket(
+            scope=self,
+            id='LogsBucket',
+            access_control=s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
+            auto_delete_objects=True,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+            object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
+            public_read_access=False,
+            removal_policy=RemovalPolicy.DESTROY,
+            versioned=True
+        )
+
+        cloudfront_logs_bucket = s3.Bucket(
+            scope=self,
+            id='CloudFrontLogsBucket',
+            access_control=s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
+            auto_delete_objects=True,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+            object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
+            public_read_access=False,
+            removal_policy=RemovalPolicy.DESTROY,
+            versioned=True
+        )
+
         s3_bucket = s3.Bucket(
             self,
             "DeploymentBucket",
             encryption=s3.BucketEncryption.S3_MANAGED,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
             removal_policy=RemovalPolicy.DESTROY,
-            server_access_logs_bucket=s3.Bucket(self, "LogsBucket"),
+            server_access_logs_bucket=logs_bucket
         )
 
         oai = cloudfront.OriginAccessIdentity(
@@ -184,6 +210,7 @@ class CloudFrontS3Stack(Stack):
             self,
             "CloudFrontDistribution",
             # web_acl_id=waf.attr_arn,
+            log_bucket=cloudfront_logs_bucket,
             certificate=certificate,
             enable_logging=True,
             default_behavior=cloudfront.BehaviorOptions(

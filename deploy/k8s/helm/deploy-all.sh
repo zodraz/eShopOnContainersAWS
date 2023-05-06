@@ -8,10 +8,6 @@ usage()
   cat <<END
 deploy.sh: deploys the $app_name application to a Kubernetes cluster using Helm.
 Parameters:
-  --aks-name <AKS cluster name>
-    The name of the AKS cluster. Required when the registry (using the -r parameter) is set to "aks".
-  --aks-rg <AKS resource group>
-    The resource group for the AKS cluster. Required when the registry (using the -r parameter) is set to "aks".
   -b | --build-solution
     Force a solution build before deployment (default: false).
   -d | --dns <dns or ip address> | --dns aks
@@ -62,14 +58,12 @@ END
 }
 
 app_name='eshop'
-aks_name=''
-aks_rg=''
 build_images=''
 clean='yes'
 build_solution=''
 container_registry=''
-docker_password=''
-docker_username=''
+docker_password=$(aws ecr get-login-password --region region) #REVIEW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+docker_username='AWS'
 dns=''
 image_tag='latest'
 push_images=''
@@ -82,10 +76,6 @@ imagePullPolicy='Always'
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --aks-name )
-      aks_name="$2"; shift 2;;
-    --aks-rg )
-      aks_rg="$2"; shift 2;;
     -b | --build-solution )
       build_solution='yes'; shift ;;
     -d | --dns )
@@ -178,34 +168,6 @@ if [[ $use_local_k8s ]]; then
   ingress_values_file="ingress_values_dockerk8s.yaml"
   dns="localhost"
 fi
-
-# if [[ $dns == "aks" ]]; then
-#   echo "#################### Begin AKS discovery based on the --dns aks setting. ####################"
-#   if [[ -z $aks_name ]] || [[ -z $aks_rg ]]; then
-#     echo "Error: When using -dns aks, MUST set -aksName and -aksRg too."
-#     echo ''
-#     usage
-#     exit 1
-#   fi
-
-#   echo "Getting AKS cluster $aks_name  AKS (in resource group $aks_rg)"
-#   # JMESPath queries are case sensitive and httpapplicationrouting can be lowercase sometimes
-#   jmespath_dnsqueries=(\
-#     addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName \
-#     addonProfiles.httpapplicationrouting.config.HTTPApplicationRoutingZoneName \
-#   )
-#   for q in "${jmespath_dnsqueries[@]}"
-#   do
-#     dns="$(az aks show -n $aks_name -g $aks_rg --query $q -o tsv)"
-#     if [[ -n $dns ]]; then break; fi
-#   done
-#   if [[ -z $dns ]]; then
-#     echo "Error: when getting DNS of AKS $aks_name (in resource group $aks_rg). Please ensure AKS has httpRouting enabled AND Azure CLI is logged in and is of version 2.0.37 or higher."
-#     exit 1
-#   fi
-#   echo "DNS base found is $dns. Will use $aks_name.$dns for the app!"
-#   dns="$aks_name.$dns"
-# fi
 
 # Initialization & check commands
 if [[ -z $dns ]]; then

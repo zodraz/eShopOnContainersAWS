@@ -2,7 +2,7 @@
 {{- $ingressPath := include "pathBase" . -}}
 {{- $serviceName := .Values.app.svc.webmarketingapigw -}}
 
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "apigwwm.fullname" . }}

@@ -23,7 +23,6 @@ data:
   all__EventBus__IsSecure: {{ .Values.inf.eventbus.isSecure }}
   all__EventBus__PersistenceEnabled: {{ .Values.inf.eventbus.persistenceEnabled }}
   all__EventBus__OutboxEnabled: {{ .Values.inf.eventbus.outboxEnabled }}
-  all__EventBus__EndpointName: {{ .Values.inf.eventbus.endpointName }}
   all__EventBus__RabbitMQEnabled: {{ .Values.inf.eventbus.rabbitmqEnabled }}
   all__EventBus__RetryCount: {{ .Values.inf.eventbus.retryCount }}
   all__EventBus__AuditEnabled: {{ .Values.inf.eventbus.auditEnabled }}

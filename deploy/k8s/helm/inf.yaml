@@ -55,8 +55,8 @@ inf:
     svc: rabbitmq             # Name of k8s svc for rabbitmq
   serilog:
     seqServerUrl": "http://localhost:5341"
-    logstashgUrl": ""
-    lokiUrl": ""
+    logstashgUrl": "http://localhost"
+    lokiUrl": "http://localhost"
   jaeger:
     host: "localhost"
     port: 6831
@@ -69,7 +69,7 @@ inf:
     region: eu-central-1
   localstack:
     useLocalStack: false
-    localStackUrl: ""
+    localStackUrl: "http://localhost:4566"
   otlpEndpoint: http://localhost:4317
   k8s:                      # inf.k8s defines Kubernetes cluster global config
     dns:  "eshoponcontainersaws.com" # k8s external  DNS. This value or ip value MUST BE PROVIDED

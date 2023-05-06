@@ -1,5 +1,6 @@
 {{- $name := include "ordering-signalrhub.fullname" . -}}
 {{- $identity := include "url-of" (list .Values.app.ingress.entries.identity .) -}}
+{{- $sqlsrv := include "sql-name" . -}}
 
 apiVersion: v1
 kind: ConfigMap

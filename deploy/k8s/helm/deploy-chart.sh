@@ -8,8 +8,6 @@ usage()
   cat <<END
 deploy.sh: deploys the $app_name application to a Kubernetes cluster using Helm.
 Parameters:
-  --eks-name <EKS cluster name>
-    The name of the EKS cluster. Required when the registry (using the -r parameter) is set to "eks".
   -c | --chart <name of chart>
     The name of the chart to upgrade (or install)
   -h | --help
@@ -43,7 +41,6 @@ END
 }
 
 app_name='eshop'
-eks_name=''
 chart=''
 clean='yes'
 container_registry=''
@@ -57,8 +54,6 @@ namespace='eshop'
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --eks-name )
-      eks_name="$2"; shift 2;;
     -c | --chart )
       chart="$2"; shift 2;;
     -h | --help )

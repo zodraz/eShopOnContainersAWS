@@ -1,14 +1,12 @@
 Param(
-    [parameter(Mandatory=$false)][string]$registry,
-    [parameter(Mandatory=$false)][string]$dockerUser,
-    [parameter(Mandatory=$false)][string]$dockerPassword,
-    [parameter(Mandatory=$false)][string]$externalDns,
+    [parameter(Mandatory=$false)][string]$registry="791977570179.dkr.ecr.eu-central-1.amazonaws.com",
+    [parameter(Mandatory=$false)][string]$dockerUser="AWS",
+    [parameter(Mandatory=$false)][string]$dockerPassword="",
+    [parameter(Mandatory=$false)][string]$externalDns="eshoponcontainersaws.com",
     [parameter(Mandatory=$false)][string]$appName="eshop",
     [parameter(Mandatory=$false)][bool]$deployInfrastructure=$true,
     [parameter(Mandatory=$false)][bool]$deployCharts=$true,
     [parameter(Mandatory=$false)][bool]$clean=$true,
-    [parameter(Mandatory=$false)][string]$aksName="",
-    [parameter(Mandatory=$false)][string]$aksRg="",
     [parameter(Mandatory=$false)][string]$imageTag="latest",
     [parameter(Mandatory=$false)][bool]$useLocalk8s=$false,
     [parameter(Mandatory=$false)][bool]$useMesh=$false,
@@ -43,6 +41,7 @@ function Install-Chart  {
 $dns = $externalDns
 $sslEnabled=$false
 $sslIssuer=""
+$dockerPassword=(Get-ECRLoginCommand).Password 
 
 if ($sslSupport -eq "staging") {
     $sslEnabled=$true
@@ -64,22 +63,6 @@ if ($useLocalk8s -eq $true) {
     $ingressValuesFile="ingress_values_dockerk8s.yaml"
     $dns="localhost"
 }
-
-# if ($externalDns -eq "aks") {
-#     if  ([string]::IsNullOrEmpty($aksName) -or [string]::IsNullOrEmpty($aksRg)) {
-#         Write-Host "Error: When using -dns aks, MUST set -aksName and -aksRg too." -ForegroundColor Red
-#         exit 1
-#     }
-#     Write-Host "Getting DNS of AKS of AKS $aksName (in resource group $aksRg)..." -ForegroundColor Green
-#     $dns = $(az aks show -n $aksName  -g $aksRg --query addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName)
-#     if ([string]::IsNullOrEmpty($dns)) {
-#         Write-Host "Error getting DNS of AKS $aksName (in resource group $aksRg). Please ensure AKS has httpRouting enabled AND Azure CLI is logged & in version 2.0.37 or higher" -ForegroundColor Red
-#         exit 1
-#     }
-#     $dns = $dns -replace '[\"]'
-#     Write-Host "DNS base found is $dns. Will use $appName.$dns for the app!" -ForegroundColor Green
-#     $dns = "$appName.$dns"
-# }
 
 # Initialization & check commands
 if ([string]::IsNullOrEmpty($dns)) {

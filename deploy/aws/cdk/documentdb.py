@@ -14,10 +14,8 @@ class DocumentDbStack(Stack):
 
         if (self.node.try_get_context("deploy_documentdb") == "True"):
 
-            db_security_group = ec2.SecurityGroup(self,
-                                                  "DocDBSecurityGroup",
-                                                  vpc=vpc,
-                                                  allow_all_outbound=True)
+            db_security_group = ec2.SecurityGroup(
+                self, "DocDBSecurityGroup", vpc=vpc, allow_all_outbound=True)
 
             db_security_group.add_ingress_rule(
                 peer=ec2.Peer.ipv4(self.node.try_get_context(
