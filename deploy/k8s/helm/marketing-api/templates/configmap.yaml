@@ -41,7 +41,7 @@ data:
   all__EventBus__FleetManager__ApiKey: {{ .Values.inf.eventbus.fleetManager.apiKey }}
   all__S3Enabled: {{ .Values.inf.S3Enabled }}
   all__UseAWS: {{ .Values.inf.useAWS }}
-  all__UseDocumentDb: {{ .Values.inf.UseDocumentDb }}
+  all__UseDocumentDb: {{ .Values.inf.useDocumentDb }}
   all__UseVault: {{ .Values.inf.useVault }}
   all__OtlpEndpoint: {{ .Values.inf.otlpEndpoint }}
   all__LocalStack__UseLocalStack: {{ .Values.inf.localstack.useLocalStack }}

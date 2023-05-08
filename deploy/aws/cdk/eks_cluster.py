@@ -188,9 +188,15 @@ class EKSClusterStack(Stack):
             # If we enabled spot then use that
             if self.node.try_get_context("eks_node_spot") == "True":
                 node_capacity_type = eks.CapacityType.SPOT
+                list_spot_instances = self.node.try_get_context(
+                    "eks_spot_node_instance_type").split(',')
+                instance_types = list(
+                    map(lambda x: ec2.InstanceType(x), list_spot_instances))
             # Otherwise give us OnDemand
             else:
                 node_capacity_type = eks.CapacityType.ON_DEMAND
+                instance_types = [ec2.InstanceType(
+                    self.node.try_get_context("eks_node_instance_type"))]
             eks_node_group = eks_cluster.add_nodegroup_capacity(
                 "cluster-default-ng",
                 capacity_type=node_capacity_type,
@@ -199,10 +205,7 @@ class EKSClusterStack(Stack):
                 disk_size=self.node.try_get_context("eks_node_disk_size"),
                 # The default in CDK is to force upgrades through even if they violate - it is safer to not do that
                 force_update=False,
-                instance_types=[
-                    ec2.InstanceType(
-                        self.node.try_get_context("eks_node_instance_type"))
-                ],
+                instance_types=instance_types,
                 release_version=self.node.try_get_context(
                     "eks_node_ami_version"),
             )

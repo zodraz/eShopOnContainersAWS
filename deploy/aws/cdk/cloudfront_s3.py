@@ -156,7 +156,7 @@ class CloudFrontS3Stack(Stack):
             object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
             public_read_access=False,
             removal_policy=RemovalPolicy.DESTROY,
-            versioned=True
+            versioned=False
         )
 
         cloudfront_logs_bucket = s3.Bucket(
@@ -169,7 +169,7 @@ class CloudFrontS3Stack(Stack):
             object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
             public_read_access=False,
             removal_policy=RemovalPolicy.DESTROY,
-            versioned=True
+            versioned=False
         )
 
         s3_bucket = s3.Bucket(
