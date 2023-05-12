@@ -17,23 +17,23 @@ data:
   all__Serilog__LogstashgUrl:  {{ .Values.inf.serilog.logstashgUrl }}
   all__Serilog__LokiUrl:  {{ .Values.inf.serilog.lokiUrl }}
   all__Jaeger__Host: {{ .Values.inf.jaeger.host }}
-  all__Jaeger__Port: {{ .Values.inf.jaeger.port }}
+  all__Jaeger__Port: "{{ .Values.inf.jaeger.port }}"
   all__EventBus__Host: {{ .Values.inf.eventbus.host }}
   all__EventBus__UserName: {{ .Values.inf.eventbus.username }}
   all__EventBus__Password: {{ .Values.inf.eventbus.password }}
-  all__EventBus__IsSecure: {{ .Values.inf.eventbus.isSecure }}
-  all__EventBus__PersistenceEnabled: {{ .Values.inf.eventbus.persistenceEnabled }}
-  all__EventBus__OutboxEnabled: {{ .Values.inf.eventbus.outboxEnabled }}
-  all__EventBus__RabbitMQEnabled: {{ .Values.inf.eventbus.rabbitmqEnabled }}
-  all__EventBus__RetryCount: {{ .Values.inf.eventbus.retryCount }}
-  all__EventBus__AuditEnabled: {{ .Values.inf.eventbus.auditEnabled }}
-  all__EventBus__FleetManager__Enabled: {{ .Values.inf.eventbus.fleetManager.enabled }}
+  all__EventBus__IsSecure: "{{ .Values.inf.eventbus.isSecure }}"
+  all__EventBus__PersistenceEnabled: "{{ .Values.inf.eventbus.persistenceEnabled }}"
+  all__EventBus__OutboxEnabled: "{{ .Values.inf.eventbus.outboxEnabled }}"
+  all__EventBus__RabbitMQEnabled: "{{ .Values.inf.eventbus.rabbitmqEnabled }}"
+  all__EventBus__RetryCount: "{{ .Values.inf.eventbus.retryCount }}"
+  all__EventBus__AuditEnabled: "{{ .Values.inf.eventbus.auditEnabled }}"
+  all__EventBus__FleetManager__Enabled: "{{ .Values.inf.eventbus.fleetManager.enabled }}"
   all__EventBus__FleetManager__Url: {{ .Values.inf.eventbus.fleetManager.url }}
   all__EventBus__FleetManager__ApiKey: {{ .Values.inf.eventbus.fleetManager.apiKey }}
-  all__UseAWS: {{ .Values.inf.useAWS }}
-  all__UseVault: {{ .Values.inf.useVault }}
+  all__UseAWS: "{{ .Values.inf.useAWS }}"
+  all__UseVault: "{{ .Values.inf.useVault }}"
   all__OtlpEndpoint: {{ .Values.inf.otlpEndpoint }}
-  all__LocalStack__UseLocalStack: {{ .Values.inf.localstack.useLocalStack }}
+  all__LocalStack__UseLocalStack: "{{ .Values.inf.localstack.useLocalStack }}"
   all__LocalStack__LocalStackUrl: {{ .Values.inf.localstack.localStackUrl }}
   all__AWS__Profile: {{ .Values.inf.aws.profile }}
   all__AWS__Region: {{ .Values.inf.aws.region }}

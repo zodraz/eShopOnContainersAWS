@@ -55,7 +55,7 @@
     "eks_node_max_quantity": 8,
     "eks_node_disk_size": 20,
     "eks_node_instance_type": "t2.medium",
-    "eks_spot_node_instance_type": "c3.large,c4.large,c5.large,c5d.large,c5a.large,c5n.large",
+    "eks_spot_node_instance_type": "c3.large,c4.large,c5.large,c5d.large,c5a.large,c5n.large,c6a.large,c6i.large,c5ad.large,c6id.large",
     "eks_node_ami_version": "1.24.7-20230105",
     "eks_node_spot": "True",
     "create_cluster_exports": "True",

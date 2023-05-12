@@ -3,9 +3,9 @@
 
 inf:
   mesh:
-    enabled: 'false'          # True to enable Linkerd (set by deploy-all.ps1)
+    enabled: false          # True to enable Linkerd (set by deploy-all.ps1)
   tls:
-    enabled: 'true'           # True to enable TLS (set by deploy-all.ps1)
+    enabled: true           # True to enable TLS (set by deploy-all.ps1)
     issuer: ""              # cert-manager issuer to use for retrieving certs (set by deploy-all.ps1)
   sql:                      # inf.sql defines the sql server databases & logins
     host:  my-sql-server   # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
@@ -42,14 +42,14 @@ inf:
     host: b-5d61595e-b01a-481b-943d-cae6f9471986.mq.eu-central-1.amazonaws.com          # Name of rabbitmq aws host
     username: abel            # Rabbitmq username
     password: "!Asdf12345"    # Rabbitmq password
-    isSecure: 'true'            # Rabbitmq secure connection
-    persistenceEnabled: 'false' # Rebus persistence enabled
-    outboxEnabled: 'false'      # Rebus Outbox functionality enabled
-    rabbitmqEnabled: 'false'    # True for Rabbitmq enabled. False to use SQS and SNS
+    isSecure: true            # Rabbitmq secure connection
+    persistenceEnabled: false # Rebus persistence enabled
+    outboxEnabled: false      # Rebus Outbox functionality enabled
+    rabbitmqEnabled: false    # True for Rabbitmq enabled. False to use SQS and SNS
     retryCount: 5             # Rebus number of retries
-    auditEnabled: 'true'        # Rebus audit functionality enabled
+    auditEnabled: true        # Rebus audit functionality enabled
     fleetManager:         
-      enabled: 'false'         # Rebus FleetManager functionality enabled
+      enabled: false         # Rebus FleetManager functionality enabled
       url: "http://kkkk"      # Rebus FleetManager url
       apiKey: "xxxxxxxxxx"    # Rebus FleetManager API key
     svc: rabbitmq             # Name of k8s svc for rabbitmq
@@ -60,22 +60,22 @@ inf:
   jaeger:
     host: "localhost"
     port: 6831
-  useAWS: 'true'
-  useDocumentDb: 'false'
-  S3Enabled: 'false'
-  useVault: 'true'
+  useAWS: true
+  useDocumentDb: false
+  S3Enabled: false
+  useVault: true
   aws:
     profile: default
     region: eu-central-1
   localstack:
-    useLocalStack: 'false'
+    useLocalStack: false
     localStackUrl: "http://localhost:4566"
   otlpEndpoint: http://localhost:4317
   k8s:                      # inf.k8s defines Kubernetes cluster global config
     dns:  "eshoponcontainersaws.com" # k8s external  DNS. This value or ip value MUST BE PROVIDED
-    local: 'false'            # True when deploying on "local K8s" provided by Docker Desktop.
+    local: false            # True when deploying on "local K8s" provided by Docker Desktop.
   misc:                     # inf.misc contains miscellaneous configuration related to infrastructure
-    useS3: 'true'             # If catalog api uses AWS S3 or not
+    useS3: true             # If catalog api uses AWS S3 or not
   registry:                 # Uncomment "registry" to specify registry secret
     secretName:             # secretName is the name of the secret inside k8s   
     server:                 "791977570179.dkr.ecr.eu-central-1.amazonaws.com"

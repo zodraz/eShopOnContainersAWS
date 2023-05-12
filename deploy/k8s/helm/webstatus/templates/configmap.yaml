@@ -45,11 +45,11 @@ data:
   all__Serilog__LogstashgUrl:  {{ .Values.inf.serilog.logstashgUrl }}
   all__Serilog__LokiUrl:  {{ .Values.inf.serilog.lokiUrl }}
   all__Jaeger__Host: {{ .Values.inf.jaeger.host }}
-  all__Jaeger__Port: {{ .Values.inf.jaeger.port }}
-  all__UseAWS: {{ .Values.inf.useAWS }}
-  all__UseVault: {{ .Values.inf.useVault }}
+  all__Jaeger__Port: "{{ .Values.inf.jaeger.port }}"
+  all__UseAWS: "{{ .Values.inf.useAWS }}"
+  all__UseVault: "{{ .Values.inf.useVault }}"
   all__OtlpEndpoint: {{ .Values.inf.otlpEndpoint }}
-  all__LocalStack__UseLocalStack: {{ .Values.inf.localstack.useLocalStack }}
+  all__LocalStack__UseLocalStack: "{{ .Values.inf.localstack.useLocalStack }}"
   all__LocalStack__LocalStackUrl: {{ .Values.inf.localstack.localStackUrl }}
   all__AWS__Profile: {{ .Values.inf.aws.profile }}
   all__AWS__Region: {{ .Values.inf.aws.region }}

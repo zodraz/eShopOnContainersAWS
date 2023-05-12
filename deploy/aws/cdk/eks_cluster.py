@@ -201,6 +201,7 @@ class EKSClusterStack(Stack):
                 "cluster-default-ng",
                 capacity_type=node_capacity_type,
                 desired_size=self.node.try_get_context("eks_node_quantity"),
+                min_size=self.node.try_get_context("eks_node_quantity"),
                 max_size=self.node.try_get_context("eks_node_max_quantity"),
                 disk_size=self.node.try_get_context("eks_node_disk_size"),
                 # The default in CDK is to force upgrades through even if they violate - it is safer to not do that
