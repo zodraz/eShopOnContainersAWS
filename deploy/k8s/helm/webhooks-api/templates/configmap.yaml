@@ -13,7 +13,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  webhooks__ConnectionString: Server={{ $sqlsrv }};Initial Catalog={{ .Values.inf.sql.webhooks.db }};User Id={{ .Values.inf.sql.common.user }};Password={{ .Values.inf.sql.common.pwd }};
+  webhooks__ConnectionString: Server={{ $sqlsrv }};Initial Catalog={{ .Values.inf.sql.webhooks.db }};User Id={{ .Values.inf.sql.common.user }};Password={{ .Values.inf.sql.common.pwd }};TrustServerCertificate=True;
   urls__IdentityUrl: http://{{ $identity }}
   urls__IdentityUrlExternal: {{ $protocol }}://{{ $identity }}
   all__Serilog__SeqServerUrl:  {{ .Values.inf.serilog.seqServerUrl }}

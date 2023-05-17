@@ -13,7 +13,7 @@ metadata:
     heritage: {{ .Release.Service }}
 data:
   # signalr__StoreConnectionString: {{ .Values.inf.redis.keystore.constr }}
-  signalr__StoreConnectionString: Server={{ $sqlsrv }};Initial Catalog={{ .Values.inf.sql.signalrhub.db }};User Id={{ .Values.inf.sql.common.user }};Password={{ .Values.inf.sql.common.pwd }};
+  signalr__StoreConnectionString: Server={{ $sqlsrv }};Initial Catalog={{ .Values.inf.sql.signalrhub.db }};User Id={{ .Values.inf.sql.common.user }};Password={{ .Values.inf.sql.common.pwd }};TrustServerCertificate=True;
   urls__IdentityUrl: http://identity-api
   all__Serilog__SeqServerUrl:  {{ .Values.inf.serilog.seqServerUrl }}
   all__Serilog__LogstashgUrl:  {{ .Values.inf.serilog.logstashgUrl }}

@@ -91,7 +91,7 @@ env:
     - name: EventBus__EndpointName
       value: Webhooks
     - name: ASPNETCORE_ENVIRONMENT
-      value: Development
+      value: Production
     - name: OrchestratorType
       value: 'K8S'
     - name: PORT

@@ -12,7 +12,7 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  ordering__ConnectionString: Server={{ $sqlsrv }};Initial Catalog={{ .Values.inf.sql.ordering.db }};User Id={{ .Values.inf.sql.common.user }};Password={{ .Values.inf.sql.common.pwd }};
+  ordering__ConnectionString: Server={{ $sqlsrv }};Initial Catalog={{ .Values.inf.sql.ordering.db }};User Id={{ .Values.inf.sql.common.user }};Password={{ .Values.inf.sql.common.pwd }};TrustServerCertificate=True;
   ordering__EnableLoadTest: "{{ .Values.inf.misc.useLoadTest }}"
   graceperiodmanager__CheckUpdateTime: "{{ .Values.cfg.checkUpdateTime }}"
   graceperiodmanager__GracePeriodTime: "{{ .Values.cfg.gracePeriodTime }}"

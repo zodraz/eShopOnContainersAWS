@@ -92,7 +92,7 @@ env:
     - name: UseCustomizationData
       value: false
     - name: ASPNETCORE_ENVIRONMENT
-      value: Development
+      value: Production
     - name: OrchestratorType
       value: 'K8S'
     - name: PORT

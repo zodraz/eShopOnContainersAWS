@@ -175,10 +175,15 @@ class CloudFrontS3Stack(Stack):
         s3_bucket = s3.Bucket(
             self,
             "DeploymentBucket",
-            encryption=s3.BucketEncryption.S3_MANAGED,
+            access_control=s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
+            auto_delete_objects=True,
             block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
+            encryption=s3.BucketEncryption.S3_MANAGED,
+            object_ownership=s3.ObjectOwnership.BUCKET_OWNER_PREFERRED,
+            server_access_logs_bucket=logs_bucket,
+            public_read_access=False,
             removal_policy=RemovalPolicy.DESTROY,
-            server_access_logs_bucket=logs_bucket
+            versioned=False          
         )
 
         oai = cloudfront.OriginAccessIdentity(

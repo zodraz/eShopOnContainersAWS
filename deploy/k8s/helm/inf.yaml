@@ -8,10 +8,10 @@ inf:
     enabled: true           # True to enable TLS (set by deploy-all.ps1)
     issuer: ""              # cert-manager issuer to use for retrieving certs (set by deploy-all.ps1)
   sql:                      # inf.sql defines the sql server databases & logins
-    host:  my-sql-server   # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
+    host:  sqlserverstack-rdsqlserverea747c72-hjb4glxilcpc.cug71fym5n3i.eu-central-1.rds.amazonaws.com   # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
     common:
-      user: sa              # SQL user
-      pwd: Pass@word        # SQL pwd
+      user: adminuser              # SQL user
+      pwd: CVC.*hN(?GIS6~}sL]Hb0bhBJ=wcNY:?        # SQL pwd
       pid: Developer
     catalog:                # inf.sql.catalog: settings for the catalog-api sql (user, pwd, db)
       db: CatalogDb         # Catalog API SQL db name
@@ -34,10 +34,10 @@ inf:
   redis:                    # inf.redis defines the redis' connection strings
     basket:     
       svc: basket-data      # Name of k8s svc for basket redis     
-      constr: basket-data   # Connection string to Redis used by Basket API
+      constr: eshop-aws-redis.rgggmg.0001.euc1.cache.amazonaws.com:6379   # Connection string to Redis used by Basket API
     keystore:
       svc: keystore-data    # Name of k8s svc for keystore-data redis
-      constr: keystore-data # Connection string to Redis used as a Keystore (by Identity API)
+      constr: eshop-aws-redis.rgggmg.0001.euc1.cache.amazonaws.com:6379 # Connection string to Redis used as a Keystore (by Identity API)
   eventbus:
     host: b-5d61595e-b01a-481b-943d-cae6f9471986.mq.eu-central-1.amazonaws.com          # Name of rabbitmq aws host
     username: abel            # Rabbitmq username
@@ -75,7 +75,7 @@ inf:
     dns:  "eshoponcontainersaws.com" # k8s external  DNS. This value or ip value MUST BE PROVIDED
     local: false            # True when deploying on "local K8s" provided by Docker Desktop.
   misc:                     # inf.misc contains miscellaneous configuration related to infrastructure
-    useS3: true             # If catalog api uses AWS S3 or not
+    useS3: false             # If catalog api uses AWS S3 or not
   registry:                 # Uncomment "registry" to specify registry secret
     secretName:             # secretName is the name of the secret inside k8s   
     server:                 "791977570179.dkr.ecr.eu-central-1.amazonaws.com"

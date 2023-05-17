@@ -1,5 +1,5 @@
 replicaCount: 1
-clusterName: eshop-aks
+clusterName: eshop-eks
 pathBase: /mobilemarketingapigw
 
 image:
