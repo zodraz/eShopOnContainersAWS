@@ -101,22 +101,22 @@ runs:
   - name: Run Trivy vulnerability scanner
     uses: aquasecurity/trivy-action@master
     with:
-       image-ref: '${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}'
+       image-ref: '${{ inputs.registry_endpoint }}/eshop:linux-${{ env.BRANCH  }}'
        format: 'table'
        ignore-unfixed: true
        exit-code: '0'
        vuln-type: 'os,library'
        severity: 'CRITICAL,HIGH'
 
-  - name: Docker list images
-    shell: bash
-    run: sudo -E docker images
-    working-directory: ./src
+  # - name: Docker list images
+  #   shell: bash
+  #   run: sudo -E docker images
+  #   working-directory: ./src
 
-  - name: Docker push ${{ inputs.service }}
-    shell: bash
-    run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
-    working-directory: ./src
+  # - name: Docker push ${{ inputs.service }}
+  #   shell: bash
+  #   run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
+  #   working-directory: ./src
   
   # - name: Docker push ${{ inputs.service }}
   #   shell: bash
@@ -128,8 +128,14 @@ runs:
   #   run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:latest
   #   working-directory: ./src
 
+  # - name: Create multiarch manifest
+  #   shell: bash
+  #   run: |
+  #     docker --config ~/.docker manifest create ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH  }} ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
+  #     docker --config ~/.docker manifest push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH  }}
+
   - name: Create multiarch manifest
     shell: bash
     run: |
-      docker --config ~/.docker manifest create ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH  }} ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
-      docker --config ~/.docker manifest push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH  }}
+      docker --config ~/.docker manifest create ${{ inputs.registry_endpoint  }}/eshop/${{ inputs.image_name }}:${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/eshop/${{ inputs.image_name  }}:linux-${{ env.BRANCH  }}
+      docker --config ~/.docker manifest push ${{ inputs.registry_endpoint  }}/eshop/${{ inputs.image_name }}:${{ env.BRANCH  }}
