@@ -58,13 +58,13 @@ runs:
     working-directory: ./src
     env:
       TAG: ${{ env.BRANCH }}
-      REGISTRY: ${{ inputs.registry_endpoint }}
+      REGISTRY: ${{ inputs.registry_endpoint }}/eshop
 
-  - name: Create ECR repository if not exists eshop/${{ inputs.image_name }}
-    uses: int128/create-ecr-repository-action@v1
-    id: ecr
-    with:
-      repository: eshop/${{ inputs.image_name }}
+  # - name: Create ECR repository if not exists eshop/${{ inputs.image_name }}
+  #   uses: int128/create-ecr-repository-action@v1
+  #   id: ecr
+  #   with:
+  #     repository: eshop/${{ inputs.image_name }}
 
   - name: Compose push ${{ inputs.service }}
     shell: bash
@@ -72,7 +72,7 @@ runs:
     working-directory: ./src
     env:
       TAG: ${{ env.BRANCH }}
-      REGISTRY: ${{ steps.ecr.outputs.repository-uri }}
+      REGISTRY: ${{ inputs.registry_endpoint }}/eshop
 
   # - name: Docker tag for ECR ${{ inputs.service }}
   #   shell: bash
