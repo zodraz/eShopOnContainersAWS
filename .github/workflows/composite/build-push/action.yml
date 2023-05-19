@@ -58,7 +58,7 @@ runs:
     working-directory: ./src
     env:
       TAG: ${{ env.BRANCH }}
-      REGISTRY: ${{ inputs.registry_endpoint }}/eshop
+      REGISTRY: ${{ inputs.registry_endpoint }}
 
   # - name: Create ECR repository if not exists eshop/${{ inputs.image_name }}
   #   uses: int128/create-ecr-repository-action@v1
@@ -72,7 +72,7 @@ runs:
     working-directory: ./src
     env:
       TAG: ${{ env.BRANCH }}
-      REGISTRY: ${{ inputs.registry_endpoint }}/eshop
+      REGISTRY: ${{ inputs.registry_endpoint }}
 
   # - name: Docker tag for ECR ${{ inputs.service }}
   #   shell: bash
@@ -101,7 +101,7 @@ runs:
   - name: Run Trivy vulnerability scanner
     uses: aquasecurity/trivy-action@master
     with:
-       image-ref: '${{ inputs.registry_endpoint }}/eshop:linux-${{ env.BRANCH  }}'
+       image-ref: '${{ inputs.registry_endpoint }}:linux-${{ env.BRANCH  }}'
        format: 'table'
        ignore-unfixed: true
        exit-code: '0'
@@ -137,5 +137,5 @@ runs:
   - name: Create multiarch manifest
     shell: bash
     run: |
-      docker --config ~/.docker manifest create ${{ inputs.registry_endpoint  }}/eshop/${{ inputs.image_name }}:${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/eshop/${{ inputs.image_name  }}:linux-${{ env.BRANCH  }}
-      docker --config ~/.docker manifest push ${{ inputs.registry_endpoint  }}/eshop/${{ inputs.image_name }}:${{ env.BRANCH  }}
+      docker --config ~/.docker manifest create ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:linux-${{ env.BRANCH  }}
+      docker --config ~/.docker manifest push ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }}
