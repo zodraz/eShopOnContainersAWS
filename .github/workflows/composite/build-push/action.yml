@@ -60,11 +60,11 @@ runs:
       TAG: ${{ env.BRANCH }}
       REGISTRY: ${{ inputs.registry_endpoint }}
 
-  - name: Create ECR repository if not exists  ${{ inputs.registry_endpoint }}/eshop/${{ inputs.image_name }}
+  - name: Create ECR repository if not exists eshop/${{ inputs.image_name }}
     uses: int128/create-ecr-repository-action@v1
     id: ecr
     with:
-      repository: ${{ inputs.registry_endpoint }}/eshop/${{ inputs.image_name }}
+      repository: eshop/${{ inputs.image_name }}
 
   - name: Docker tag for ECR ${{ inputs.service }}
     shell: bash
