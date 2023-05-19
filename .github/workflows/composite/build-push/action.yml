@@ -66,29 +66,37 @@ runs:
     with:
       repository: eshop/${{ inputs.image_name }}
 
-  - name: Docker tag for ECR ${{ inputs.service }}
+  - name: Compose push ${{ inputs.service }}
     shell: bash
-    run: |
-      IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
-      echo "IMAGE_ID: $IMAGE_ID"
-      sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
+    run: sudo -E docker-compose push ${{ inputs.service }}
     working-directory: ./src
+    env:
+      TAG: ${{ env.BRANCH }}
+      REGISTRY: ${{ steps.ecr.outputs.repository-uri }}
 
-  - name: Docker tag for ECR on Linux ${{ inputs.service }}
-    shell: bash
-    run: |
-      IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
-      echo "IMAGE_ID: $IMAGE_ID"
-      sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
-    working-directory: ./src
+  # - name: Docker tag for ECR ${{ inputs.service }}
+  #   shell: bash
+  #   run: |
+  #     IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
+  #     echo "IMAGE_ID: $IMAGE_ID"
+  #     sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
+  #   working-directory: ./src
 
-  - name: Docker tag for ECR on Linux ${{ inputs.service }}
-    shell: bash
-    run: |
-      IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
-      echo "IMAGE_ID: $IMAGE_ID"
-      sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:latest
-    working-directory: ./src
+  # - name: Docker tag for ECR on Linux ${{ inputs.service }}
+  #   shell: bash
+  #   run: |
+  #     IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
+  #     echo "IMAGE_ID: $IMAGE_ID"
+  #     sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
+  #   working-directory: ./src
+
+  # - name: Docker tag for ECR on Linux ${{ inputs.service }}
+  #   shell: bash
+  #   run: |
+  #     IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
+  #     echo "IMAGE_ID: $IMAGE_ID"
+  #     sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:latest
+  #   working-directory: ./src
 
   - name: Run Trivy vulnerability scanner
     uses: aquasecurity/trivy-action@master
@@ -110,15 +118,15 @@ runs:
     run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
     working-directory: ./src
   
-  - name: Docker push ${{ inputs.service }}
-    shell: bash
-    run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
-    working-directory: ./src
+  # - name: Docker push ${{ inputs.service }}
+  #   shell: bash
+  #   run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
+  #   working-directory: ./src
 
-  - name: Docker push ${{ inputs.service }}
-    shell: bash
-    run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:latest
-    working-directory: ./src
+  # - name: Docker push ${{ inputs.service }}
+  #   shell: bash
+  #   run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:latest
+  #   working-directory: ./src
 
   - name: Create multiarch manifest
     shell: bash
