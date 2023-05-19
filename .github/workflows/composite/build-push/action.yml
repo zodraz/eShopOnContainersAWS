@@ -101,7 +101,7 @@ runs:
   - name: Run Trivy vulnerability scanner
     uses: aquasecurity/trivy-action@master
     with:
-       image-ref: '${{ inputs.registry_endpoint }}:linux-${{ env.BRANCH  }}'
+       image-ref: '${{ inputs.registry_endpoint }}/${{ inputs.image_name }}:linux-${{ env.BRANCH  }}'
        format: 'table'
        ignore-unfixed: true
        exit-code: '0'
