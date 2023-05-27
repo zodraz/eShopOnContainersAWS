@@ -14,7 +14,7 @@ from aws_cdk import (aws_ec2 as ec2, aws_eks as eks, aws_iam as iam,
                      aws_opensearchservice as opensearch, aws_logs as logs,
                      aws_certificatemanager as cm, CfnOutput,
                      RemovalPolicy, Stack, aws_route53 as route53,
-                     Environment)
+                     lambda_layer_kubectl_v24)
 from constructs import Construct
 import yaml
 
@@ -101,6 +101,7 @@ class EKSClusterStack(Stack):
             endpoint_access=endpoint_access,
             version=eks.KubernetesVersion.of(
                 self.node.try_get_context("eks_version")),
+            kubectl_layer=lambda_layer_kubectl_v24.KubectlV24Layer("kubectl")
             default_capacity=0,
             role=node_role,
             vpc_subnets=vpc_subnets)

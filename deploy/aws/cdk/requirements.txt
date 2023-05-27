@@ -1,4 +1,5 @@
 aws-cdk-lib==2.80.0
+aws-cdk.lambda-layer-kubectl-v24==2.0.190
 constructs>=10.0.0,<11.0.0
 attrs==21.2.0
 cattrs==22.2.0

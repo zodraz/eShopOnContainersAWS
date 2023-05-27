@@ -102,10 +102,10 @@ runs:
        vuln-type: 'os,library'
        severity: 'CRITICAL,HIGH'
 
-  # - name: Docker list images
-  #   shell: bash
-  #   run: sudo -E docker images
-  #   working-directory: ./src
+  - name: Docker list images
+    shell: bash
+    run: sudo -E docker images
+    working-directory: ./src
 
   # - name: Docker push ${{ inputs.service }}
   #   shell: bash
