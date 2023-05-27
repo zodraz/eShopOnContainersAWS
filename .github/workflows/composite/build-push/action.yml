@@ -125,11 +125,5 @@ runs:
   # - name: Create multiarch manifest
   #   shell: bash
   #   run: |
-  #     docker --config ~/.docker manifest create ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH  }} ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
-  #     docker --config ~/.docker manifest push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH  }}
-
-  - name: Create multiarch manifest
-    shell: bash
-    run: |
-      docker --config ~/.docker manifest create ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:linux-${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:latest
-      docker --config ~/.docker manifest push ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }}
+  #     docker --config ~/.docker manifest create ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:linux-${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:latest
+  #     docker --config ~/.docker manifest push ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }}
