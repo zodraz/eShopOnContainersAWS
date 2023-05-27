@@ -11,6 +11,7 @@ from documentdb import DocumentDbStack
 from amq_rabbitmq import AmazonMQRabbitMQStack
 from secrets_manager import SecretsManagerStack
 from route53 import Route53Stack
+from iam_oic_provider import IamOICProvider
 
 app = App()
 if app.node.try_get_context("account").strip() != "":
@@ -42,6 +43,9 @@ eks_cluster_stack = EKSClusterStack(app,
                                     "EKSClusterStack",
                                     vpc.vpc,
                                     env=environment)
+
+IamOICProvider(app, 'EksOICIdentityProvider',
+               oidc_url=eks_cluster_stack.oidc_url, env=environment)
 
 elastic_cache_redis = ElasticCacheRedisStack(
     app, "ElasticCacheRedisStack", vpc.vpc, env=environment)

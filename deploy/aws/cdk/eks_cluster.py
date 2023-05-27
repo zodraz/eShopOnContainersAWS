@@ -13,13 +13,15 @@ Have a look there for many options you can change to customise this template for
 from aws_cdk import (aws_ec2 as ec2, aws_eks as eks, aws_iam as iam,
                      aws_opensearchservice as opensearch, aws_logs as logs,
                      aws_certificatemanager as cm, CfnOutput,
-                     RemovalPolicy, Stack, aws_route53 as route53)
+                     RemovalPolicy, Stack, aws_route53 as route53,
+                     Environment)
 from constructs import Construct
 import yaml
 
 # Import the custom resource to switch on control plane logging from ekslogs_custom_resource.py
 from ekslogs_custom_resource import EKSLogsObjectResource
 from amp_custom_resource import AMPCustomResource
+from eks_worker_role_statements import EksWorkerRoleStatements
 
 
 class EKSClusterStack(Stack):
@@ -27,25 +29,39 @@ class EKSClusterStack(Stack):
     def __init__(self, scope: Construct, id: str, vpc: ec2.Vpc, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
+        statement = EksWorkerRoleStatements()
+
         # Either create a new IAM role to administrate the cluster or create a new one
         if self.node.try_get_context(
                 "create_new_cluster_admin_role") == "True":
+            # self.cluster_admin_role = iam.Role(
+            #     self,
+            #     "ClusterAdminRole",
+            #     role_name='eks-admin-role',
+            #     assumed_by=iam.CompositePrincipal(
+            #         iam.AccountRootPrincipal(),
+            #         iam.ServicePrincipal("ec2.amazonaws.com"),
+            #     ),
+            # )
+            # cluster_admin_policy_statement_json_1 = {
+            #     "Effect": "Allow",
+            #     "Action": ["eks:DescribeCluster"],
+            #     "Resource": "*",
+            # }
+            # self.cluster_admin_role.add_to_principal_policy(
+            #     iam.PolicyStatement.from_json(
+            #         cluster_admin_policy_statement_json_1))
+
             self.cluster_admin_role = iam.Role(
-                self,
-                "ClusterAdminRole",
-                assumed_by=iam.CompositePrincipal(
-                    iam.AccountRootPrincipal(),
-                    iam.ServicePrincipal("ec2.amazonaws.com"),
-                ),
+                self, 'EKSMasterRole', role_name='eks-admin-role',
+                assumed_by=iam.ServicePrincipal("ec2.amazonaws.com")
             )
-            cluster_admin_policy_statement_json_1 = {
-                "Effect": "Allow",
-                "Action": ["eks:DescribeCluster"],
-                "Resource": "*",
-            }
-            self.cluster_admin_role.add_to_principal_policy(
-                iam.PolicyStatement.from_json(
-                    cluster_admin_policy_statement_json_1))
+            self.cluster_admin_role.add_managed_policy(
+                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3ReadOnlyAccess"))
+            self.cluster_admin_role.add_managed_policy(
+                iam.ManagedPolicy.from_aws_managed_policy_name("IAMFullAccess"))
+            self.cluster_admin_role.add_to_policy(statement.admin_statement())
+
         else:
             # You'll also need to add a trust relationship to ec2.amazonaws.com to sts:AssumeRole to this as well
             self.cluster_admin_role = iam.Role.from_role_arn(
@@ -53,6 +69,20 @@ class EKSClusterStack(Stack):
                 "ClusterAdminRole",
                 role_arn=self.node.try_get_context("existing_admin_role_arn"),
             )
+
+         # EKS Node Role
+        node_role = iam.Role(
+            self, "EKSNodeRole", role_name='eks-node-role', assumed_by=iam.ServicePrincipal("eks.amazonaws.com")
+        )
+        node_role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonEKSClusterPolicy"))
+        node_role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonEKSWorkerNodePolicy"))
+        node_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name(
+            "AmazonEC2ContainerRegistryReadOnly"))
+        node_role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonEKSServicePolicy"))
+
         # Create an EKS Cluster
         if self.node.try_get_context("vpc_only_public") == "True":
             vpc_subnets = [ec2.SubnetSelection(
@@ -72,50 +102,57 @@ class EKSClusterStack(Stack):
             version=eks.KubernetesVersion.of(
                 self.node.try_get_context("eks_version")),
             default_capacity=0,
+            role=node_role,
             vpc_subnets=vpc_subnets)
 
-        cluster_pod_role = iam.Role(
-            self,
-            "ClusterPodRole",
-            assumed_by=iam.AnyPrincipal()
-        )
+        self.oidc_url = eks_cluster.cluster_open_id_connect_issuer_url
 
-        amazon_dynamodb_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-            "AmazonDynamoDBFullAccess")
-        cluster_pod_role.add_managed_policy(amazon_dynamodb_full_access)
+        # cluster_pod_role = iam.Role(
+        #     self,
+        #     "ClusterPodRole",
+        #     assumed_by=iam.AnyPrincipal()
+        # )
 
-        if self.node.try_get_context("deploy_dynamodb") == "True":
-            amazon_doc_db_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-                "AmazonDocDBFullAccess")
-            cluster_pod_role.add_managed_policy(amazon_doc_db_full_access)
+        # amazon_dynamodb_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+        #     "AmazonDynamoDBFullAccess")
+        # cluster_pod_role.add_managed_policy(amazon_dynamodb_full_access)
 
-        if self.node.try_get_context("deploy_rabbitmq") == "True":
-            amazon_mq_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-                "AmazonMQFullAccess")
-            cluster_pod_role.add_managed_policy(amazon_mq_full_access)
+        # if self.node.try_get_context("deploy_dynamodb") == "True":
+        #     amazon_doc_db_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+        #         "AmazonDocDBFullAccess")
+        #     cluster_pod_role.add_managed_policy(amazon_doc_db_full_access)
 
-        amazon_elastic_cache_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-            "AmazonElastiCacheFullAccess")
-        cluster_pod_role.add_managed_policy(amazon_elastic_cache_full_access)
+        # if self.node.try_get_context("deploy_rabbitmq") == "True":
+        #     amazon_mq_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+        #         "AmazonMQFullAccess")
+        #     cluster_pod_role.add_managed_policy(amazon_mq_full_access)
 
-        amazon_rds_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-            "AmazonRDSFullAccess")
-        cluster_pod_role.add_managed_policy(amazon_rds_full_access)
+        # amazon_elastic_cache_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+        #     "AmazonElastiCacheFullAccess")
+        # cluster_pod_role.add_managed_policy(amazon_elastic_cache_full_access)
 
-        amazon_sqs_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-            "AmazonSQSFullAccess")
-        cluster_pod_role.add_managed_policy(amazon_sqs_full_access)
+        # amazon_rds_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+        #     "AmazonRDSFullAccess")
+        # cluster_pod_role.add_managed_policy(amazon_rds_full_access)
 
-        amazon_sns_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-            "AmazonSNSFullAccess")
-        cluster_pod_role.add_managed_policy(amazon_sns_full_access)
+        # amazon_sqs_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+        #     "AmazonSQSFullAccess")
+        # cluster_pod_role.add_managed_policy(amazon_sqs_full_access)
 
-        cluster_pod_role_arn = cluster_pod_role.role_arn
+        # amazon_sns_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
+        #     "AmazonSNSFullAccess")
+        # cluster_pod_role.add_managed_policy(amazon_sns_full_access)
 
-        eks_service_account = eks_cluster.add_service_account("eshop-aws-eks-service-account",
-                                                              annotations={
-                                                                  "eks.amazonaws.com/role-arn": cluster_pod_role_arn
-                                                              })
+        # amazon_secretsmanager_rw = iam.ManagedPolicy.from_aws_managed_policy_name(
+        #     "SecretsManagerReadWrite")
+        # cluster_pod_role.add_managed_policy(amazon_secretsmanager_rw)
+
+        # cluster_pod_role_arn = cluster_pod_role.role_arn
+
+        # eks_service_account = eks_cluster.add_service_account("eshop-aws-eks-service-account",
+        #                                                       annotations={
+        #                                                           "eks.amazonaws.com/role-arn": cluster_pod_role_arn
+        #                                                       })
 
         # Create a Fargate Pod Execution Role to use with any Fargate Profiles
         # We create this explicitly to allow for logging without fargate_only_cluster=True
@@ -197,6 +234,27 @@ class EKSClusterStack(Stack):
                 node_capacity_type = eks.CapacityType.ON_DEMAND
                 instance_types = [ec2.InstanceType(
                     self.node.try_get_context("eks_node_instance_type"))]
+
+            # Worker Role
+            worker_role = iam.Role(self, "EKSWorkerRole", role_name='eks-worker-role',
+                                   assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"))
+            attached_policy = ['AmazonEC2ContainerRegistryReadOnly',
+                               'AmazonEKSWorkerNodePolicy', 'AmazonSSMManagedInstanceCore']
+            for policy in attached_policy:
+                worker_role.add_managed_policy(
+                    iam.ManagedPolicy.from_aws_managed_policy_name(policy))
+            worker_role.add_to_policy(statement.eks_cni())
+
+            ssh_worker_sg = ec2.SecurityGroup(
+                self, 'EksWorkerSSHSG',
+                vpc=vpc,
+                description='EKS SSH to worker nodes',
+                security_group_name='eks-ssh'
+            )
+            # ssh_worker_sg.add_ingress_rule(ec2.Peer.ipv4('10.3.0.0/16'), ec2.Port.tcp(22), "SSH Access")
+            ssh_worker_sg.add_ingress_rule(
+                ec2.Peer.any_ipv4(), ec2.Port.tcp(22), "SSH Access")
+
             eks_node_group = eks_cluster.add_nodegroup_capacity(
                 "cluster-default-ng",
                 capacity_type=node_capacity_type,
@@ -204,15 +262,20 @@ class EKSClusterStack(Stack):
                 min_size=self.node.try_get_context("eks_node_quantity"),
                 max_size=self.node.try_get_context("eks_node_max_quantity"),
                 disk_size=self.node.try_get_context("eks_node_disk_size"),
+                labels={'role': 'worker'},
+                nodegroup_name='eks-node-group',
+                node_role=worker_role,
+                remote_access=eks.NodegroupRemoteAccess(
+                    ssh_key_name='dev-t', source_security_groups=[ssh_worker_sg]),
                 # The default in CDK is to force upgrades through even if they violate - it is safer to not do that
                 force_update=False,
                 instance_types=instance_types,
                 release_version=self.node.try_get_context(
                     "eks_node_ami_version"),
             )
-            eks_node_group.role.add_managed_policy(
-                iam.ManagedPolicy.from_aws_managed_policy_name(
-                    "AmazonSSMManagedInstanceCore"))
+            # eks_node_group.role.add_managed_policy(
+            #     iam.ManagedPolicy.from_aws_managed_policy_name(
+            #         "AmazonSSMManagedInstanceCore"))
 
         # AWS Load Balancer Controller
         if self.node.try_get_context("deploy_aws_lb_controller") == "True":
