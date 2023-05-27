@@ -7,7 +7,7 @@ Param(
     [parameter(Mandatory = $false)][bool]$deployInfrastructure = $false,
     [parameter(Mandatory = $false)][bool]$deployCharts = $true,
     [parameter(Mandatory = $false)][bool]$clean = $true,
-    [parameter(Mandatory = $false)][string]$imageTag = "master",
+    [parameter(Mandatory = $false)][string]$imageTag = "latest",
     [parameter(Mandatory = $false)][bool]$useLocalk8s = $false,
     [parameter(Mandatory = $false)][bool]$useMesh = $false,
     [parameter(Mandatory = $false)][string][ValidateSet('Always', 'IfNotPresent', 'Never', IgnoreCase = $false)]$imagePullPolicy = "Always",

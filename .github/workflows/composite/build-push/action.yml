@@ -52,6 +52,12 @@ runs:
       echo "BRANCH=$currentbranch" >> $GITHUB_ENV
     shell: bash
 
+  - name: Create ECR repository if not exists eshop/${{ inputs.image_name }}
+    uses: int128/create-ecr-repository-action@v1
+    id: ecr
+    with:
+     repository: eshop/${{ inputs.image_name }}
+
   - name: Compose build ${{ inputs.service }}
     shell: bash
     run: sudo -E docker-compose build ${{ inputs.service }}
