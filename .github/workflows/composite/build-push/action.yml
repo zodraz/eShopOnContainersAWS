@@ -84,13 +84,13 @@ runs:
   #     sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
   #   working-directory: ./src
 
-  # - name: Docker tag for ECR on Linux ${{ inputs.service }}
-  #   shell: bash
-  #   run: |
-  #     IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
-  #     echo "IMAGE_ID: $IMAGE_ID"
-  #     sudo -E docker tag $IMAGE_ID ${{ inputs.registry_endpoint }}/${{ inputs.image_name }}:latest
-  #   working-directory: ./src
+  - name: Docker tag for ECR on Linux ${{ inputs.service }}
+    shell: bash
+    run: |
+      IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
+      echo "IMAGE_ID: $IMAGE_ID"
+      sudo -E docker tag $IMAGE_ID ${{ inputs.registry_endpoint }}/${{ inputs.image_name }}:latest
+    working-directory: ./src
 
   - name: Run Trivy vulnerability scanner
     uses: aquasecurity/trivy-action@master
@@ -117,10 +117,10 @@ runs:
   #   run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
   #   working-directory: ./src
 
-  # - name: Docker push ${{ inputs.service }}
-  #   shell: bash
-  #   run: sudo -E docker push ${{ inputs.registry_endpoint }}/${{ inputs.image_name }}:latest
-  #   working-directory: ./src
+  - name: Docker push ${{ inputs.service }}
+    shell: bash
+    run: sudo -E docker push ${{ inputs.registry_endpoint }}/${{ inputs.image_name }}:latest
+    working-directory: ./src
 
   # - name: Create multiarch manifest
   #   shell: bash
@@ -128,8 +128,8 @@ runs:
   #     docker --config ~/.docker manifest create ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH  }} ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
   #     docker --config ~/.docker manifest push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH  }}
 
-  # - name: Create multiarch manifest
-  #   shell: bash
-  #   run: |
-  #     docker --config ~/.docker manifest create ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:linux-${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:latest
-  #     docker --config ~/.docker manifest push ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }}
+  - name: Create multiarch manifest
+    shell: bash
+    run: |
+      docker --config ~/.docker manifest create ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:linux-${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:latest
+      docker --config ~/.docker manifest push ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }}
