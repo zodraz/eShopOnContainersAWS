@@ -35,6 +35,7 @@
     <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.2.30" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="5.0.1" />
     <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="5.0.1" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.5" />
     <PackageReference Include="Google.Protobuf" Version="3.19.4" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />

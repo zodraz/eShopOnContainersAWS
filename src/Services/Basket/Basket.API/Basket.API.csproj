@@ -24,6 +24,7 @@
 	  <PackageReference Include="AspNetCore.HealthChecks.Aws.SecretsManager" Version="6.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.2" />
 	  <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0-preview.1" />
+	  <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.5" />
 	  <PackageReference Include="Google.Protobuf" Version="3.19.4" />
 	  <PackageReference Include="Grpc.AspNetCore.Server" Version="2.34.0" />
 	  <PackageReference Include="Grpc.Tools" Version="2.34.0" PrivateAssets="All" />
