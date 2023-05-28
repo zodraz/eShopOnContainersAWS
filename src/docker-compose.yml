@@ -169,7 +169,7 @@ services:
     image: ${REGISTRY:-eshop}/marketing.function:${PLATFORM:-linux}-${TAG:-latest}
     build:
       context: .
-      dockerfile: Services/Marketing/Infrastructure/Lambdas/Marketing.Functions/src/Marketing.Functions/Dockerfile
+      dockerfile: Services/Marketing/Infrastructure/Lambdas/Marketing.Functions/src/Marketing.Functions/Docker/Dockerfile
     depends_on:
       - sqldata
       - nosqldata

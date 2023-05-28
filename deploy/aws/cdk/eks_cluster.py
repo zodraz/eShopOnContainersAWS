@@ -1926,13 +1926,28 @@ class EKSClusterStack(Stack):
         # At the moment better to use CloudWatch logs which seperates by source logstream and onward
         # stream from that to OpenSearch?
 
-        irsa_pods_service_account = eks_cluster.add_service_account(
+        eks_cluster.add_service_account(
             "ServiceAccountForIRSAPods",
-            name="sel-eks-sa",
+            name="eshop-eks-sa",
             namespace="default",
             annotations={'eks.amazonaws.com/role-arn': 'arn:aws:iam::' +
                          self.node.try_get_context(
-                             "account") + ':role/EshopEKS-OIDC-SA'})
+                             "account") + ':role/EshopEksForOidcSa'})
+
+        # Deploy the manifests from service-accounts.yaml
+        service_accounts_yaml_file = open(
+            "service-accounts.yaml", "r")
+        service_accounts_yaml = list(
+            yaml.load_all(service_accounts_yaml_file,
+                          Loader=yaml.FullLoader))
+        service_accounts_yaml_file.close()
+        loop_iteration = 0
+        for value in service_accounts_yaml:
+            # print(value)
+            loop_iteration = loop_iteration + 1
+            manifest_id = "ServiceAccountsManifest" + \
+                str(loop_iteration)
+            manifest = eks_cluster.add_manifest(manifest_id, value)
 
         if self.node.try_get_context(
                 "fargate_logs_to_managed_opensearch") == "True":
