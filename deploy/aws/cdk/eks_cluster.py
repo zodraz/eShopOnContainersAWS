@@ -34,33 +34,23 @@ class EKSClusterStack(Stack):
         # Either create a new IAM role to administrate the cluster or create a new one
         if self.node.try_get_context(
                 "create_new_cluster_admin_role") == "True":
-            # self.cluster_admin_role = iam.Role(
-            #     self,
-            #     "ClusterAdminRole",
-            #     role_name='eks-admin-role',
-            #     assumed_by=iam.CompositePrincipal(
-            #         iam.AccountRootPrincipal(),
-            #         iam.ServicePrincipal("ec2.amazonaws.com"),
-            #     ),
-            # )
-            # cluster_admin_policy_statement_json_1 = {
-            #     "Effect": "Allow",
-            #     "Action": ["eks:DescribeCluster"],
-            #     "Resource": "*",
-            # }
-            # self.cluster_admin_role.add_to_principal_policy(
-            #     iam.PolicyStatement.from_json(
-            #         cluster_admin_policy_statement_json_1))
-
             self.cluster_admin_role = iam.Role(
-                self, 'EKSMasterRole', role_name='eks-admin-role',
-                assumed_by=iam.ServicePrincipal("ec2.amazonaws.com")
+                self,
+                "EKSMasterRole",
+                role_name='eks-admin-role',
+                assumed_by=iam.CompositePrincipal(
+                    iam.AccountRootPrincipal(),
+                    iam.ServicePrincipal("ec2.amazonaws.com"),
+                ),
             )
-            self.cluster_admin_role.add_managed_policy(
-                iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3ReadOnlyAccess"))
-            self.cluster_admin_role.add_managed_policy(
-                iam.ManagedPolicy.from_aws_managed_policy_name("IAMFullAccess"))
-            self.cluster_admin_role.add_to_policy(statement.admin_statement())
+            cluster_admin_policy_statement_json_1 = {
+                "Effect": "Allow",
+                "Action": ["eks:DescribeCluster"],
+                "Resource": "*",
+            }
+            self.cluster_admin_role.add_to_principal_policy(
+                iam.PolicyStatement.from_json(
+                    cluster_admin_policy_statement_json_1))
 
         else:
             # You'll also need to add a trust relationship to ec2.amazonaws.com to sts:AssumeRole to this as well
@@ -101,59 +91,11 @@ class EKSClusterStack(Stack):
             endpoint_access=endpoint_access,
             version=eks.KubernetesVersion.of(
                 self.node.try_get_context("eks_version")),
-            kubectl_layer=lambda_layer_kubectl_v24.KubectlV24Layer("kubectl"),
+            kubectl_layer=lambda_layer_kubectl_v24.KubectlV24Layer(
+                self, "kubectl"),
             default_capacity=0,
             role=node_role,
             vpc_subnets=vpc_subnets)
-
-        self.oidc_url = eks_cluster.cluster_open_id_connect_issuer_url
-
-        # cluster_pod_role = iam.Role(
-        #     self,
-        #     "ClusterPodRole",
-        #     assumed_by=iam.AnyPrincipal()
-        # )
-
-        # amazon_dynamodb_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-        #     "AmazonDynamoDBFullAccess")
-        # cluster_pod_role.add_managed_policy(amazon_dynamodb_full_access)
-
-        # if self.node.try_get_context("deploy_dynamodb") == "True":
-        #     amazon_doc_db_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-        #         "AmazonDocDBFullAccess")
-        #     cluster_pod_role.add_managed_policy(amazon_doc_db_full_access)
-
-        # if self.node.try_get_context("deploy_rabbitmq") == "True":
-        #     amazon_mq_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-        #         "AmazonMQFullAccess")
-        #     cluster_pod_role.add_managed_policy(amazon_mq_full_access)
-
-        # amazon_elastic_cache_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-        #     "AmazonElastiCacheFullAccess")
-        # cluster_pod_role.add_managed_policy(amazon_elastic_cache_full_access)
-
-        # amazon_rds_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-        #     "AmazonRDSFullAccess")
-        # cluster_pod_role.add_managed_policy(amazon_rds_full_access)
-
-        # amazon_sqs_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-        #     "AmazonSQSFullAccess")
-        # cluster_pod_role.add_managed_policy(amazon_sqs_full_access)
-
-        # amazon_sns_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-        #     "AmazonSNSFullAccess")
-        # cluster_pod_role.add_managed_policy(amazon_sns_full_access)
-
-        # amazon_secretsmanager_rw = iam.ManagedPolicy.from_aws_managed_policy_name(
-        #     "SecretsManagerReadWrite")
-        # cluster_pod_role.add_managed_policy(amazon_secretsmanager_rw)
-
-        # cluster_pod_role_arn = cluster_pod_role.role_arn
-
-        # eks_service_account = eks_cluster.add_service_account("eshop-aws-eks-service-account",
-        #                                                       annotations={
-        #                                                           "eks.amazonaws.com/role-arn": cluster_pod_role_arn
-        #                                                       })
 
         # Create a Fargate Pod Execution Role to use with any Fargate Profiles
         # We create this explicitly to allow for logging without fargate_only_cluster=True
@@ -221,6 +163,14 @@ class EKSClusterStack(Stack):
                 export_name="EKSFargatePodExecRoleArn",
             )
 
+            CfnOutput(
+                self,
+                id="EKSClusterOIDCProvider",
+                value=eks_cluster.cluster_open_id_connect_issuer,
+                description="The EKS Cluster's OIDC Provider",
+                export_name="EKSClusterOIDCProvider",
+            )
+
         # Add a Managed Node Group
         if self.node.try_get_context("eks_deploy_managed_nodegroup") == "True":
             # If we enabled spot then use that
@@ -256,6 +206,13 @@ class EKSClusterStack(Stack):
             ssh_worker_sg.add_ingress_rule(
                 ec2.Peer.any_ipv4(), ec2.Port.tcp(22), "SSH Access")
 
+            if self.node.try_get_context("ssh_key").strip() != "":
+                ssh_key = self.node.try_get_context("ssh_key").strip()
+            else:
+                ec2.CfnKeyPair(self, "eshopKeyPair",
+                               key_name="eshop-eks-ssh-key")
+                ssh_key = "eshop-eks-ssh-key"
+
             eks_node_group = eks_cluster.add_nodegroup_capacity(
                 "cluster-default-ng",
                 capacity_type=node_capacity_type,
@@ -267,16 +224,16 @@ class EKSClusterStack(Stack):
                 nodegroup_name='eks-node-group',
                 node_role=worker_role,
                 remote_access=eks.NodegroupRemoteAccess(
-                    ssh_key_name='dev-t', source_security_groups=[ssh_worker_sg]),
+                    ssh_key_name=ssh_key, source_security_groups=[ssh_worker_sg]),
                 # The default in CDK is to force upgrades through even if they violate - it is safer to not do that
                 force_update=False,
                 instance_types=instance_types,
                 release_version=self.node.try_get_context(
                     "eks_node_ami_version"),
             )
-            # eks_node_group.role.add_managed_policy(
-            #     iam.ManagedPolicy.from_aws_managed_policy_name(
-            #         "AmazonSSMManagedInstanceCore"))
+            eks_node_group.role.add_managed_policy(
+                iam.ManagedPolicy.from_aws_managed_policy_name(
+                    "AmazonSSMManagedInstanceCore"))
 
         # AWS Load Balancer Controller
         if self.node.try_get_context("deploy_aws_lb_controller") == "True":
@@ -1968,6 +1925,14 @@ class EKSClusterStack(Stack):
         # This is on the roadmap see https://github.com/aws/containers-roadmap/issues/1197
         # At the moment better to use CloudWatch logs which seperates by source logstream and onward
         # stream from that to OpenSearch?
+
+        irsa_pods_service_account = eks_cluster.add_service_account(
+            "ServiceAccountForIRSAPods",
+            name="sel-eks-sa",
+            namespace="default",
+            annotations={'eks.amazonaws.com/role-arn': 'arn:aws:iam::' +
+                         self.node.try_get_context(
+                             "account") + ':role/EshopEKS-OIDC-SA'})
 
         if self.node.try_get_context(
                 "fargate_logs_to_managed_opensearch") == "True":

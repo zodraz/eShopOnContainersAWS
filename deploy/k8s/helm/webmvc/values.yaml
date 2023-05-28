@@ -1,6 +1,7 @@
 replicaCount: 1
 clusterName: eshop-eks
 pathBase: /webmvc
+serviceAccountName: eshop-eks-sa
 
 image:
   repository: eshop/webmvc

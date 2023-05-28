@@ -1,7 +1,8 @@
 from constructs import Construct
 from aws_cdk import (
     Stack, Tags, CfnJson,
-    aws_iam as iam
+    aws_iam as iam,
+    CfnOutput, Fn
 )
 
 from eks_worker_role_statements import EksWorkerRoleStatements
@@ -9,19 +10,25 @@ from eks_worker_role_statements import EksWorkerRoleStatements
 import re
 
 
-class IamOICProvider(Stack):
-    def __init__(self, scope: Construct, construct_id: str, oidc_url: str, env, **kwargs) -> None:
+class IamOICProviderStack(Stack):
+    def __init__(self, scope: Construct, construct_id: str, env, **kwargs) -> None:
         super().__init__(scope, construct_id, env=env, **kwargs)
 
-        statement = EksWorkerRoleStatements()
-        iam_oic = iam.OpenIdConnectProvider(
-            self, construct_id,
-            url=oidc_url,
-            client_ids=['sts.amazonaws.com']
-        )
-        Tags.of(iam_oic).add(key='cfn.eks.stack', value='iam-pid-stack')
+        # iam_oic = iam.OpenIdConnectProvider(
+        #     self, "eshopOpenIdConnectProvider",
+        #     url=oidc_url,
+        #     client_ids=['sts.amazonaws.com']
+        # )
+        # Tags.of(iam_oic).add(key='cfn.eks.stack', value='iam-pid-stack')
 
-        oidc_provider = re.sub("https://", "", oidc_url)
+        oidc_provider = Fn.import_value("EKSClusterOIDCProvider")
+
+        CfnOutput(
+            self,
+            id="oidc_provider",
+            value=oidc_provider,
+            description="oidc_provider"
+        )
 
         def string_like(name_space, sa_name):
             string = CfnJson(
@@ -35,7 +42,7 @@ class IamOICProvider(Stack):
 
         oic_role = iam.Role(
             self, 'EksIAMServiceAccountRole',
-            role_name='eshop-eks-oic-dev-sa',
+            role_name='EshopEksForOidcSa',
             assumed_by=iam.FederatedPrincipal(
                 federated=f'arn:aws:iam::{env.account}:oidc-provider/{oidc_provider}',
                 conditions={'StringEquals': string_like(

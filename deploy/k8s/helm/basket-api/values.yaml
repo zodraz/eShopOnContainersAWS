@@ -1,6 +1,7 @@
 replicaCount: 1
 clusterName: eshop-eks
 pathBase: /basket-api
+serviceAccountName: eshop-eks-sa
 
 image:
   repository: eshop/basket.api

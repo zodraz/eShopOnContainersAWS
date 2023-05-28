@@ -1,6 +1,7 @@
 replicaCount: 1
 clusterName: eshop-eks
 pathBase: /webstatus
+serviceAccountName: eshop-eks-sa
 
 image:
   repository: eshop/webstatus

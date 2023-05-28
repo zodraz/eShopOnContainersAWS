@@ -29,6 +29,10 @@
     <PackageReference Include="Google.Protobuf" Version="3.19.4" />
 	  <PackageReference Include="Kralizek.Extensions.Configuration.AWSSecretsManager" Version="1.6.3" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="OpenTelemetry" Version="1.2.0" />
     <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.1.0" />

@@ -1,5 +1,4 @@
-﻿using Amazon.S3;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net.Http;
 
 namespace Microsoft.eShopOnContainers.Services.Basket.API.Controllers;

@@ -1,6 +1,7 @@
 replicaCount: 1
 clusterName: eshop-aks
 pathBase: /catalog-api
+serviceAccountName: eshop-eks-sa
 
 image:
   repository: eshop/catalog.api

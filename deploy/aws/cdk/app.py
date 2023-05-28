@@ -4,14 +4,14 @@ from eks_cluster import EKSClusterStack
 from vpc import VpcStack
 from rds_sqlserver import RDSSQLServerStack
 from cloudfront_s3 import CloudFrontS3Stack
-from elasticcache_redis import ElasticCacheRedisStack
+from elasticache_redis import ElastiCacheRedisStack
 from lambda_function_url import LambdaFunctionUrlStack
 from documentdb import DocumentDbStack
 # from waf_alb import WAFALBStack
 from amq_rabbitmq import AmazonMQRabbitMQStack
 from secrets_manager import SecretsManagerStack
 from route53 import Route53Stack
-from iam_oic_provider import IamOICProvider
+from iam_oic_provider import IamOICProviderStack
 
 app = App()
 if app.node.try_get_context("account").strip() != "":
@@ -39,15 +39,14 @@ rds_sqlserver = RDSSQLServerStack(
 
 # Note that if we didn't pass through the ACCOUNT and REGION from these environment variables that
 # it won't let us create 3 AZs and will only create a max of 2 - even when we ask for 3 in eks_vpc
-eks_cluster_stack = EKSClusterStack(app,
-                                    "EKSClusterStack",
-                                    vpc.vpc,
-                                    env=environment)
+eks_cluster = EKSClusterStack(app,
+                              "EKSClusterStack",
+                              vpc.vpc,
+                              env=environment)
 
-IamOICProvider(app, 'EksOICIdentityProvider',
-               oidc_url=eks_cluster_stack.oidc_url, env=environment)
+IamOICProviderStack(app, 'IamOICProviderStack', env=environment)
 
-elastic_cache_redis = ElasticCacheRedisStack(
+elastic_cache_redis = ElastiCacheRedisStack(
     app, "ElasticCacheRedisStack", vpc.vpc, env=environment)
 
 lambda_url = LambdaFunctionUrlStack(

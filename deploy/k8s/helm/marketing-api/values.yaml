@@ -1,6 +1,7 @@
 replicaCount: 1
 clusterName: eshop-eks
 pathBase: /marketing-api
+serviceAccountName: eshop-eks-sa
 
 image:
   repository: eshop/marketing.api

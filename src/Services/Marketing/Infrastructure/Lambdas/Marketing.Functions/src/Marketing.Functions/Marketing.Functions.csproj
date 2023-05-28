@@ -9,6 +9,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <!-- Generate ready to run images during publishing to improve cold start time. -->
     <PublishReadyToRun>true</PublishReadyToRun>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,6 +41,10 @@
     <PackageReference Include="AWSXRayRecorder.Handlers.AwsSdk" Version="2.11.0" />
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="Google.Protobuf" Version="3.19.4" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="4.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />

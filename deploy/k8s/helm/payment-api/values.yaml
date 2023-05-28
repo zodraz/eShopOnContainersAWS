@@ -1,6 +1,7 @@
 replicaCount: 1
 clusterName: eshop-eks
 pathBase: /payment-api
+serviceAccountName: eshop-eks-sa
 
 image:
   repository: eshop/payment.api

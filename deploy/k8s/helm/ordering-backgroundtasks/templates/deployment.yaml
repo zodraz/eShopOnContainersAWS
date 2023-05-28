@@ -22,6 +22,7 @@ spec:
         app: {{ template "ordering-backgroundtasks.name" . }}
         release: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ .Values.serviceAccountName }}
       {{ if .Values.inf.registry -}}
       imagePullSecrets:
       - name: {{ .Values.inf.registry.secretName }}

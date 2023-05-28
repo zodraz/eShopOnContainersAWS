@@ -6,7 +6,7 @@ from aws_cdk import (
 )
 
 
-class ElasticCacheRedisStack(Stack):
+class ElastiCacheRedisStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, vpc: ec2.Vpc,
                  **kwargs) -> None:

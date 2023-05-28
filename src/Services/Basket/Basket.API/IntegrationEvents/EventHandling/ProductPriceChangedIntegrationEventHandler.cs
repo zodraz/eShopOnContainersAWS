@@ -19,14 +19,14 @@ public class ProductPriceChangedIntegrationEventHandler : IHandleMessages<Produc
         {
             _logger.LogInformation("----- Handling integration event: at {AppName} - ({@IntegrationEvent})", Program.AppName, @event);
 
-            //var userIds = _repository.GetUsers();
+            var userIds = _repository.GetUsers();
 
-            //foreach (var id in userIds)
-            //{
-            //    var basket = await _repository.GetBasketAsync(id);
+            foreach (var id in userIds)
+            {
+                var basket = await _repository.GetBasketAsync(id);
 
-            //    await UpdatePriceInBasketItems(@event.ProductId, @event.NewPrice, @event.OldPrice, basket);
-            //}
+                await UpdatePriceInBasketItems(@event.ProductId, @event.NewPrice, @event.OldPrice, basket);
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 replicaCount: 1
 clusterName: eshop-eks
 pathBase: /identity
+serviceAccountName: eshop-eks-sa
 
 image:
   repository: eshop/identity.api

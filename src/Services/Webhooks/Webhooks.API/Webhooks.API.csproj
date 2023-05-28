@@ -23,6 +23,10 @@
 	  <PackageReference Include="Kralizek.Extensions.Configuration.AWSSecretsManager" Version="1.6.3" />	 
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.HealthChecks" Version="1.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="5.0.2" />
     <PackageReference Include="OpenTelemetry" Version="1.2.0" />
     <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.1.0" />

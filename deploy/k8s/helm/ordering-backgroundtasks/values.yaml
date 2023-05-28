@@ -1,6 +1,7 @@
 replicaCount: 1
 clusterName: eshop-eks
 pathBase: /ordering-backgroundtasks
+serviceAccountName: eshop-eks-sa
 
 image:
   repository: eshop/ordering.backgroundtasks

@@ -26,6 +26,7 @@ spec:
         linkerd.io/inject: enabled
       {{- end }}
     spec:
+      serviceAccountName: {{ .Values.serviceAccountName }}
       {{ if .Values.inf.registry -}}
       imagePullSecrets:
       - name: {{ .Values.inf.registry.secretName }}
