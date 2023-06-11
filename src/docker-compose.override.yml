@@ -97,11 +97,9 @@ services:
       - Jaeger__Host=${ESHOP_JAEGER_HOST}
       - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
-      #- UseVault=${ESHOP_USE_AWS_VAULT}
-      - UseVault=true
+      - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopBasketApi}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
       - PATH_BASE=/basket-api
       - GRPC_PORT=81
       - PORT=80
@@ -187,7 +185,6 @@ services:
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopOrderingApi}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
       - Serilog__MinimumLevel__Override__Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ=Verbose
       - Serilog__MinimumLevel__Override__ordering-api=Verbose
       - PATH_BASE=/ordering-api
@@ -233,7 +230,6 @@ services:
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopOrderningBkg}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
       - Serilog__MinimumLevel__Override__Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ=Verbose
       - AWS__Profile=${ESHOP_AWS_PROFILE}
       - AWS__Region=${ESHOP_AWS_REGION}
@@ -279,7 +275,6 @@ services:
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopMarketigApi}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
       - PATH_BASE=/marketing-api
       - AWS__Profile=${ESHOP_AWS_PROFILE}
       - AWS__Region=${ESHOP_AWS_REGION}
@@ -358,7 +353,6 @@ services:
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopLocationsApi}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
       - PATH_BASE=/locations-api
       - AWS__Profile=${ESHOP_AWS_PROFILE}
       - AWS__Region=${ESHOP_AWS_REGION}
@@ -633,7 +627,6 @@ services:
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
       - AWS__Profile=${ESHOP_AWS_PROFILE}
       - AWS__Region=${ESHOP_AWS_REGION}
       - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}

@@ -226,11 +226,6 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
 
         protected virtual void ConfigureAuth(IApplicationBuilder app)
         {
-            if (Configuration.GetValue<bool>("UseLoadTest"))
-            {
-                app.UseMiddleware<ByPassAuthMiddleware>();
-            }
-
             app.UseAuthentication();
             app.UseAuthorization();
         }
@@ -331,7 +326,7 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
             return services;
         }
 
-        public static IServiceCollection AddEventBus(this IServiceCollection services,LocationSettings locationSettings)
+        public static IServiceCollection AddEventBus(this IServiceCollection services, LocationSettings locationSettings)
         {
             var eventBusSettings = locationSettings.EventBus;
 

@@ -22,7 +22,7 @@ class RDSSQLServerStack(Stack):
             "sqlServerPwd",
             description="SQLServer auth",
             generate_secret_string=secretsmanager.SecretStringGenerator(
-                exclude_characters='/"@'))
+                exclude_characters='/"@;'))
 
         db_user = "adminuser"
 

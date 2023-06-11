@@ -146,7 +146,7 @@
             {
                 app.UsePathBase(pathBase);
             }
-            
+
             app.UseRouting();
             app.UseHttpMetrics(options =>
             {
@@ -174,7 +174,7 @@
             app.UseSwagger()
                .UseSwaggerUI(setup =>
                {
-                   setup.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Marketing.API V1");
+                   setup.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Marketing.API V1");
                    setup.OAuthClientId("marketingswaggerui");
                    setup.OAuthAppName("Marketing Swagger UI");
                });
@@ -230,14 +230,9 @@
                 options.RequireHttpsMetadata = false;
             });
         }
-      
+
         protected virtual void ConfigureAuth(IApplicationBuilder app)
         {
-            if (Configuration.GetValue<bool>("UseLoadTest"))
-            {
-                app.UseMiddleware<ByPassAuthMiddleware>();
-            }
-
             app.UseAuthentication();
             app.UseAuthorization();
         }

@@ -31,8 +31,6 @@ env:
   urls:
   # configmap declares variables which value is taken from the config map defined in template configmap.yaml (name is name of var and key the key in configmap).
   configmap:
-    - name: UseLoadTest
-      key: all_EnableLoadTest
     - name: IdentityUrl
       key: internalurls__IdentityUrl
     - name: IdentityUrlExternal

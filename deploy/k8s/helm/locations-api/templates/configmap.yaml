@@ -12,7 +12,6 @@ metadata:
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 data:
-  all_EnableLoadTest: "{{ .Values.inf.misc.useLoadTest }}"
   internalurls__IdentityUrl: http://{{ .Values.app.svc.identity }}
   urls__IdentityUrl: {{ $identity }}
   locations__ConnectionString: mongodb://{{ $mongo }}
