@@ -20,18 +20,21 @@ class AmazonMQRabbitMQStack(Stack):
             bastion_to_mq_group = ec2.SecurityGroup(
                 self, 'bastion_to_mq_group', vpc=vpc)
 
-            mq_group.add_ingress_rule(peer=ec2.Peer.ipv4(self.node.try_get_context(
-                "vpc_cidr_mask_rabbitmq")),
-                connection=ec2.Port.tcp(5671),
-                description='allow AMQP 0-9-1 and 1.0 clients with TLS communication within VPC')
-            mq_group.add_ingress_rule(peer=ec2.Peer.ipv4(self.node.try_get_context(
-                "vpc_cidr_mask_rabbitmq")),
-                connection=ec2.Port.tcp(5672),
-                description='allow AMQP 0-9-1 and 1.0 clients with TLS communication without TLS within VPC')
-            mq_group.add_ingress_rule(peer=ec2.Peer.ipv4(self.node.try_get_context(
-                "vpc_cidr_mask_rabbitmq")),
-                connection=ec2.Port.tcp(443),
-                description='allow communication on RabbitMQ console port within VPC')
+            list_subnets = self.node.try_get_context(
+                "vpc_cidr_rabbitmq_subnets").split(',')
+
+            for subnet in list_subnets:
+
+                mq_group.add_ingress_rule(peer=ec2.Peer.ipv4(subnet),
+                                          connection=ec2.Port.tcp(5671),
+                                          description='allow AMQP 0-9-1 and 1.0 clients with TLS communication within VPC')
+                mq_group.add_ingress_rule(peer=ec2.Peer.ipv4(subnet),
+                                          connection=ec2.Port.tcp(5672),
+                                          description='allow AMQP 0-9-1 and 1.0 clients with TLS communication without TLS within VPC')
+                mq_group.add_ingress_rule(peer=ec2.Peer.ipv4(subnet),
+                                          connection=ec2.Port.tcp(443),
+                                          description='allow communication on RabbitMQ console port within VPC')
+
             mq_group.add_ingress_rule(peer=mq_group,
                                       connection=ec2.Port.all_tcp(),
                                       description='allow communication from nlb and other brokers')

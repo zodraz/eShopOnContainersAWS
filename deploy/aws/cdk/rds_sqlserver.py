@@ -36,11 +36,14 @@ class RDSSQLServerStack(Stack):
             vpc_subnet = ec2.SubnetSelection(
                 subnet_type=ec2.SubnetType.PRIVATE_WITH_EGRESS)
 
-            db_security_group.add_ingress_rule(
-                peer=ec2.Peer.ipv4(self.node.try_get_context(
-                    "vpc_cidr_mask_sqlserver")),
-                description="SQL Server",
-                connection=ec2.Port.tcp(1433))
+            list_subnets = self.node.try_get_context(
+                "vpc_cidr_sqlserver_subnets").split(',')
+
+            for subnet in list_subnets:
+                db_security_group.add_ingress_rule(
+                    peer=ec2.Peer.ipv4(subnet),
+                    description="SQL Server",
+                    connection=ec2.Port.tcp(1433))
 
             db_public_access = False
         else:

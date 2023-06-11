@@ -8,10 +8,10 @@ inf:
     enabled: true           # True to enable TLS (set by deploy-all.ps1)
     issuer: ""              # cert-manager issuer to use for retrieving certs (set by deploy-all.ps1)
   sql:                      # inf.sql defines the sql server databases & logins
-    host:  sqlserverstack-rdsqlserverea747c72-tkjkxs73lqoa.cug71fym5n3i.eu-central-1.rds.amazonaws.com  # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
+    host:  sqlserverstack-rdsqlserverea747c72-zv9u0zakyodj.cug71fym5n3i.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
     common:
       user: adminuser              # SQL user
-      pwd: UgJq^Yp]jwLiw|QVgD1%;b-&f$?7WJLk        # SQL pwd
+      pwd: 8NwN,#m>t&yf9mwN3F1IX[~Cj2MI4|hc        # SQL pwd
       pid: Developer
     catalog:                # inf.sql.catalog: settings for the catalog-api sql (user, pwd, db)
       db: CatalogDb         # Catalog API SQL db name

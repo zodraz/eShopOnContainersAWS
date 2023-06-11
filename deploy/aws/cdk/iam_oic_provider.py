@@ -5,10 +5,6 @@ from aws_cdk import (
     CfnOutput, Fn
 )
 
-from eks_worker_role_statements import EksWorkerRoleStatements
-
-import re
-
 
 class IamOICProviderStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, env, **kwargs) -> None:

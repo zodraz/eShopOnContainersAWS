@@ -17,11 +17,14 @@ class DocumentDbStack(Stack):
             db_security_group = ec2.SecurityGroup(
                 self, "DocDBSecurityGroup", vpc=vpc, allow_all_outbound=True)
 
-            db_security_group.add_ingress_rule(
-                peer=ec2.Peer.ipv4(self.node.try_get_context(
-                    "vpc_cidr_mask_docdb")),
-                description="DocDB",
-                connection=ec2.Port.tcp(27017))
+            list_subnets = self.node.try_get_context(
+                "vpc_cidr_documentdb_subnets").split(',')
+
+            for subnet in list_subnets:
+                db_security_group.add_ingress_rule(
+                    peer=ec2.Peer.ipv4(subnet),
+                    description="DocDB",
+                    connection=ec2.Port.tcp(27017))
 
             if self.node.try_get_context("vpc_only_public") == "False":
                 vpc_subnet = ec2.SubnetSelection(

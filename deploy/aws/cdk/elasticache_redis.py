@@ -18,12 +18,15 @@ class ElastiCacheRedisStack(Stack):
             vpc=vpc,
         )
 
-        security_group.add_ingress_rule(
-            peer=ec2.Peer.ipv4(self.node.try_get_context(
-                "vpc_cidr_mask_redis")),
-            description="Allow Redis connection",
-            connection=ec2.Port.tcp(6379)
-        )
+        list_subnets = self.node.try_get_context(
+            "vpc_cidr_redis_subnets").split(',')
+
+        for subnet in list_subnets:
+            security_group.add_ingress_rule(
+                peer=ec2.Peer.ipv4(subnet),
+                description="Allow Redis connection",
+                connection=ec2.Port.tcp(6379)
+            )
 
         if self.node.try_get_context("vpc_only_public") == "False":
             subnets_ids = [ps.subnet_id for ps in vpc.private_subnets]

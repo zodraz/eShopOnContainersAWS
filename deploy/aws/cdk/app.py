@@ -44,7 +44,9 @@ eks_cluster = EKSClusterStack(app,
                               vpc.vpc,
                               env=environment)
 
-IamOICProviderStack(app, 'IamOICProviderStack', env=environment)
+oidcstack = IamOICProviderStack(app, 'IamOICProviderStack', env=environment)
+
+oidcstack.add_dependency(eks_cluster)
 
 elastic_cache_redis = ElastiCacheRedisStack(
     app, "ElasticCacheRedisStack", vpc.vpc, env=environment)

@@ -100,5 +100,5 @@ env:
     - name: GRPC_PORT
       value: "81"
     - name:  Vault__SecretGroups
-      value: EshopWebhookApi
+      value: EshopWebhooksApi
 
