@@ -124,8 +124,6 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
                 .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
-            var config = builder.Build();
-
             return builder.Build();
         }
     }

@@ -44,7 +44,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - SpaClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5104
       - XamarinCallback=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5105/xamarincallback
-      - ConnectionString=${ESHOP_AWS_IDENTITY_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Service.IdentityDb;User Id=sa;Password=Pass@word};TrustServerCertificate=True
+      - ConnectionString=${ESHOP_AWS_IDENTITY_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Service.IdentityDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
       - MvcClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5100
       - BasketApiClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5103
       - OrderingApiClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5102
@@ -117,7 +117,7 @@ services:
   catalog-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionString=${ESHOP_AWS_CATALOG_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word};TrustServerCertificate=True
+      - ConnectionString=${ESHOP_AWS_CATALOG_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
       - PicBaseUrl=${ESHOP_STORAGE_CATALOG_URL}
       - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
       - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
@@ -160,7 +160,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_ORDERING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.OrderingDb;User Id=sa;Password=Pass@word};TrustServerCertificate=True
+      - ConnectionString=${ESHOP_AWS_ORDERING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.OrderingDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
       - identityUrl=http://identity-api
       - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
       - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
@@ -205,7 +205,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_ORDERING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.OrderingDb;User Id=sa;Password=Pass@word};TrustServerCertificate=True
+      - ConnectionString=${ESHOP_AWS_ORDERING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.OrderingDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
       - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
       - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
       - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
@@ -245,8 +245,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_MARKETING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.MarketingDb;User Id=sa;Password=Pass@word};TrustServerCertificate=True
-      - MongoConnectionString=${ESHOP_AWS_COSMOSDB:-mongodb://nosqldata}
+      - ConnectionString=${ESHOP_AWS_MARKETING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.MarketingDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
+      - MongoConnectionString=${ESHOP_AWS_NOSQL:-mongodb://nosqldata}
       - MongoDatabase=MarketingDb
       - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
       - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
@@ -327,7 +327,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_COSMOSDB:-mongodb://nosqldata}
+      - ConnectionString=${ESHOP_AWS_NOSQL:-mongodb://nosqldata}
       - Database=LocationsDb
       - identityUrl=http://identity-api
       - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
@@ -368,7 +368,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AZURE_WEBHOOKS_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.WebhooksDb;User Id=sa;Password=Pass@word};TrustServerCertificate=True
+      - ConnectionString=${ESHOP_AZURE_WEBHOOKS_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.WebhooksDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
       - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
       - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
       - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}

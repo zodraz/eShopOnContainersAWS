@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.eShopOnContainers.Services.Locations.API;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -23,6 +24,10 @@ namespace Locations.FunctionalTests
             // Added to avoid the Authorize data annotation in test environment. 
             // Property "SuppressCheckForUnhandledSecurityMetadata" in appsettings.json
             services.Configure<RouteOptions>(Configuration);
+
+            services.AddOptions();
+            services.Configure<LocationSettings>(Configuration);
+
             return base.ConfigureServices(services);
         }
         protected override void ConfigureAuth(IApplicationBuilder app)

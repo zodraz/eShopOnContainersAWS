@@ -11,17 +11,30 @@ public class CatalogIntegrationEventService : ICatalogIntegrationEventService
 {
     private readonly IBus _bus;
     private readonly ILogger<CatalogIntegrationEventService> _logger;
+    private readonly IOptionsSnapshot<CatalogSettings> _settings;
 
     public CatalogIntegrationEventService(IBus bus,
+        IOptionsSnapshot<CatalogSettings> settings,
         ILogger<CatalogIntegrationEventService> logger)
     {
         _bus = bus ?? throw new ArgumentNullException(nameof(bus));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
     }
 
     public async Task PublishEventsThroughEventBusAsync(IntegrationEvent @event, DbContext dbContext = null, Func<Task> action = null, bool insideHandler = true)
     {
         _logger.LogInformation("----- Publishing integration event:  {AppName} - ({@IntegrationEvent})", Program.AppName, @event);
+
+        if (!_settings.Value.EventBus.OutboxEnabled)
+        {
+            await _bus.Publish(@event);
+            if (action is not null)
+            {
+                await action();
+            }
+            return;
+        }
 
         if (insideHandler)
         {

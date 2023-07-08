@@ -128,7 +128,7 @@
     "dns_domain":"eshoponcontainersaws.com",
     "create_new_certificate":"False",
     "use_certificate":"True",
-    "certificate_dns_domain_arn":"arn:aws:acm:us-east-1:791977570179:certificate/79902415-03bb-4e62-a2aa-ac8b20a449a3",
+    "certificate_dns_domain_arn":"arn:aws:acm:us-east-1:791977570179:certificate/6990ea41-e51c-4ba2-ad64-624f34bdcf66",
     "ssh_key":""
   }
 }

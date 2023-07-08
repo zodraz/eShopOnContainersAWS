@@ -71,7 +71,7 @@ public class Startup
         //and then creating the connection it seems reasonable to move
         //that cost to startup instead of having the first request pay the
         //penalty.
-        services.AddSingleton<ConnectionMultiplexer>(sp =>
+        services.AddSingleton(sp =>
         {
             var configuration = ConfigurationOptions.Parse(basketSettings.CacheConnectionString, true);
 

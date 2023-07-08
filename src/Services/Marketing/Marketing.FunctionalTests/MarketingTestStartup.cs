@@ -19,6 +19,9 @@ namespace Marketing.FunctionalTests
             // Added to avoid the Authorize data annotation in test environment. 
             // Property "SuppressCheckForUnhandledSecurityMetadata" in appsettings.json
             services.Configure<RouteOptions>(Configuration);
+
+            services.Configure<MarketingSettings>(Configuration);
+
             return base.ConfigureServices(services);
         }
         

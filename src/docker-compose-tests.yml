@@ -1,6 +1,18 @@
 version: '3.4'
 
 services:
+  localstack-test:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - 4566:4566
+    environment:
+      - SERVICES=s3,sns,sqs,secretsmanager,dynamodb,cloudfront,cloudwatch,logs
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+    volumes:
+      - ./.localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
   sql-data-test:
     image: mcr.microsoft.com/mssql/server:2019-latest 
 
@@ -95,6 +107,31 @@ services:
     volumes:
       - ${BUILD_ARTIFACTSTAGINGDIRECTORY:-./tests-results/}:/tests
 
+  marketing-api-functional-test:
+    image: ${REGISTRY:-eshop}/marketing-api-test:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Marketing/Marketing.API/Dockerfile
+      target: functionaltest
+    depends_on:
+      - sql-data-test
+      - nosql-data-test
+      - identity-api-test
+      - rabbitmq-test
+    volumes:
+      - ${BUILD_ARTIFACTSTAGINGDIRECTORY:-./tests-results/}:/tests
+
+  locations-api-functional-test:
+    image: ${REGISTRY:-eshop}/locations-api-test:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Services/Location/Locations.API/Dockerfile
+      target: functionaltest
+    depends_on:
+      - nosql-data-test
+      - rabbitmq-test
+    volumes:
+      - ${BUILD_ARTIFACTSTAGINGDIRECTORY:-./tests-results/}:/tests
 
   payment-api-test:
     image: ${REGISTRY:-eshop}/payment-api-test:${TAG:-latest}
