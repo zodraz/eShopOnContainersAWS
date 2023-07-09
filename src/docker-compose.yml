@@ -56,9 +56,9 @@ services:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
     volumes:
-        - ./configs/grafana/provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
-        - ./configs/grafana/provisioning/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yaml
-        - ./configs/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./configs/grafana/provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./configs/grafana/provisioning/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./configs/grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
         prometheus:
             condition: service_healthy

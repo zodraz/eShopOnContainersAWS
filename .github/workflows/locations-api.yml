@@ -23,24 +23,42 @@ env:
   SERVICE: locations-api
   IMAGE: locations.api
   DOTNET_VERSION: 6.0.x
-  PROJECT_PATH: Services/Locations/Marketing.API
-  TESTS_PATH: Services/Locations/Locations.FunctionalTests
+  PROJECT_PATH: Services/Location/Locations.API
+  TESTS_PATH: Services/Location/Locations.FunctionalTests
 
 jobs:
 
+  # BuildContainersForPR_Linux:
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.event_name == 'pull_request' }}
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
+  #   - uses: ./.github/workflows/composite/build-test
+  #     with:
+  #       service: ${{ env.SERVICE }}
+  #       registry_endpoint: ${{ secrets.REGISTRY_ENDPOINT }}
+  #       image_name: ${{ env.IMAGE }}
+  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       aws-region: ${{ secrets.AWS_REGION }}
+  #       dotnet_version: ${{ env.DOTNET_VERSION }}
+  #       project_path: ${{ env.PROJECT_PATH }}
+  #       tests_path: ${{ env.TESTS_PATH }}
   BuildContainersForPR_Linux:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - uses: ./.github/workflows/composite/build-test
+    - uses: ./.github/workflows/composite/build
       with:
         service: ${{ env.SERVICE }}
         registry_endpoint: ${{ secrets.REGISTRY_ENDPOINT }}
-        dotnet_version: ${{ env.DOTNET_VERSION }}
-        project_path: ${{ env.PROJECT_PATH }}
-        tests_path: ${{ env.TESTS_PATH }}
+        image_name: ${{ env.IMAGE }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
   BuildLinux:
     runs-on: ubuntu-latest

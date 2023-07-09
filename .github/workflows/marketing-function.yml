@@ -23,8 +23,8 @@ env:
   SERVICE: marketing-function
   IMAGE: marketing.function
   DOTNET_VERSION: 6.0.x
-  PROJECT_PATH: ServicesMarketing/Infrastructure/Lambdas/Marketing.Functions/src/Marketing.Functions
-  TESTS_PATH: ServicesMarketing/Infrastructure/Lambdas/Marketing.Functions/test/Marketing.Functions.Tests
+  PROJECT_PATH: Services/Marketing/Infrastructure/Lambdas/Marketing.Functions/src/Marketing.Functions
+  TESTS_PATH: Services/Marketing/Infrastructure/Lambdas/Marketing.Functions/test/Marketing.Functions.Tests
 
 jobs:
 
@@ -38,6 +38,10 @@ jobs:
       with:
         service: ${{ env.SERVICE }}
         registry_endpoint: ${{ secrets.REGISTRY_ENDPOINT }}
+        image_name: ${{ env.IMAGE }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
         dotnet_version: ${{ env.DOTNET_VERSION }}
         project_path: ${{ env.PROJECT_PATH }}
         tests_path: ${{ env.TESTS_PATH }}
