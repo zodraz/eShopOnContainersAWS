@@ -12,6 +12,7 @@ on:
     - .github/workflows/basket-api.yml
   
   pull_request:
+    types: [opened, reopened]
     branches:
     - dev
 

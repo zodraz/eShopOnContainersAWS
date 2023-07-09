@@ -23,8 +23,8 @@ env:
   SERVICE: marketing-function
   IMAGE: marketing.function
   DOTNET_VERSION: 6.0.x
-  PROJECT_PATH: ServicesMarketing/Infrastructure/Lambdas/Marketing.Functions/src/Marketing.Functions
-  TESTS_PATH: ServicesMarketing/Infrastructure/Lambdas/Marketing.Functions/test/Marketing.Functions.Tests
+  PROJECT_PATH: Services/Marketing/Infrastructure/Lambdas/Marketing.Functions/src/Marketing.Functions
+  TESTS_PATH: Services/Marketing/Infrastructure/Lambdas/Marketing.Functions/test/Marketing.Functions.Tests
 
 jobs:
 
