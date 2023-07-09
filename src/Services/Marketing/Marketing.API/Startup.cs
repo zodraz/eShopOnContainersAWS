@@ -189,24 +189,24 @@
                      Description = "The Marketing Service HTTP API"
                  });
 
-                 options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-                 {
-                     Type = SecuritySchemeType.OAuth2,
-                     Flows = new OpenApiOAuthFlows()
-                     {
-                         Implicit = new OpenApiOAuthFlow()
-                         {
-                             AuthorizationUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
-                             TokenUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
-                             Scopes = new Dictionary<string, string>()
-                             {
-                                { "marketing", "Marketing API" }
-                             }
-                         }
-                     }
-                 });
+                 //options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                 //{
+                 //    Type = SecuritySchemeType.OAuth2,
+                 //    Flows = new OpenApiOAuthFlows()
+                 //    {
+                 //        Implicit = new OpenApiOAuthFlow()
+                 //        {
+                 //            AuthorizationUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
+                 //            TokenUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
+                 //            Scopes = new Dictionary<string, string>()
+                 //            {
+                 //               { "marketing", "Marketing API" }
+                 //            }
+                 //        }
+                 //    }
+                 //});
 
-                 options.OperationFilter<AuthorizeCheckOperationFilter>();
+                 //options.OperationFilter<AuthorizeCheckOperationFilter>();
              });
         }
 

@@ -81,24 +81,24 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
                     Description = "The Location Microservice HTTP API. This is a Data-Driven/CRUD microservice sample",
                 });
 
-                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-                {
-                    Type = SecuritySchemeType.OAuth2,
-                    Flows = new OpenApiOAuthFlows()
-                    {
-                        Implicit = new OpenApiOAuthFlow()
-                        {
-                            AuthorizationUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
-                            TokenUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
-                            Scopes = new Dictionary<string, string>()
-                            {
-                                { "locations", "Locations API" }
-                            }
-                        }
-                    }
-                });
+                //options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                //{
+                //    Type = SecuritySchemeType.OAuth2,
+                //    Flows = new OpenApiOAuthFlows()
+                //    {
+                //        Implicit = new OpenApiOAuthFlow()
+                //        {
+                //            AuthorizationUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
+                //            TokenUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
+                //            Scopes = new Dictionary<string, string>()
+                //            {
+                //                { "locations", "Locations API" }
+                //            }
+                //        }
+                //    }
+                //});
 
-                options.OperationFilter<AuthorizeCheckOperationFilter>();
+                //options.OperationFilter<AuthorizeCheckOperationFilter>();
 
             });
 
