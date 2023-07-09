@@ -405,29 +405,29 @@ services:
    volumes:
      - ./ApiGateways/Envoy/config/mobileshopping:/etc/envoy
    ports:
-   - "5200:80"
-   - "15200:8001"
+     - "5200:80"
+     - "15200:8001"
 
   mobilemarketingapigw:
    volumes:
      - ./ApiGateways/Envoy/config/mobileshopping:/etc/envoy
    ports:
-   - "5201:80"
-   - "15201:8001"
+     - "5201:80"
+     - "15201:8001"
 
   webshoppingapigw:
     volumes:
       - ./ApiGateways/Envoy/config/webshopping:/etc/envoy
     ports:
-    - "5202:80"
-    - "15202:8001"
+      - "5202:80"
+      - "15202:8001"
 
   webmarketingapigw:
     volumes:
       - ./ApiGateways/Envoy/config/webmarketing:/etc/envoy
     ports:
-    - "5203:80"
-    - "15203:8001"
+      - "5203:80"
+      - "15203:8001"
 
   mobileshoppingagg:
    environment:
@@ -532,7 +532,7 @@ services:
       - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
       - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
     ports:
-    - "5112:80"
+      - "5112:80"
 
   webstatus:
     environment:
