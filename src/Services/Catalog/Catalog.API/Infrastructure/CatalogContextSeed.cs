@@ -8,13 +8,18 @@ public class CatalogContextSeed
     {
         var policy = CreatePolicy(logger, nameof(CatalogContextSeed));
 
+        var connStr = context.Database.GetDbConnection().ConnectionString;
+
+        logger.LogInformation("Connection string is 333: " + connStr);
+
+
         await policy.ExecuteAsync(async () =>
         {
             var useCustomizationData = settings.Value.UseCustomizationData;
             var contentRootPath = env.ContentRootPath;
             var picturePath = env.WebRootPath;
 
-            var connStr=context.Database.GetDbConnection().ConnectionString;
+            
 
             logger.LogInformation("Connection string is 2222: " + connStr);
 
