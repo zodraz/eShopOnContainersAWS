@@ -64,4 +64,4 @@ runs:
     working-directory: ./src
     env:
       TAG: ${{ env.BRANCH }}
-      # REGISTRY: ${{ inputs.registry_endpoint }}
+      REGISTRY: eshop
