@@ -2,6 +2,8 @@
 
 Log.Logger = CreateSerilogLogger(configuration);
 
+Log.Information("Connectionstring is: " + configuration["ConnectionString"]);
+
 try
 {
     Log.Information("Configuring web host ({ApplicationContext})...", Program.AppName);

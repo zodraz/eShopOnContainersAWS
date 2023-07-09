@@ -347,10 +347,6 @@ public static class CustomExtensionMethods
                         t.EnableDiagnosticSources();
                     });
 
-                //var logger = services.GetService<ILogger<CatalogContextSeed>>();
-
-                System.Console.WriteLine("Connection string:" + configuration["ConnectionString"]);
-
                 if (eventBusSettings.OutboxEnabled)
                 {
                     rebusConfig.Outbox(o => o.StoreInSqlServer(configuration["ConnectionString"], "Outbox"));
