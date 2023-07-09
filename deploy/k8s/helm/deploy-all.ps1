@@ -32,6 +32,7 @@ function Install-Chart {
     
     if ($chart -ne "eshop-common" -or $customRegistry) {
         # eshop-common is ignored when no secret must be deployed        
+        # $command = "install --dry-run --debug $appName-$chart $options $chart"
         $command = "install $appName-$chart $options $chart"
         Write-Host "Helm Command: helm $command" -ForegroundColor Gray
         Invoke-Expression 'cmd /c "helm $command"'
@@ -108,6 +109,10 @@ Write-Host "Begin eShopOnContainers installation using Helm" -ForegroundColor Gr
 $infras = ("sql-data", "nosql-data", "rabbitmq", "keystore-data", "basket-data")
 $charts = ("eshop-common", "basket-api", "catalog-api", "identity-api", "locations-api", "marketing-api", "mobileshoppingagg", "ordering-api", "ordering-backgroundtasks", "ordering-signalrhub", "payment-api", "webmvc", "webshoppingagg", "webspa", "webstatus", "webhooks-api", "webhooks-web")
 $gateways = ("apigwmm", "apigwms", "apigwwm", "apigwws")
+
+# $deployInfrastructure = $false
+# $charts = ("catalog-api")
+
 
 if ($deployInfrastructure) {
     foreach ($infra in $infras) {

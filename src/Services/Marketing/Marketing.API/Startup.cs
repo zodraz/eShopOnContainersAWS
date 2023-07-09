@@ -1,6 +1,5 @@
 ﻿namespace Microsoft.eShopOnContainers.Services.Marketing.API
 {
-    using Amazon;
     using Amazon.SimpleNotificationService;
     using Amazon.SQS;
     using AspNetCore.Builder;
@@ -24,7 +23,6 @@
     using Microsoft.AspNetCore.Diagnostics.HealthChecks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.eShopOnContainers.Services.Marketing.API.Controllers;
-    using Microsoft.eShopOnContainers.Services.Marketing.API.Infrastructure.Middlewares;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.OpenApi.Models;
     using Prometheus;
@@ -184,7 +182,6 @@
         {
             services.AddSwaggerGen(options =>
              {
-                 options.DescribeAllEnumsAsStrings();
                  options.SwaggerDoc("v1", new OpenApiInfo
                  {
                      Title = "eShopOnContainers - Marketing HTTP API",

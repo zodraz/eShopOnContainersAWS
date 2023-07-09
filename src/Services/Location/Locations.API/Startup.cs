@@ -74,7 +74,6 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
             // Add framework services.
             services.AddSwaggerGen(options =>
             {
-                options.DescribeAllEnumsAsStrings();
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "eShopOnContainers - Location HTTP API",

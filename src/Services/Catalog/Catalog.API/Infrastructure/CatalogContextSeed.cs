@@ -14,33 +14,38 @@ public class CatalogContextSeed
             var contentRootPath = env.ContentRootPath;
             var picturePath = env.WebRootPath;
 
-            if (!context.CatalogBrands.Any())
+            using (context)
             {
-                await context.CatalogBrands.AddRangeAsync(useCustomizationData
-                    ? GetCatalogBrandsFromFile(contentRootPath, logger)
-                    : GetPreconfiguredCatalogBrands());
+                context.Database.Migrate();
 
-                await context.SaveChangesAsync();
-            }
+                if (!context.CatalogBrands.Any())
+                {
+                    await context.CatalogBrands.AddRangeAsync(useCustomizationData
+                        ? GetCatalogBrandsFromFile(contentRootPath, logger)
+                        : GetPreconfiguredCatalogBrands());
 
-            if (!context.CatalogTypes.Any())
-            {
-                await context.CatalogTypes.AddRangeAsync(useCustomizationData
-                    ? GetCatalogTypesFromFile(contentRootPath, logger)
-                    : GetPreconfiguredCatalogTypes());
+                    await context.SaveChangesAsync();
+                }
 
-                await context.SaveChangesAsync();
-            }
+                if (!context.CatalogTypes.Any())
+                {
+                    await context.CatalogTypes.AddRangeAsync(useCustomizationData
+                        ? GetCatalogTypesFromFile(contentRootPath, logger)
+                        : GetPreconfiguredCatalogTypes());
 
-            if (!context.CatalogItems.Any())
-            {
-                await context.CatalogItems.AddRangeAsync(useCustomizationData
-                    ? GetCatalogItemsFromFile(contentRootPath, context, logger)
-                    : GetPreconfiguredItems());
+                    await context.SaveChangesAsync();
+                }
 
-                await context.SaveChangesAsync();
+                if (!context.CatalogItems.Any())
+                {
+                    await context.CatalogItems.AddRangeAsync(useCustomizationData
+                        ? GetCatalogItemsFromFile(contentRootPath, context, logger)
+                        : GetPreconfiguredItems());
 
-                GetCatalogItemPictures(contentRootPath, picturePath);
+                    await context.SaveChangesAsync();
+
+                    GetCatalogItemPictures(contentRootPath, picturePath);
+                }
             }
         });
     }
