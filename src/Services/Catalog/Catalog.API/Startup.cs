@@ -347,7 +347,7 @@ public static class CustomExtensionMethods
                         t.EnableDiagnosticSources();
                     });
 
-                var logger = services.GetService<ILogger<CatalogContextSeed>>();
+                //var logger = services.GetService<ILogger<CatalogContextSeed>>();
 
                 System.Console.WriteLine("Connection string:" + configuration["ConnectionString"]);
 
