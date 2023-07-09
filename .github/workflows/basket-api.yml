@@ -22,6 +22,9 @@ on:
 env:
   SERVICE: basket-api
   IMAGE: basket.api
+  DOTNET_VERSION: 6.0.x
+  PROJECT_PATH: Services/Basket/Basket.API
+  TESTS_PATH: Services/Basket/Basket.UnitTests
 
 jobs:
 
