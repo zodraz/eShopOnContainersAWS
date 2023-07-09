@@ -16,6 +16,7 @@ try
         var settings = services.GetService<IOptions<CatalogSettings>>();
         var logger = services.GetService<ILogger<CatalogContextSeed>>();
 
+        Log.Information("bout to enter...");
         new CatalogContextSeed().SeedAsync(context, env, settings, logger).Wait();
     });
 

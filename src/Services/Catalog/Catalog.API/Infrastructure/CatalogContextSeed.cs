@@ -10,7 +10,7 @@ public class CatalogContextSeed
 
         var connStr = context.Database.GetDbConnection().ConnectionString;
 
-        logger.LogInformation("Connection string is 333: " + connStr);
+        Log.Information("Connection string is 333: " + connStr);
 
 
         await policy.ExecuteAsync(async () =>
