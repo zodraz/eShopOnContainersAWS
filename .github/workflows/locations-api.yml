@@ -23,7 +23,7 @@ env:
   SERVICE: locations-api
   IMAGE: locations.api
   DOTNET_VERSION: 6.0.x
-  PROJECT_PATH: Services/Locations/Marketing.API
+  PROJECT_PATH: Services/Locations/Locations.API
   TESTS_PATH: Services/Locations/Locations.FunctionalTests
 
 jobs:
