@@ -14,6 +14,10 @@ public class CatalogContextSeed
             var contentRootPath = env.ContentRootPath;
             var picturePath = env.WebRootPath;
 
+            var connStr=context.Database.GetDbConnection().ConnectionString;
+
+            logger.LogInformation("Connection string is 2222: " + connStr);
+
             using (context)
             {
                 context.Database.Migrate();
