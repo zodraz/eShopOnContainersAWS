@@ -1,3 +1,5 @@
+using Amazon.Runtime.Internal.Util;
+
 namespace Microsoft.eShopOnContainers.Services.Catalog.API;
 
 public class Startup
@@ -344,6 +346,10 @@ public static class CustomExtensionMethods
                         t.SimpleRetryStrategy(errorQueueAddress: "Error", maxDeliveryAttempts: eventBusSettings.RetryCount);
                         t.EnableDiagnosticSources();
                     });
+
+                var logger = services.GetService<ILogger<CatalogContextSeed>>();
+
+                System.Console.WriteLine("Connection string:" + configuration["ConnectionString"]);
 
                 if (eventBusSettings.OutboxEnabled)
                 {
