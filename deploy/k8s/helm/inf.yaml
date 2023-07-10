@@ -8,10 +8,10 @@ inf:
     enabled: true           # True to enable TLS (set by deploy-all.ps1)
     issuer: ""              # cert-manager issuer to use for retrieving certs (set by deploy-all.ps1)
   sql:                      # inf.sql defines the sql server databases & logins
-    host:  sqlserverstack-rdsqlserverea747c72-1rxmyikvqrbn.cug71fym5n3i.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
+    host:  sqlserverstack-rdsqlserverea747c72-m715y3cmb3m9.cug71fym5n3i.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
     common:
       user: adminuser              # SQL user
-      pwd: 31'PIfX4sCfoFZ#TxmPDHwlsT7W^>.KV        # SQL pwd
+      pwd: p_T-27e89yE*1GcdqQO6,C~8CA:4!z>a        # SQL pwd
       pid: Developer
     catalog:                # inf.sql.catalog: settings for the catalog-api sql (user, pwd, db)
       db: CatalogDb         # Catalog API SQL db name
@@ -39,13 +39,13 @@ inf:
       svc: keystore-data    # Name of k8s svc for keystore-data redis
       constr: eshop-aws-redis.rgggmg.0001.euc1.cache.amazonaws.com:6379 # Connection string to Redis used as a Keystore (by Identity API)
   eventbus:
-    host: amqps://b-95680d4c-deaf-4663-8c4a-50d714276ace.mq.eu-central-1.amazonaws.com:5671          # Name of rabbitmq aws host
-    username: abel            # Rabbitmq username
-    password: "!Asdf12345"    # Rabbitmq password
+    host: b-624b0404-fcfd-493f-b8f1-7019fb0781de.mq.eu-central-1.amazonaws.com          # Name of rabbitmq aws host
+    username: admin            # Rabbitmq username
+    password: "password1234"    # Rabbitmq password
     isSecure: true            # Rabbitmq secure connection
     persistenceEnabled: false # Rebus persistence enabled
     outboxEnabled: false      # Rebus Outbox functionality enabled
-    rabbitmqEnabled: false    # True for Rabbitmq enabled. False to use SQS and SNS
+    rabbitmqEnabled: true    # True for Rabbitmq enabled. False to use SQS and SNS
     retryCount: 5             # Rebus number of retries
     auditEnabled: true        # Rebus audit functionality enabled
     fleetManager:         
