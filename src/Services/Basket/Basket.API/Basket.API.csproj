@@ -8,15 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Update="web.config">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.2" />
-    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.2.30" />
-    <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.2.51" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.7" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.106" />
+    <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.102.64" />
     <PackageReference Include="AspNetCore.HealthChecks.Aws.Sns" Version="6.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Aws.Sqs" Version="6.0.0" />
 	  <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="6.0.2" />
@@ -24,7 +18,7 @@
 	  <PackageReference Include="AspNetCore.HealthChecks.Aws.SecretsManager" Version="6.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.2" />
 	  <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0-preview.1" />
-	  <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.5" />
+	  <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.21" />
 	  <PackageReference Include="Google.Protobuf" Version="3.19.4" />
 	  <PackageReference Include="Grpc.AspNetCore.Server" Version="2.34.0" />
 	  <PackageReference Include="Grpc.Tools" Version="2.34.0" PrivateAssets="All" />
@@ -38,9 +32,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.Compilers" Version="4.6.0" />
-	  <PackageReference Include="OpenTelemetry" Version="1.2.0" />
-	  <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.1.0" />
-	  <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.AWS" Version="1.0.1" />
+	  <PackageReference Include="OpenTelemetry" Version="1.5.1" />
+	  <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.2.0" />
+	  <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.AWS" Version="1.0.2" />
 	  <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.2.0" />
 	  <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="1.2.0-rc5" />
     <PackageReference Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.5" />

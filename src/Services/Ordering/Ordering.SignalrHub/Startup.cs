@@ -78,21 +78,21 @@ public class Startup
             options.AddCustomLabel("host", context => context.Request.Host.Host);
         });
         app.UseCors("CorsPolicy");
+        app.UseHealthChecks("/hc", new HealthCheckOptions()
+        {
+            Predicate = _ => true,
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+        app.UseHealthChecks("/liveness", new HealthCheckOptions
+        {
+            Predicate = r => r.Name.Contains("self")
+        });
         app.UseAuthentication();
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapMetrics();
-            endpoints.MapHealthChecks("/hc", new HealthCheckOptions()
-            {
-                Predicate = _ => true,
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-            });
-            endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
-            {
-                Predicate = r => r.Name.Contains("self")
-            });
             endpoints.MapHub<NotificationsHub>("/hub/notificationhub");
         });
     }

@@ -29,9 +29,6 @@
     <Content Remove="Setup\Catalogitems - Copy.zip" />
     <None Remove="Setup\Catalogitems - Copy.zip" />
     <Compile Include="IntegrationEvents\EventHandling\AnyFutureIntegrationEventHandler.cs.txt" />
-    <Content Update="web.config;">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -41,10 +38,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.2" />
-	  <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.2.30" />
-	  <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.2.51" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.5" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.7" />
+	  <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.106" />
+	  <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.102.64" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.21" />
     <PackageReference Include="AspNetCore.HealthChecks.Aws.S3" Version="6.0.2" />
     <PackageReference Include="AspNetCore.HealthChecks.Aws.SecretsManager" Version="6.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Aws.Sns" Version="6.0.0" />
@@ -66,9 +63,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
-    <PackageReference Include="OpenTelemetry" Version="1.2.0" />
-    <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.1.0" />
-    <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.AWS" Version="1.0.1" />
+    <PackageReference Include="OpenTelemetry" Version="1.5.1" />
+    <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.2.0" />
+    <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.AWS" Version="1.0.2" />
     <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.2.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="1.2.0-rc5" />
     <PackageReference Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.5" />

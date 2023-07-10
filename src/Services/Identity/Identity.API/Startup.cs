@@ -106,7 +106,7 @@
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-            }            
+            }         
 
             var pathBase = Configuration["PATH_BASE"];
             if (!string.IsNullOrEmpty(pathBase))
@@ -125,6 +125,17 @@
             });
 
             app.UseForwardedHeaders();
+
+            app.UseHealthChecks("/hc", new HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+            app.UseHealthChecks("/liveness", new HealthCheckOptions
+            {
+                Predicate = r => r.Name.Contains("self")
+            });
+
             // Adds IdentityServer
             app.UseIdentityServer();
 
@@ -143,15 +154,6 @@
                 endpoints.MapMetrics();
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/hc", new HealthCheckOptions()
-                {
-                    Predicate = _ => true,
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                });
-                endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
-                {
-                    Predicate = r => r.Name.Contains("self")
-                });
             });
         }
     }

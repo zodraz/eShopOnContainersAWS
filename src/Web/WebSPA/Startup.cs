@@ -109,20 +109,20 @@ public class Startup
         {
             options.AddCustomLabel("host", context => context.Request.Host.Host);
         });
+        app.UseHealthChecks("/hc", new HealthCheckOptions()
+        {
+            Predicate = _ => true,
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+        app.UseHealthChecks("/liveness", new HealthCheckOptions
+        {
+            Predicate = r => r.Name.Contains("self")
+        });
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapMetrics();
             endpoints.MapDefaultControllerRoute();
             endpoints.MapControllers();
-            endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
-            {
-                Predicate = r => r.Name.Contains("self")
-            });
-            endpoints.MapHealthChecks("/hc", new HealthCheckOptions()
-            {
-                Predicate = _ => true,
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-            });
         });
 
         // Handles all still unnatended (by any other middleware) requests by returning the default page of the SPA (wwwroot/index.html).
@@ -135,7 +135,7 @@ public class Startup
             spa.Options.SourcePath = "Client";
 
             if (env.IsDevelopment())
-            { 
+            {
 
                 // use the SpaServices extension method for angular, that will make the application to run "ng serve" for us, when in development.
                 spa.UseAngularCliServer(npmScript: "start");

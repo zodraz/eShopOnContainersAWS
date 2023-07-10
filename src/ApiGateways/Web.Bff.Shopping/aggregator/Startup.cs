@@ -63,6 +63,15 @@ public class Startup
         });
         app.UseGrpcMetrics();
         app.UseCors("CorsPolicy");
+        app.UseHealthChecks("/hc", new HealthCheckOptions()
+        {
+            Predicate = _ => true,
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+        app.UseHealthChecks("/liveness", new HealthCheckOptions
+        {
+            Predicate = r => r.Name.Contains("self")
+        });
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -71,15 +80,6 @@ public class Startup
             endpoints.MapMetrics();
             endpoints.MapDefaultControllerRoute();
             endpoints.MapControllers();
-            endpoints.MapHealthChecks("/hc", new HealthCheckOptions()
-            {
-                Predicate = _ => true,
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-            });
-            endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
-            {
-                Predicate = r => r.Name.Contains("self")
-            });
         });
     }
 }

@@ -14,9 +14,9 @@
 </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.2" />
-	  <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.2.30" />
-	  <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.2.51" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.7" />
+	  <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.106" />
+	  <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.102.64" />
     <PackageReference Include="AspNetCore.HealthChecks.Aws.SecretsManager" Version="6.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Aws.Sns" Version="6.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.Aws.Sqs" Version="6.0.0" />
@@ -25,7 +25,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="5.0.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
     <PackageReference Include="Autofac" Version="6.1.0" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.5" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.103.21" />
     <PackageReference Include="Dapper" Version="2.0.78" />
     <PackageReference Include="Google.Protobuf" Version="3.19.4" />
 	  <PackageReference Include="Kralizek.Extensions.Configuration.AWSSecretsManager" Version="1.6.3" />
@@ -35,9 +35,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
-    <PackageReference Include="OpenTelemetry" Version="1.2.0" />
-    <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.1.0" />
-    <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.AWS" Version="1.0.1" />
+    <PackageReference Include="OpenTelemetry" Version="1.5.1" />
+    <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.2.0" />
+    <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.AWS" Version="1.0.2" />
     <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.2.0" />
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus" Version="1.2.0-rc5" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.2.0" />

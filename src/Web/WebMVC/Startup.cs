@@ -61,6 +61,15 @@ public class Startup
         {
             options.AddCustomLabel("host", context => context.Request.Host.Host);
         });
+        app.UseHealthChecks("/hc", new HealthCheckOptions()
+        {
+            Predicate = _ => true,
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+        app.UseHealthChecks("/liveness", new HealthCheckOptions
+        {
+            Predicate = r => r.Name.Contains("self")
+        });
         app.UseAuthentication();
         app.UseAuthorization();
 
@@ -70,15 +79,6 @@ public class Startup
             endpoints.MapControllerRoute("default", "{controller=Catalog}/{action=Index}/{id?}");
             endpoints.MapControllerRoute("defaultError", "{controller=Error}/{action=Error}");
             endpoints.MapControllers();
-            endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
-            {
-                Predicate = r => r.Name.Contains("self")
-            });
-            endpoints.MapHealthChecks("/hc", new HealthCheckOptions()
-            {
-                Predicate = _ => true,
-                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-            });
         });
     }
 }

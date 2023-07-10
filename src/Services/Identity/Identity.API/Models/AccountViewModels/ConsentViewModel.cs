@@ -1,4 +1,5 @@
 ﻿using IdentityServer4.Models;
+using Scope = IdentityServer4.Models.Scope;
 
 namespace Microsoft.eShopOnContainers.Services.Identity.API.Models.AccountViewModels
 {

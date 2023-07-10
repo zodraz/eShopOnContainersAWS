@@ -224,38 +224,17 @@ public static class CustomExtensionMethods
 
     public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        try
-        {
-            services.AddEntityFrameworkSqlServer()
-            .AddDbContext<CatalogContext>(options =>
-            {
-                options.UseSqlServer(configuration["ConnectionString"],
+        services.AddEntityFrameworkSqlServer()
+           .AddDbContext<CatalogContext>(options =>
+           {
+               options.UseSqlServer("Server=sqlserverstack-rdsqlserverea747c72-1rxmyikvqrbn.cug71fym5n3i.eu-central-1.rds.amazonaws.com;Initial Catalog=CatalogDb;User Id=adminuser;Password=31'PIfX4sCfoFZ#TxmPDHwlsT7W^>.KV;TrustServerCertificate=True; ",
                                         sqlServerOptionsAction: sqlOptions =>
-                                        {
-                                            sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
-                                            //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
-                                            sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
-                                        });
-            });
-        }
-        catch (Exception)
-        {
-
-            throw new Exception("Connection string is: " + configuration["ConnectionString"]);
-        }
-        
-
-        //services.AddEntityFrameworkSqlServer()
-        //   .AddDbContext<CatalogContext>(options =>
-        //   {
-        //       options.UseSqlServer("Server=sqlserverstack-rdsqlserverea747c72-1rxmyikvqrbn.cug71fym5n3i.eu-central-1.rds.amazonaws.com;Initial Catalog=CatalogDb;User Id=adminuser;Password=31'PIfX4sCfoFZ#TxmPDHwlsT7W^>.KV;TrustServerCertificate=True; ",
-        //                                sqlServerOptionsAction: sqlOptions =>
-        //                           {
-        //                               sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
-        //                               //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
-        //                               sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
-        //                           });
-        //   });
+                                   {
+                                       sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                                       //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
+                                       sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                                   });
+           });
 
         return services;
     }
@@ -287,7 +266,7 @@ public static class CustomExtensionMethods
     public static IServiceCollection AddSwagger(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSwaggerGen(options =>
-        {            
+        {         
             options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "eShopOnContainers - Catalog HTTP API",

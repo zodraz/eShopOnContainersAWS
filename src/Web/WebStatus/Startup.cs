@@ -1,4 +1,6 @@
-﻿namespace WebStatus;
+﻿using HealthChecks.UI.Client;
+
+namespace WebStatus;
 
 public class Startup
 {
@@ -52,6 +54,10 @@ public class Startup
             config.ResourcesPath = string.IsNullOrEmpty(pathBase) ? "/ui/resources" : $"{pathBase}/ui/resources";
             config.UIPath = "/hc-ui";
         });
+        app.UseHealthChecks("/liveness", new HealthCheckOptions
+        {
+            Predicate = r => r.Name.Contains("self")
+        });
 
         app.UseStaticFiles();
 
@@ -64,10 +70,6 @@ public class Startup
         {
             endpoints.MapMetrics();
             endpoints.MapDefaultControllerRoute();
-            endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
-            {
-                Predicate = r => r.Name.Contains("self")
-            });
         });
     }
 }
