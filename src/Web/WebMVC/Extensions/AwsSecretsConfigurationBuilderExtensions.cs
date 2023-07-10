@@ -14,9 +14,7 @@ public static class AwsSecretsConfigurationBuilderExtensions
     {
         return hostBuilder.ConfigureAppConfiguration((hostingContext, configBuilder) =>
         {
-            // Don't add AWS secrets when running in develop
-            if (!hostingContext.HostingEnvironment.IsDevelopment() ||
-                config.GetValue<bool>("UseVault", true))
+            if (config.GetValue<bool>("UseVault", true))
             {
                 // Call our extension method
                 configBuilder.AddAwsSecrets(hostingContext);

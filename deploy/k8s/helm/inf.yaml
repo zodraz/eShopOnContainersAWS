@@ -63,7 +63,7 @@ inf:
   useAWS: true
   useDocumentDb: false
   S3Enabled: false
-  useVault: true
+  useVault: false
   aws:
     profile: default
     region: eu-central-1
