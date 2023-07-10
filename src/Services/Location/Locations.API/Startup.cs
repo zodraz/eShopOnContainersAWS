@@ -159,6 +159,17 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
                 options.AddCustomLabel("host", context => context.Request.Host.Host);
             });
             app.UseCors("CorsPolicy");
+
+            app.UseHealthChecks("/hc", new HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+            app.UseHealthChecks("/liveness", new HealthCheckOptions
+            {
+                Predicate = r => r.Name.Contains("self")
+            });
+
             ConfigureAuth(app);
 
             app.UseEndpoints(endpoints =>
@@ -166,15 +177,6 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
                 endpoints.MapMetrics();
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/hc", new HealthCheckOptions()
-                {
-                    Predicate = _ => true,
-                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-                });
-                endpoints.MapHealthChecks("/liveness", new HealthCheckOptions
-                {
-                    Predicate = r => r.Name.Contains("self")
-                });
             });
 
             app.UseSwagger()
