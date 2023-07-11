@@ -151,19 +151,19 @@ public static class CustomExtensionMethods
 
         if (eventBusSettings.RabbitMQEnabled)
         {
-            var protocol = eventBusSettings.IsSecure ? "amqps" : "amqp";
-            var credentials = string.Empty;
+            //var protocol = eventBusSettings.IsSecure ? "amqps" : "amqp";
+            //var credentials = string.Empty;
 
-            if (!string.IsNullOrEmpty(eventBusSettings.UserName) && !string.IsNullOrEmpty(eventBusSettings.Password))
-            {
-                credentials = $"{eventBusSettings.UserName}:{eventBusSettings.Password}@";
-            }
+            //if (!string.IsNullOrEmpty(eventBusSettings.UserName) && !string.IsNullOrEmpty(eventBusSettings.Password))
+            //{
+            //    credentials = $"{eventBusSettings.UserName}:{eventBusSettings.Password}@";
+            //}
 
-            hcBuilder
-                .AddRabbitMQ(
-                    $"{protocol}://{credentials}{eventBusSettings.Host}",
-                    name: "signalr-rabbitmqbus-check",
-                    tags: new string[] { "rabbitmqbus" });
+            //hcBuilder
+            //    .AddRabbitMQ(
+            //        $"{protocol}://{credentials}{eventBusSettings.Host}",
+            //        name: "signalr-rabbitmqbus-check",
+            //        tags: new string[] { "rabbitmqbus" });
         }
         else
         {
