@@ -1,4 +1,6 @@
-﻿var configuration = GetConfiguration();
+﻿using Microsoft.Extensions.Hosting;
+
+var configuration = GetConfiguration();
 
 Log.Logger = CreateSerilogLogger(configuration);
 
@@ -7,19 +9,34 @@ try
     Log.Information("Configuring web host ({ApplicationContext})...", Program.AppName);
     var host = CreateHostBuilder(configuration, args);
 
-    Log.Information("Applying migrations ({ApplicationContext})...", Program.AppName);
-    host.MigrateDbContext<CatalogContext>((context, services) =>
-    {
-        var env = services.GetService<IWebHostEnvironment>();
-        var settings = services.GetService<IOptions<CatalogSettings>>();
-        var logger = services.GetService<ILogger<CatalogContextSeed>>();
+    //Log.Information("Applying migrations ({ApplicationContext})...", Program.AppName);
+    //host.MigrateDbContext<CatalogContext>((context, services) =>
+    //{
+    //    var env = services.GetService<IWebHostEnvironment>();
+    //    var settings = services.GetService<IOptions<CatalogSettings>>();
+    //    var logger = services.GetService<ILogger<CatalogContextSeed>>();
 
-        Log.Information("bout to enter...");
-        new CatalogContextSeed().SeedAsync(context, env, settings, logger).Wait();
-    });
+    //    Log.Information("bout to enter...");
+    //    new CatalogContextSeed().SeedAsync(context, env, settings, logger).Wait();
+    //});
 
-    Log.Information("Starting web host ({ApplicationContext})...", Program.AppName);
-    host.Run();
+    //Log.Information("Starting web host ({ApplicationContext})...", Program.AppName);
+    //host.Run();
+
+
+    var env = host.Services.GetService<IWebHostEnvironment>();
+    var settings = host.Services.GetService<IOptions<CatalogSettings>>();
+    var logger = host.Services.GetService<ILogger<CatalogContextSeed>>();
+    var context = host.Services.GetService<CatalogContext>();
+
+    Log.Information("Connectionstring is: " + context.Database.GetDbConnection().ConnectionString);
+
+    context.Database.Migrate();
+
+    new CatalogContextSeed()
+        .SeedAsync(context, env, settings, logger)
+        .Wait();
+
 
     return 0;
 }
