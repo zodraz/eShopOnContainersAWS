@@ -15,7 +15,7 @@ metadata:
 data:
   catalog__ConnectionString: Server={{ $sqlsrv }};Initial Catalog={{ .Values.inf.sql.catalog.db }};User Id={{ .Values.inf.sql.common.user }};Password={{ .Values.inf.sql.common.pwd }};TrustServerCertificate=True;
   catalog__PicBaseUrl: {{ $protocol }}://{{ $webshoppingapigw }}/c/api/v1/catalog/items/[0]/pic/
-  catalog__S3Enabled: "{{ .Values.inf.misc.useS3 }}"
+  catalog__S3Enabled: "{{ .Values.inf.S3Enabled }}"
   all__Serilog__SeqServerUrl:  {{ .Values.inf.serilog.seqServerUrl }}
   all__Serilog__LogstashgUrl:  {{ .Values.inf.serilog.logstashgUrl }}
   all__Serilog__LokiUrl:  {{ .Values.inf.serilog.lokiUrl }}

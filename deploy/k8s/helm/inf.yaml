@@ -62,7 +62,7 @@ inf:
     port: 6831
   useAWS: true
   useDocumentDb: false
-  S3Enabled: false
+  S3Enabled: false #If catalog api uses AWS S3 or not
   useVault: false
   aws:
     profile: default
@@ -74,8 +74,6 @@ inf:
   k8s:                      # inf.k8s defines Kubernetes cluster global config
     dns:  "eshoponcontainersaws.com" # k8s external  DNS. This value or ip value MUST BE PROVIDED
     local: false            # True when deploying on "local K8s" provided by Docker Desktop.
-  misc:                     # inf.misc contains miscellaneous configuration related to infrastructure
-    useS3: false             # If catalog api uses AWS S3 or not
   registry:                 # Uncomment "registry" to specify registry secret
     secretName:             # secretName is the name of the secret inside k8s   
     server:                 "791977570179.dkr.ecr.eu-central-1.amazonaws.com"

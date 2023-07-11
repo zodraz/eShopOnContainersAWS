@@ -85,7 +85,7 @@
     "deploy_sg_for_pods": "True",
     "deploy_secretsmanager_csi": "False",
     "deploy_external_secrets": "False",
-    "deploy_kubecost": "True",
+    "deploy_kubecost": "False",
     "kubecost_token": "aGVsbUBrdWJlY29zdC5jb20=xm343yadf98",
     "deploy_amp": "True",
     "deploy_grafana_for_amp": "True",
