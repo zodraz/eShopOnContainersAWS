@@ -45,7 +45,7 @@ inf:
     isSecure: true            # Rabbitmq secure connection
     persistenceEnabled: false # Rebus persistence enabled
     outboxEnabled: false      # Rebus Outbox functionality enabled
-    rabbitmqEnabled: false    # True for Rabbitmq enabled. False to use SQS and SNS
+    rabbitmqEnabled: true    # True for Rabbitmq enabled. False to use SQS and SNS
     retryCount: 5             # Rebus number of retries
     auditEnabled: true        # Rebus audit functionality enabled
     fleetManager:         
@@ -62,7 +62,7 @@ inf:
     port: 6831
   useAWS: true
   useDocumentDb: false
-  S3Enabled: false #If catalog api uses AWS S3 or not
+  S3Enabled: true #If catalog api uses AWS S3 or not
   useVault: false
   aws:
     profile: default

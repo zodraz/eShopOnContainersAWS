@@ -50,9 +50,11 @@ class IamOICProviderStack(Stack):
         oic_role.add_managed_policy(
             iam.ManagedPolicy.from_aws_managed_policy_name('AmazonS3ReadOnlyAccess'))
 
-        amazon_dynamodb_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
-            "AmazonDynamoDBFullAccess")
-        oic_role.add_managed_policy(amazon_dynamodb_full_access)
+        oic_role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name('CloudWatchFullAccess'))
+
+        oic_role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonDynamoDBFullAccess"))
 
         if self.node.try_get_context("deploy_dynamodb") == "True":
             amazon_doc_db_full_access = iam.ManagedPolicy.from_aws_managed_policy_name(
