@@ -23,21 +23,6 @@ try
     Log.Information("Starting web host ({ApplicationContext})...", Program.AppName);
     host.Run();
 
-
-    //var env = host.Services.GetService<IWebHostEnvironment>();
-    //var settings = host.Services.GetService<IOptions<CatalogSettings>>();
-    //var logger = host.Services.GetService<ILogger<CatalogContextSeed>>();
-    //var context = host.Services.GetService<CatalogContext>();
-
-    //Log.Information("Connectionstring is: " + context.Database.GetDbConnection().ConnectionString);
-
-    //context.Database.Migrate();
-
-    //new CatalogContextSeed()
-    //    .SeedAsync(context, env, settings, logger)
-    //    .Wait();
-
-
     return 0;
 }
 catch (Exception ex)

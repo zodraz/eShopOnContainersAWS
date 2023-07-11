@@ -78,67 +78,67 @@ public static class CustomExtensionMethods
 
         hcBuilder.AddCheck("self", () => HealthCheckResult.Healthy());
 
-        if (eventBusSettings.RabbitMQEnabled)
-        {
-            var protocol = eventBusSettings.IsSecure ? "amqps" : "amqp";
-            var credentials = string.Empty;
+        //if (eventBusSettings.RabbitMQEnabled)
+        //{
+        //    var protocol = eventBusSettings.IsSecure ? "amqps" : "amqp";
+        //    var credentials = string.Empty;
 
-            if (!string.IsNullOrEmpty(eventBusSettings.UserName) && !string.IsNullOrEmpty(eventBusSettings.Password))
-            {
-                credentials = $"{eventBusSettings.UserName}:{eventBusSettings.Password}@";
-            }
+        //    if (!string.IsNullOrEmpty(eventBusSettings.UserName) && !string.IsNullOrEmpty(eventBusSettings.Password))
+        //    {
+        //        credentials = $"{eventBusSettings.UserName}:{eventBusSettings.Password}@";
+        //    }
 
-            hcBuilder
-                .AddRabbitMQ(
-                    $"{protocol}://{credentials}{eventBusSettings.Host}",
-                    name: "payment-rabbitmqbus-check",
-                    tags: new string[] { "rabbitmqbus" });
-        }
-        else
-        {
-            if (useAWS && !useLocalStack)
-            {
-                hcBuilder
-                      .AddSqs(options =>
-                      {
-                          options.RegionEndpoint = awsOptions.Region;
-                          options.AddQueue(eventBusSettings.EndpointName);
-                          if (eventBusSettings.AuditEnabled)
-                          {
-                              options.AddQueue("Audit");
-                          }
-                      });
+        //    hcBuilder
+        //        .AddRabbitMQ(
+        //            $"{protocol}://{credentials}{eventBusSettings.Host}",
+        //            name: "payment-rabbitmqbus-check",
+        //            tags: new string[] { "rabbitmqbus" });
+        //}
+        //else
+        //{
+        //    if (useAWS && !useLocalStack)
+        //    {
+        //        hcBuilder
+        //              .AddSqs(options =>
+        //              {
+        //                  options.RegionEndpoint = awsOptions.Region;
+        //                  options.AddQueue(eventBusSettings.EndpointName);
+        //                  if (eventBusSettings.AuditEnabled)
+        //                  {
+        //                      options.AddQueue("Audit");
+        //                  }
+        //              });
 
-                hcBuilder
-                      .AddSnsTopicsAndSubscriptions(options =>
-                      {
-                          options.RegionEndpoint = awsOptions.Region;
-                          options.AddTopicAndSubscriptions($"{eventSufix}{nameof(OrderPaymentFailedIntegrationEvent)}");
-                          options.AddTopicAndSubscriptions($"{eventSufix}{nameof(OrderPaymentSucceededIntegrationEvent)}");
-                          options.AddTopicAndSubscriptions($"{eventSufix}{nameof(OrderStatusChangedToStockConfirmedIntegrationEvent)}");
-                      });
-            }
-        }
+        //        hcBuilder
+        //              .AddSnsTopicsAndSubscriptions(options =>
+        //              {
+        //                  options.RegionEndpoint = awsOptions.Region;
+        //                  options.AddTopicAndSubscriptions($"{eventSufix}{nameof(OrderPaymentFailedIntegrationEvent)}");
+        //                  options.AddTopicAndSubscriptions($"{eventSufix}{nameof(OrderPaymentSucceededIntegrationEvent)}");
+        //                  options.AddTopicAndSubscriptions($"{eventSufix}{nameof(OrderStatusChangedToStockConfirmedIntegrationEvent)}");
+        //              });
+        //    }
+        //}
 
-        if (useVault && useAWS && !useLocalStack)
-        {
-            var settings = new VaultSettings();
-            configuration.GetSection("Vault").Bind(settings);
+        //if (useVault && useAWS && !useLocalStack)
+        //{
+        //    var settings = new VaultSettings();
+        //    configuration.GetSection("Vault").Bind(settings);
 
-            var secrets = settings.SecretGroups.Select(grp => $"{env.EnvironmentName}/{grp}").ToList();
+        //    var secrets = settings.SecretGroups.Select(grp => $"{env.EnvironmentName}/{grp}").ToList();
 
-            hcBuilder
-                   .AddSecretsManager(options =>
-                   {
-                       options.RegionEndpoint = awsOptions.Region;
-                       foreach (var secret in secrets)
-                       {
-                           options.AddSecret(secret);
-                       }
-                   });
-        }
+        //    hcBuilder
+        //           .AddSecretsManager(options =>
+        //           {
+        //               options.RegionEndpoint = awsOptions.Region;
+        //               foreach (var secret in secrets)
+        //               {
+        //                   options.AddSecret(secret);
+        //               }
+        //           });
+        //}
 
-        hcBuilder.ForwardToPrometheus();
+        //hcBuilder.ForwardToPrometheus();
 
         return services;
     }
