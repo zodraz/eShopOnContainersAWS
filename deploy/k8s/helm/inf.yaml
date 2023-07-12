@@ -8,10 +8,10 @@ inf:
     enabled: true           # True to enable TLS (set by deploy-all.ps1)
     issuer: ""              # cert-manager issuer to use for retrieving certs (set by deploy-all.ps1)
   sql:                      # inf.sql defines the sql server databases & logins
-    host:  sqlserverstack-rdsqlserverea747c72-wzf70krkp0xt.cug71fym5n3i.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
+    host:  sqlserverstack-rdsqlserverea747c72-z66ctjzcd7ib.cug71fym5n3i.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
     common:
       user: adminuser              # SQL user
-      pwd: )]pSYQw2Am`!c$b&8$p0h>!kOX`|VE^m        # SQL pwd
+      pwd: 5fZ``>WIM{S<*aUO[y<b,yoECRtb}Bv-        # SQL pwd
       pid: Developer
     catalog:                # inf.sql.catalog: settings for the catalog-api sql (user, pwd, db)
       db: CatalogDb         # Catalog API SQL db name
@@ -39,7 +39,7 @@ inf:
       svc: keystore-data    # Name of k8s svc for keystore-data redis
       constr: eshop-aws-redis.rgggmg.0001.euc1.cache.amazonaws.com:6379 # Connection string to Redis used as a Keystore (by Identity API)
   eventbus:
-    host: b-f61b9da8-4af6-4974-840f-f7c7674a6012.mq.eu-central-1.amazonaws.com          # Name of rabbitmq aws host
+    host: b-6275d0ea-aabb-431e-a93e-e372ac337345.mq.eu-central-1.amazonaws.com          # Name of rabbitmq aws host
     username: admin            # Rabbitmq username
     password: "password1234"    # Rabbitmq password
     isSecure: true            # Rabbitmq secure connection
