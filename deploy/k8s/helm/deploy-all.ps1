@@ -11,7 +11,7 @@ Param(
     [parameter(Mandatory = $false)][bool]$useLocalk8s = $false,
     [parameter(Mandatory = $false)][bool]$useMesh = $false,
     [parameter(Mandatory = $false)][string][ValidateSet('Always', 'IfNotPresent', 'Never', IgnoreCase = $false)]$imagePullPolicy = "Always",
-    [parameter(Mandatory = $false)][string][ValidateSet('prod', 'staging', 'none', 'custom', IgnoreCase = $false)]$sslSupport = "none",
+    [parameter(Mandatory = $false)][string][ValidateSet('prod', 'staging', 'none', 'custom', IgnoreCase = $false)]$sslSupport = "prod",
     [parameter(Mandatory = $false)][string]$tlsSecretName = "eshop-tls-custom",
     [parameter(Mandatory = $false)][string]$chartsToDeploy = "*",
     [parameter(Mandatory = $false)][string]$ingressMeshAnnotationsFile = "ingress_values_linkerd.yaml"
@@ -39,7 +39,7 @@ function Install-Chart {
     }
 }
 
-#NOTE: Poweshell modeule must be installed https://stackoverflow.com/questions/70393195/get-ecrlogincommand-is-not-recognized-as-the-name-of-a-cmdlet-function-scrip
+#NOTE: Poweshell module must be installed https://stackoverflow.com/questions/70393195/get-ecrlogincommand-is-not-recognized-as-the-name-of-a-cmdlet-function-scrip
 
 $dns = $externalDns
 $sslEnabled = $false

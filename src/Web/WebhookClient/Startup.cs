@@ -86,18 +86,14 @@ public class Startup
         app.UseStaticFiles();
         app.UseSession();
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapMetrics();
+        {         
             endpoints.MapDefaultControllerRoute();
             endpoints.MapRazorPages();
         });
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
     }
 }
 

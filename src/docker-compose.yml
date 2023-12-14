@@ -1,7 +1,6 @@
-version: '3.4'
+version: "3.4"
 
 services:
-
   localstack:
     image: localstack/localstack:latest
     container_name: localstack
@@ -15,15 +14,25 @@ services:
       - ./.localstack:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
 
-  loki: 
-    image: grafana/loki:2.4.1
+  loki:
+    image: grafana/loki:2.9.2
     container_name: loki
+    command: -config.file=/mnt/config/loki-config.yml
+    volumes:
+      - ./configs/loki/loki.yml:/mnt/config/loki-config.yml
     ports:
       - "3100:3100"
-      
+
   jaeger:
     image: jaegertracing/all-in-one
     container_name: jaeger
+    command: --query.ui-config=/etc/jaeger/jaeger-ui.json --collector.otlp.enabled=true --prometheus.server-url=http://prometheus:9090
+    environment:
+      - METRICS_STORAGE_TYPE=prometheus
+      - PROMETHEUS_QUERY_NORMALIZE_CALLS=true
+      - PROMETHEUS_QUERY_NORMALIZE_DURATION=true
+    volumes:
+      - ./configs/jaeger/ui.json:/etc/jaeger/jaeger-ui.json
     restart: unless-stopped
     ports:
       - 5775:5775/udp
@@ -34,40 +43,61 @@ services:
       - 14268:14268
       - 16686:16686 # Jaeger UI
 
+  # jaeger:
+  #   image: jaegertracing/all-in-one:1.51
+  #   container_name: jaeger
+  #   command: --query.ui-config=/etc/jaeger/jaeger-ui.json --collector.otlp.enabled=true --prometheus.server-url=http://prometheus:9090 --prometheus.query.support-spanmetrics-connector=true
+  #   environment:
+  #     - METRICS_STORAGE_TYPE=prometheus
+  #     - PROMETHEUS_QUERY_NORMALIZE_CALLS=true
+  #     - PROMETHEUS_QUERY_NORMALIZE_DURATION=true
+  #   volumes:
+  #     - ./configs/jaeger/ui.json:/etc/jaeger/jaeger-ui.json
+  #   restart: unless-stopped
+  #   ports:
+  #     - "127.0.0.1:16686:16686"
+
   otel-collector:
     image: amazon/aws-otel-collector:latest
-    command: --config /config/otel-collector-config.yml
+    container_name: otel-collector
+    command: --config /etc/otelcol/otel-collector-config.yml
     volumes:
-      - ./configs/otel-collector:/config
+      - ./configs/otel-collector/otel-collector-config.yml:/etc/otelcol/otel-collector-config.yml
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=${AWS_REGION}
     ports:
-      - "4317:4317"   # OTLP gRPC receiver
-      - "35670:55679" # zpages extension
+      # - "8888:8888" # Prometheus metrics exposed by the collector
+      - "8889:8889" # Prometheus exporter metrics
+      - "4317:4317" # OTLP gRPC receiver
+      # - "35670:55679" # zpages extension
 
   grafana:
     container_name: grafana
-    image: grafana/grafana:8.3.3
+    image: grafana/grafana:10.2.2
     ports:
       - "3000:3000"
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      # - GF_AUTH_DISABLE_LOGIN_FORM=true
     volumes:
+      - ./configs/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./configs/grafana/provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yaml
       - ./configs/grafana/provisioning/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./configs/grafana/dashboards/dotnet-otel.json:/etc/grafana/provisioning/dashboards/dotnet-otel.json
+      - ./configs/grafana/dashboards/logs.json:/etc/grafana/provisioning/dashboards/logs.json
       - ./configs/grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
-        prometheus:
-            condition: service_healthy
+      prometheus:
+        condition: service_healthy
     healthcheck:
-        test: wget -q --tries=1 -O- http://localhost:3000/
-        interval: 3s
-        timeout: 3s
-        retries: 10
-        start_period: 10s
+      test: wget -q --tries=1 -O- http://localhost:3000/
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
   prometheus:
     image: prom/prometheus
@@ -78,11 +108,11 @@ services:
     volumes:
       - ./configs/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     healthcheck:
-        test: wget -q --tries=1 -O- http://localhost:9090/
-        interval: 3s
-        timeout: 3s
-        retries: 10
-        start_period: 10s
+      test: wget -q --tries=1 -O- http://localhost:9090/
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
   seq:
     container_name: seq
@@ -90,7 +120,7 @@ services:
 
   sqldata:
     container_name: mssql
-    image: mcr.microsoft.com/mssql/server:2019-latest 
+    image: mcr.microsoft.com/mssql/server:2019-latest
 
   nosqldata:
     container_name: mongo
@@ -167,6 +197,7 @@ services:
 
   marketing-function:
     image: ${REGISTRY:-eshop}/marketing.function:${PLATFORM:-linux}-${TAG:-latest}
+    container_name: marketing-function
     build:
       context: .
       dockerfile: Services/Marketing/Infrastructure/Lambdas/Marketing.Functions/src/Marketing.Functions/Docker/Dockerfile
@@ -203,27 +234,30 @@ services:
     depends_on:
       - sqldata
 
-  mobileshoppingapigw:
-   image: envoyproxy/envoy:v1.11.1
-   restart: always
+  # mobileshoppingapigw:
+  #   image: envoyproxy/envoy:v1.11.1
+  #   container_name: mobileshoppingapigw
+  #   restart: always
 
-  mobilemarketingapigw:
-   image: envoyproxy/envoy:v1.11.1
+  # mobilemarketingapigw:
+  #   image: envoyproxy/envoy:v1.11.1
+  #   container_name: mobilemarketingapigw
+  #   restart: always
 
-  mobileshoppingagg:
-   image: ${REGISTRY:-eshop}/mobileshoppingagg:${PLATFORM:-linux}-${TAG:-latest}
-   build:
-     context: .
-     dockerfile: ApiGateways/Mobile.Bff.Shopping/aggregator/Dockerfile
-   restart: always
-   depends_on:
-     - nosqldata
-     - sqldata
-     - identity-api
-     - rabbitmq
-     - ordering-api
-     - catalog-api
-     - basket-api
+  # mobileshoppingagg:
+  #   image: ${REGISTRY:-eshop}/mobileshoppingagg:${PLATFORM:-linux}-${TAG:-latest}
+  #   build:
+  #     context: .
+  #     dockerfile: ApiGateways/Mobile.Bff.Shopping/aggregator/Dockerfile
+  #   restart: always
+  #   depends_on:
+  #     - nosqldata
+  #     - sqldata
+  #     - identity-api
+  #     - rabbitmq
+  #     - ordering-api
+  #     - catalog-api
+  #     - basket-api
 
   webshoppingagg:
     image: ${REGISTRY:-eshop}/webshoppingagg:${PLATFORM:-linux}-${TAG:-latest}
@@ -295,19 +329,23 @@ services:
 
   webshoppingapigw:
     image: envoyproxy/envoy:v1.11.1
+    container_name: webshoppingapigw
+
     restart: always
 
   webmarketingapigw:
     image: envoyproxy/envoy:v1.11.1
+    container_name: webmarketingapigw
+    restart: always
 
   #fleetmanager:
   #  image: "mookid8000/fleetmanager:4.28.6"
   #  restart: "unless-stopped"
-  #  ports: 
-  #    - "5000:5000" 
+  #  ports:
+  #    - "5000:5000"
   #  volumes:
   #    - servicebus_directory:/usr/share/servicebus
   #  logging:
   #    driver: "json-file"
   #    options:
-  #      max-size: "50m"  
+  #      max-size: "50m"

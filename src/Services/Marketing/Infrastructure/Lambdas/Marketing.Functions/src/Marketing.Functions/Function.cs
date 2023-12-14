@@ -44,44 +44,18 @@ namespace Marketing.Functions
                     .AddXRayTraceId()
                     .AddAWSInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddOtlpExporter(options =>
-                    {
-                        options.Endpoint = new Uri(LambdaConfiguration.Configuration["OtlpEndpoint"]);
-                    });
-
-
-            var jaegerHost = LambdaConfiguration.Configuration["Jaeger:Host"];
-            var jaegerPort = LambdaConfiguration.Configuration["Jaeger:Port"];
-
-            if (!string.IsNullOrEmpty(jaegerHost))
-            {
-                traceProviderBuilder.AddJaegerExporter(options =>
-                {
-                    options.AgentHost = jaegerHost;
-                    options.AgentPort = Convert.ToInt32(jaegerPort);
-                    options.ExportProcessorType = ExportProcessorType.Simple;
-                });
-            };
+                    .AddOtlpExporter(options => options.Endpoint = new Uri(LambdaConfiguration.Configuration["OtlpEndpoint"]));
 
             traceProviderBuilder.Build();
 
             Sdk.SetDefaultTextMapPropagator(new AWSXRayPropagator());
 
             var meterProviderBuilder = Sdk.CreateMeterProviderBuilder()
-                .AddPrometheusExporter(opt =>
-                {
-                    opt.StartHttpListener = true;
-                    opt.GetType()
-                   ?.GetField("httpListenerPrefixes", BindingFlags.NonPublic | BindingFlags.Instance)
-                   ?.SetValue(opt, new[] { "http://*:9464" });
-                })
                 .AddHttpClientInstrumentation()
-                .AddAspNetCoreInstrumentation();
-
-            meterProviderBuilder.AddOtlpExporter(options =>
-            {
-                options.Endpoint = new Uri(LambdaConfiguration.Configuration["OtlpEndpoint"]);
-            });
+                .AddAspNetCoreInstrumentation()
+                .AddRuntimeInstrumentation()
+                .AddProcessInstrumentation()
+                .AddPrometheusExporter();
 
             meterProviderBuilder.Build();
         }

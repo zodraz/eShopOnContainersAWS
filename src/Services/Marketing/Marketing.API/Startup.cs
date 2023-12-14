@@ -14,7 +14,6 @@
     using Extensions.Logging;
     using HealthChecks.UI.Client;
     using Infrastructure;
-    using Infrastructure.Filters;
     using Infrastructure.Repositories;
     using Infrastructure.Services;
     using IntegrationEvents.Events;
@@ -25,7 +24,6 @@
     using Microsoft.eShopOnContainers.Services.Marketing.API.Controllers;
     using Microsoft.Extensions.Diagnostics.HealthChecks;
     using Microsoft.OpenApi.Models;
-    using Prometheus;
     using Rebus.Auditing.Messages;
     using Rebus.AwsSnsAndSqs.Config;
     using Rebus.Config;
@@ -146,10 +144,10 @@
             }
 
             app.UseRouting();
-            app.UseHttpMetrics(options =>
-            {
-                options.AddCustomLabel("host", context => context.Request.Host.Host);
-            });
+            
+            //{
+            //    options.AddCustomLabel("host", context => context.Request.Host.Host);
+            //});
             app.UseCors("CorsPolicy");
 
             app.UseHealthChecks("/hc", new HealthCheckOptions()
@@ -165,8 +163,7 @@
             ConfigureAuth(app);
 
             app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapMetrics();
+            {             
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllers();
             });
@@ -178,6 +175,8 @@
                    setup.OAuthClientId("marketingswaggerui");
                    setup.OAuthAppName("Marketing Swagger UI");
                });
+
+            app.UseOpenTelemetryPrometheusScrapingEndpoint();
         }
 
         private void AddCustomSwagger(IServiceCollection services)
@@ -355,9 +354,6 @@
                            }
                        });
             }
-
-            hcBuilder.ForwardToPrometheus();
-
             return services;
         }
 

@@ -113,6 +113,7 @@ public class Startup
         {
             app.UsePathBase(pathBase);
         }
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
         app.UseSwagger()
             .UseSwaggerUI(setup =>
@@ -123,12 +124,6 @@ public class Startup
             });
 
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
-        app.UseGrpcMetrics();
-
         app.UseCors("CorsPolicy");
 
         app.UseHealthChecks("/hc", new HealthCheckOptions()
@@ -147,7 +142,6 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapMetrics();
             endpoints.MapGrpcService<BasketService>();
             endpoints.MapDefaultControllerRoute();
             endpoints.MapControllers();
@@ -276,8 +270,6 @@ public static class CustomExtensionMethods
                    });
         }
 
-        hcBuilder.ForwardToPrometheus();
-
         return services;
     }
 
@@ -353,12 +345,12 @@ public static class CustomExtensionMethods
             var localStackUrl = configuration["LocalStack:LocalStackUrl"];
 
             AmazonSQSConfig amazonSqsConfig = new AmazonSQSConfig 
-            { 
+            {
                 RegionEndpoint = awsOptions.Region,
             };
             
             AmazonSimpleNotificationServiceConfig amazonSimpleNotificationServiceConfig = new AmazonSimpleNotificationServiceConfig 
-            { 
+            {
                 RegionEndpoint = awsOptions.Region,
             };
 
@@ -402,7 +394,7 @@ public static class CustomExtensionMethods
                     rebusConfig.Options(t => t.EnableMessageAuditing(auditQueue: "Audit"));
                 }
 
-                return rebusConfig;                
+                return rebusConfig;             
             },
             onCreated: async bus =>
             {

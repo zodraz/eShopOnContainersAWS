@@ -32,7 +32,6 @@ global using OpenTelemetry.Contrib.Extensions.AWSXRay.Trace;
 global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
 global using OpenTelemetry.Metrics;
-global using Prometheus;
 global using Serilog;
 global using Swashbuckle.AspNetCore.SwaggerGen;
 global using System;

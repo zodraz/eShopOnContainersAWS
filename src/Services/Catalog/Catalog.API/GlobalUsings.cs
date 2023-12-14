@@ -43,7 +43,6 @@ global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
 global using Polly.Retry;
 global using Polly;
-global using Prometheus;
 global using Rebus.AwsSnsAndSqs.Config;
 global using Rebus.Auditing.Messages;
 global using Rebus.Bus;

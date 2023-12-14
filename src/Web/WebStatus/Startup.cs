@@ -1,6 +1,4 @@
-﻿using HealthChecks.UI.Client;
-
-namespace WebStatus;
+﻿namespace WebStatus;
 
 public class Startup
 {
@@ -18,8 +16,7 @@ public class Startup
 
         services.AddOptions();
         services.AddHealthChecks()
-            .AddCheck("self", () => HealthCheckResult.Healthy())
-            .ForwardToPrometheus();
+            .AddCheck("self", () => HealthCheckResult.Healthy());
 
         services
             .AddHealthChecksUI()
@@ -34,6 +31,8 @@ public class Startup
     //This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
     {
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -62,13 +61,10 @@ public class Startup
         app.UseStaticFiles();
 
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
+        
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapMetrics();
+            
             endpoints.MapDefaultControllerRoute();
         });
     }

@@ -2,7 +2,6 @@
 using Amazon.CloudWatchLogs;
 using Amazon.SimpleNotificationService;
 using Amazon.SQS;
-using Microsoft.eShopOnContainers.BuildingBlocks.EventBus;
 using Microsoft.eShopOnContainers.Services.IntegrationEvents.Events;
 using Microsoft.eShopOnContainers.Services.Ordering.API;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Prometheus;
 using Rebus.Auditing.Messages;
 using Rebus.AwsSnsAndSqs.Config;
 using Rebus.Config;
@@ -94,8 +92,6 @@ namespace Ordering.BackgroundTasks.Extensions
                            }
                        });
             }
-
-            hcBuilder.ForwardToPrometheus();
 
             return services;
         }

@@ -56,6 +56,8 @@ public class Startup
             app.UsePathBase(pathBase);
         }
 
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
         app.UseSwagger()
             .UseSwaggerUI(c =>
             {
@@ -65,11 +67,7 @@ public class Startup
             });
 
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
-        app.UseGrpcMetrics();
+
         app.UseCors("CorsPolicy");
         app.UseHealthChecks("/hc", new HealthCheckOptions()
         {
@@ -84,7 +82,6 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapMetrics();
             endpoints.MapGrpcService<OrderingService>();
             endpoints.MapDefaultControllerRoute();
             endpoints.MapControllers();
@@ -228,8 +225,6 @@ static class CustomExtensionsMethods
                    });
         }
 
-        hcBuilder.ForwardToPrometheus();
-
         return services;
     }
 
@@ -253,7 +248,7 @@ static class CustomExtensionsMethods
     public static IServiceCollection AddCustomSwagger(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSwaggerGen(options =>
-        {            
+        {          
             options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "eShopOnContainers - Ordering HTTP API",

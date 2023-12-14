@@ -3,7 +3,6 @@
     using HealthChecks.UI.Client;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-    using Microsoft.eShopOnContainers.BuildingBlocks.EventBus;
     using Microsoft.eShopOnContainers.Services.Ordering.API;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +10,6 @@
     using Microsoft.Extensions.Logging;
     using Ordering.BackgroundTasks.Extensions;
     using Ordering.BackgroundTasks.Services;
-    using Prometheus;
 
     public class Startup
     {
@@ -42,10 +40,10 @@
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             app.UseRouting();
-            app.UseHttpMetrics(options =>
-            {
-                options.AddCustomLabel("host", context => context.Request.Host.Host);
-            });
+            
+            //{
+            //    options.AddCustomLabel("host", context => context.Request.Host.Host);
+            //});
             app.UseHealthChecks("/hc", new HealthCheckOptions()
             {
                 Predicate = _ => true,
@@ -55,10 +53,8 @@
             {
                 Predicate = r => r.Name.Contains("self")
             });
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapMetrics();
-            });
+
+            app.UseOpenTelemetryPrometheusScrapingEndpoint();
         }
     }
 }

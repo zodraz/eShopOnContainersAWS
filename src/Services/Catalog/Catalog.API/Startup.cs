@@ -47,6 +47,8 @@ public class Startup
             app.UsePathBase(pathBase);
         }
 
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
         app.UseSwagger()
             .UseSwaggerUI(c =>
             {
@@ -54,15 +56,9 @@ public class Startup
             });
 
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
-        app.UseGrpcMetrics();
         app.UseCors("CorsPolicy");
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapMetrics();
             endpoints.MapDefaultControllerRoute();
             endpoints.MapControllers();
             endpoints.MapGet("/_proto/", async ctx =>
@@ -216,8 +212,6 @@ public static class CustomExtensionMethods
                        }
                    });
         }
-
-        hcBuilder.ForwardToPrometheus();
 
         return services;
     }

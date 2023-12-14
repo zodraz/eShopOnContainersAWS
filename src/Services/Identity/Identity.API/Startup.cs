@@ -41,9 +41,7 @@
                 .AddCheck("self", () => HealthCheckResult.Healthy())
                 .AddSqlServer(Configuration["ConnectionString"],
                     name: "IdentityDB-check",
-                    tags: new string[] { "IdentityDB" })
-                .ForwardToPrometheus();
-
+                    tags: new string[] { "IdentityDB" });
             services.AddTransient<ILoginService<ApplicationUser>, EFLoginService>();
             services.AddTransient<IRedirectService, RedirectService>();
 
@@ -106,7 +104,7 @@
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-            }         
+            } 
 
             var pathBase = Configuration["PATH_BASE"];
             if (!string.IsNullOrEmpty(pathBase))
@@ -144,17 +142,15 @@
             // To avoid this problem, the policy of cookies shold be in Lax mode.
             app.UseCookiePolicy(new CookiePolicyOptions { MinimumSameSitePolicy = AspNetCore.Http.SameSiteMode.Lax });
             app.UseRouting();
-            app.UseHttpMetrics(options =>
-            {
-                options.AddCustomLabel("host", context => context.Request.Host.Host);
-            });
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapMetrics();
+                
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllers();
             });
+
+            app.UseOpenTelemetryPrometheusScrapingEndpoint();
         }
     }
 }

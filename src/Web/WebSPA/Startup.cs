@@ -21,10 +21,10 @@ public class Startup
     {
         services.AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy())
-            .AddUrlGroup(new Uri(Configuration["IdentityUrlHC"]), 
-                name: "identityapi-check", 
-                tags: new string[] { "identityapi" })
-            .ForwardToPrometheus();
+            .AddUrlGroup(new Uri(Configuration["IdentityUrlHC"]),
+                name: "identityapi-check",
+                tags: new string[] { "identityapi" });
+            //.ForwardToPrometheus();
 
         services.Configure<AppSettings>(Configuration);
 
@@ -105,10 +105,10 @@ public class Startup
             app.UseSpaStaticFiles();
         }
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
+        
+        //{
+        //    options.AddCustomLabel("host", context => context.Request.Host.Host);
+        //});
         app.UseHealthChecks("/hc", new HealthCheckOptions()
         {
             Predicate = _ => true,
@@ -120,7 +120,7 @@ public class Startup
         });
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapMetrics();
+            
             endpoints.MapDefaultControllerRoute();
             endpoints.MapControllers();
         });
@@ -141,5 +141,7 @@ public class Startup
                 spa.UseAngularCliServer(npmScript: "start");
             }
         });
+
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
     }
 }

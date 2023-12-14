@@ -1,10 +1,6 @@
 global:
-  scrape_interval:     3s # By default, scrape targets every 5 seconds.
-
-  # Attach these labels to any time series or alerts when communicating with
-  # external systems (federation, remote storage, Alertmanager).
-  # external_labels:
-  #   monitor: 'nats-openrmf-server'
+  scrape_interval:     5s # By default, scrape targets every 5 seconds.
+  evaluation_interval: 5s
 
 # A scrape configuration containing exactly one endpoint to scrape:
 scrape_configs:
@@ -16,19 +12,33 @@ scrape_configs:
     static_configs:
     # replace the IP with your local IP for development
     # localhost is not it, as that is w/in the container :)
-    - targets:
-        - host.docker.internal:5105
-        - host.docker.internal:5103
-        - host.docker.internal:5101
-        - host.docker.internal:5102
-        - host.docker.internal:5111
-        - host.docker.internal:5110
-        - host.docker.internal:5108
-        - host.docker.internal:5109
-        - host.docker.internal:5113
-        - host.docker.internal:5121
-        - host.docker.internal:5112
-        - host.docker.internal:5107
-        - host.docker.internal:5104
-        - host.docker.internal:5100
-        - host.docker.internal:5114
+     - targets:
+        - basket-api:5103
+        - catalog-api:5101
+        - identity-api:5105
+        - locations-api:5109
+        - marketing-api:5110
+        - ordering-api:5102
+        - ordering-backgroundtasks:5111
+        - ordering-signalrhub:5112
+        - payment-api:5108
+        - webmvc:5100
+        - webshoppingagg:5121
+        - webspa:5104
+        - webstatus:5107
+        - webhooks-api:5113
+        - webhooks-client:5114
+
+  - job_name: "aggregated-trace-metrics"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["otel-collector:8889"]
+
+  - job_name: jaeger
+    static_configs:
+      - targets:
+          - jaeger:14269
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

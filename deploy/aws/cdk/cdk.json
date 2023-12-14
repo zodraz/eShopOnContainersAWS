@@ -80,7 +80,7 @@
     "vpn_server_certificate_arn": "arn:aws:acm:eu-central-1:791977570179:certificate/6fce34ce-1d9b-40d7-ace9-77698dd0131c",
     "vpn_client_cidr_block": "10.1.0.0/22",
     "deploy_cloudwatch_container_insights_metrics": "True",
-    "deploy_cloudwatch_container_insights_logs": "True",
+    "deploy_cloudwatch_container_insights_logs": "False",
     "cloudwatch_container_insights_logs_retention_days": 7,
     "deploy_sg_for_pods": "True",
     "deploy_secretsmanager_csi": "False",
@@ -128,7 +128,9 @@
     "dns_domain":"eshoponcontainersaws.com",
     "create_new_certificate":"False",
     "use_certificate":"True",
-    "certificate_dns_domain_arn":"arn:aws:acm:us-east-1:791977570179:certificate/6990ea41-e51c-4ba2-ad64-624f34bdcf66",
-    "ssh_key":""
+    "certificate_dns_domain_arn":"arn:aws:acm:us-east-1:791977570179:certificate/9adc3037-8f06-43d9-9e4b-35b7a407cd4b",
+    "ssh_key":"",
+    "deploy_loki": "True",
+    "deploy_jaeger": "True"
   }
 }

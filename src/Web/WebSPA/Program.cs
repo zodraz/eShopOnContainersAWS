@@ -75,6 +75,5 @@ IWebHost BuildWebHost(string[] args) =>
 
 public partial class Program
 {
-    private static readonly string _namespace = typeof(Startup).Namespace;
-    public static readonly string AppName = _namespace;
+    public static readonly string AppName = "WebSPA";
 }

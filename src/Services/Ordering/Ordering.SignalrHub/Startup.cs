@@ -73,10 +73,6 @@ public class Startup
         }
 
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
         app.UseCors("CorsPolicy");
         app.UseHealthChecks("/hc", new HealthCheckOptions()
         {
@@ -91,10 +87,10 @@ public class Startup
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapMetrics();
+        {          
             endpoints.MapHub<NotificationsHub>("/hub/notificationhub");
         });
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
     }
 
     private void ConfigureAuthService(IServiceCollection services)
@@ -209,7 +205,6 @@ public static class CustomExtensionMethods
                    });
         }
 
-        hcBuilder.ForwardToPrometheus();
 
         return services;
     }

@@ -2,12 +2,19 @@ receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 0.0.0.0:4317
+      http:
 
 exporters:
+  prometheus:
+    endpoint: "0.0.0.0:8889"
 
-  logging:
-    loglevel: info
+  otlp:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+
+  # logging:
+  #     loglevel: info
 
   awsxray:
     region: eu-central-1
@@ -15,21 +22,22 @@ exporters:
   awsemf:
     region: eu-central-1
 
+# processors:
+#   resource:
+#     attributes:
+#       - action: insert
+#         key: service_name
+#         from_attribute: service.name
+
 service:
   pipelines:
-
-    # receive traces from Open Telemetry Protocol endpoint
     traces:
-      receivers:
-        - otlp
-      exporters:
-        - logging
-        - awsxray
-    
-    # receive metrics from Open Telemetry Protocol endpoint
+      receivers: [ otlp ]
+      exporters: [ otlp, logging, awsxray ]
     metrics:
-      receivers:
-        - otlp
-      exporters:
-        - logging
-        - awsemf
+      receivers: [ otlp ]
+      exporters: [ logging, prometheus, awsemf ]
+    # logs:
+    #   receivers: [ otlp ]
+    #   processors: [ resource ]
+    #   exporters: [ logging ]

@@ -1795,6 +1795,112 @@ class EKSClusterStack(Stack):
                 grafana_dashboard_manifest = eks_cluster.add_manifest(
                     manifest_id, value)
 
+        if self.node.try_get_context("deploy_loki") == "True":
+
+            # Create IRSA mapping
+            loki_sa = eks_cluster.add_service_account(
+                "loki-sa",
+                name="loki-iamproxy-service-account",
+                namespace="kube-system")
+
+            # Associate the IAM Policy
+            loki_policy_statement_json_1 = {
+                "Effect":
+                "Allow",
+                "Action": [
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:AbortMultipartUpload",
+                    "s3:ListBucket",
+                    "s3:DeleteObject",
+                    "s3:GetObjectVersion",
+                    "s3:ListMultipartUploadParts"
+                ],
+                "Resource": ["*"],
+            }
+            loki_sa.add_to_principal_policy(
+                iam.PolicyStatement.from_json(loki_policy_statement_json_1))
+
+            loki_chart = eks_cluster.add_helm_chart(
+                "loki-chart",
+                chart="loki",
+                version="5.40.1",
+                release="loki-for-amp",
+                repository="https://grafana.github.io/helm-charts",
+                namespace="kube-system",
+                create_namespace=False,
+                # values={
+                #     "loki": {
+                #         "commonConfigaaaaaaaa": {
+                #             "replication_factor": 1
+                #         },
+                #         "storage": {
+                #             "type": "filesystemaaaa"
+                #         },
+                #         "singleBinary": {
+                #             "replicas": 1
+                #         }
+                #     }
+                # }
+                values={
+                    "serviceAccount": {
+                        "name": "loki-iamproxy-service-account",
+                        "annotations": {
+                            "eks.amazonaws.com/role-arn": loki_sa.role.role_arn
+                        },
+                        "create": False,
+                    },
+                    "loki": {
+                        "storage": {
+                            "type": "s3"
+                        },
+                        "s3": {
+                            "region": "eu-central-1"
+                        },
+                        "bucketNames": {
+                            "chunks": "loki-chunk",
+                            "ruler": "loki-ruler",
+                            "admin": "loki-admin"
+                        }
+                    }
+                }
+            )
+            loki_chart.node.add_dependency(amp_grafana_chart)
+
+            nginx_chart = eks_cluster.add_helm_chart(
+                "nginx-chart",
+                chart="ingress-nginx",
+                version="4.8.4",
+                release="ingress-nginx",
+                repository="https://kubernetes.github.io/ingress-nginx",
+                namespace="ingress-nginx",
+                create_namespace=True,
+                values={
+                    "serviceAccount": {
+                        "name": "nginx-service-account",
+                        "create": False,
+                    }
+                }
+            )
+            nginx_chart.node.add_dependency(loki_chart)
+
+            jaeger_chart = eks_cluster.add_helm_chart(
+                "jaeger-chart",
+                chart="jaeger",
+                version="0.72.1",
+                release="jaeger",
+                repository="https://jaegertracing.github.io/helm-charts",
+                namespace="kube-system",
+                create_namespace=False,
+                values={
+                    "serviceAccount": {
+                        "name": "jaeger-service-account",
+                        "create": False,
+                    }
+                }
+            )
+            jaeger_chart.node.add_dependency(nginx_chart)
+
         # Run everything via Fargate (i.e. no EC2 Nodes/Managed Node Group)
         # NOTE: You need to add any namespaces other than kube-system and default to this
         # OR create additional Fargate Profiles with the additional namespaces/labels

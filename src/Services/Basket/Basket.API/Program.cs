@@ -1,4 +1,6 @@
-﻿var configuration = GetConfiguration();
+﻿using OpenTelemetry.Logs;
+
+var configuration = GetConfiguration();
 
 Log.Logger = CreateSerilogLogger(configuration);
 

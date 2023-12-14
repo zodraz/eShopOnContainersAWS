@@ -1,21 +1,16 @@
-﻿using Amazon;
-using Amazon.SimpleNotificationService;
+﻿using Amazon.SimpleNotificationService;
 using Amazon.SQS;
 using Autofac;
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using HealthChecks.UI.Client;
-using Locations.API;
 using Locations.API.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.eShopOnContainers.BuildingBlocks.EventBus;
 using Microsoft.eShopOnContainers.Services.Locations.API.Infrastructure;
 using Microsoft.eShopOnContainers.Services.Locations.API.Infrastructure.Filters;
-using Microsoft.eShopOnContainers.Services.Locations.API.Infrastructure.Middlewares;
 using Microsoft.eShopOnContainers.Services.Locations.API.Infrastructure.Repositories;
 using Microsoft.eShopOnContainers.Services.Locations.API.Infrastructure.Services;
 using Microsoft.eShopOnContainers.Services.Locations.API.IntegrationEvents.Events;
@@ -24,7 +19,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Prometheus;
 using Rebus.Auditing.Messages;
 using Rebus.AwsSnsAndSqs.Config;
 using Rebus.Config;
@@ -36,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using static Microsoft.eShopOnContainers.Services.Locations.API.AwsSecretsConfigurationBuilderExtensions;
 
 namespace Microsoft.eShopOnContainers.Services.Locations.API
 {
@@ -153,11 +146,9 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
                 app.UsePathBase(pathBase);
             }
 
+            app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
             app.UseRouting();
-            app.UseHttpMetrics(options =>
-            {
-                options.AddCustomLabel("host", context => context.Request.Host.Host);
-            });
             app.UseCors("CorsPolicy");
 
             app.UseHealthChecks("/hc", new HealthCheckOptions()
@@ -174,7 +165,6 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapMetrics();
                 endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllers();
             });
@@ -321,9 +311,6 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
                            }
                        });
             }
-
-            hcBuilder.ForwardToPrometheus();
-
             return services;
         }
 

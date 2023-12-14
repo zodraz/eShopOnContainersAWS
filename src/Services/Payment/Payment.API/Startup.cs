@@ -41,11 +41,8 @@ public class Startup
             app.UsePathBase(pathBase);
         }
 
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
         app.UseHealthChecks("/hc", new HealthCheckOptions()
         {
             Predicate = _ => true,
@@ -54,10 +51,6 @@ public class Startup
         app.UseHealthChecks("/liveness", new HealthCheckOptions
         {
             Predicate = r => r.Name.Contains("self")
-        });
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapMetrics();
         });
     }
 }
@@ -137,8 +130,6 @@ public static class CustomExtensionMethods
                        }
                    });
         }
-
-        hcBuilder.ForwardToPrometheus();
 
         return services;
     }

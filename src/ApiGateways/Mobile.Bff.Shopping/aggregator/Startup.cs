@@ -18,8 +18,8 @@ public class Startup
             .AddUrlGroup(new Uri(Configuration["OrderingUrlHC"]), name: "orderingapi-check", tags: new string[] { "orderingapi" })
             .AddUrlGroup(new Uri(Configuration["BasketUrlHC"]), name: "basketapi-check", tags: new string[] { "basketapi" })
             .AddUrlGroup(new Uri(Configuration["IdentityUrlHC"]), name: "identityapi-check", tags: new string[] { "identityapi" })
-            .AddUrlGroup(new Uri(Configuration["PaymentUrlHC"]), name: "paymentapi-check", tags: new string[] { "paymentapi" })
-            .ForwardToPrometheus();
+            .AddUrlGroup(new Uri(Configuration["PaymentUrlHC"]), name: "paymentapi-check", tags: new string[] { "paymentapi" });
+            //.ForwardToPrometheus();
 
         services.AddCustomMvc(Configuration)
                 .AddCustomAuthentication(Configuration)
@@ -55,11 +55,11 @@ public class Startup
         });
 
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
-        app.UseGrpcMetrics();
+        
+        //{
+        //    options.AddCustomLabel("host", context => context.Request.Host.Host);
+        //});
+        //app.UseGrpcMetrics();
         app.UseCors("CorsPolicy");
         app.UseHealthChecks("/hc", new HealthCheckOptions()
         {
@@ -74,10 +74,11 @@ public class Startup
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapMetrics();
+            
             endpoints.MapDefaultControllerRoute();
             endpoints.MapControllers();
         });
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
     }
 }
 

@@ -54,13 +54,10 @@ public class Startup
 
         // Fix samesite issue when running eShop from docker-compose locally as by default http protocol is being used
         // Refer to https://github.com/dotnet-architecture/eShopOnContainers/issues/1391
-        app.UseCookiePolicy(new CookiePolicyOptions { MinimumSameSitePolicy = AspNetCore.Http.SameSiteMode.Lax });
+        app.UseCookiePolicy(new CookiePolicyOptions { MinimumSameSitePolicy = SameSiteMode.Lax });
 
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
+        
         app.UseHealthChecks("/hc", new HealthCheckOptions()
         {
             Predicate = _ => true,
@@ -75,11 +72,12 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapMetrics();
             endpoints.MapControllerRoute("default", "{controller=Catalog}/{action=Index}/{id?}");
             endpoints.MapControllerRoute("defaultError", "{controller=Error}/{action=Error}");
             endpoints.MapControllers();
         });
+
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
     }
 }
 
@@ -89,9 +87,8 @@ static class ServiceCollectionExtensions
     {
         services.AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy())
-            .AddUrlGroup(new Uri(configuration["IdentityUrlHC"]), 
-            name: "identityapi-check", tags: new string[] { "identityapi" })
-            .ForwardToPrometheus();
+            .AddUrlGroup(new Uri(configuration["IdentityUrlHC"]),
+            name: "identityapi-check", tags: new string[] { "identityapi" });
 
         return services;
     }

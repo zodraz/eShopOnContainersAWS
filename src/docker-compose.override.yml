@@ -1,4 +1,4 @@
-version: '3.4'
+version: "3.4"
 
 # The default docker-compose.override file can use the "localhost" as the external name for testing web apps within the same dev machine.
 # The ESHOP_EXTERNAL_DNS_NAME_OR_IP environment variable is taken, by default, from the ".env" file defined like:
@@ -401,19 +401,19 @@ services:
     ports:
       - "5113:80"
 
-  mobileshoppingapigw:
-   volumes:
-     - ./ApiGateways/Envoy/config/mobileshopping:/etc/envoy
-   ports:
-     - "5200:80"
-     - "15200:8001"
+  # mobileshoppingapigw:
+  #   volumes:
+  #     - ./ApiGateways/Envoy/config/mobileshopping:/etc/envoy
+  #   ports:
+  #     - "5200:80"
+  #     - "15200:8001"
 
-  mobilemarketingapigw:
-   volumes:
-     - ./ApiGateways/Envoy/config/mobileshopping:/etc/envoy
-   ports:
-     - "5201:80"
-     - "15201:8001"
+  # mobilemarketingapigw:
+  #   volumes:
+  #     - ./ApiGateways/Envoy/config/mobileshopping:/etc/envoy
+  #   ports:
+  #     - "5201:80"
+  #     - "15201:8001"
 
   webshoppingapigw:
     volumes:
@@ -429,38 +429,38 @@ services:
       - "5203:80"
       - "15203:8001"
 
-  mobileshoppingagg:
-   environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - urls__basket=http://basket-api
-      - urls__catalog=http://catalog-api
-      - urls__orders=http://ordering-api
-      - urls__identity=http://identity-api
-      - urls__grpcBasket=http://basket-api:81
-      - urls__grpcCatalog=http://catalog-api:81
-      - urls__grpcOrdering=http://ordering-api:81
-      - CatalogUrlHC=http://catalog-api/hc
-      - OrderingUrlHC=http://ordering-api/hc
-      - IdentityUrlHC=http://identity-api/hc
-      - BasketUrlHC=http://basket-api/hc
-      - MarketingUrlHC=http://marketing-api/hc
-      - PaymentUrlHC=http://payment-api/hc
-      - LocationUrlHC=http://locations-api/hc
-      - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
-      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
-      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
-      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
-      - AWS__Profile=${ESHOP_AWS_PROFILE}
-      - AWS__Region=${ESHOP_AWS_REGION}
-      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
-      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
-      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
-      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
-   ports:
-     - "5120:80"
+  # mobileshoppingagg:
+  #   environment:
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - urls__basket=http://basket-api
+  #     - urls__catalog=http://catalog-api
+  #     - urls__orders=http://ordering-api
+  #     - urls__identity=http://identity-api
+  #     - urls__grpcBasket=http://basket-api:81
+  #     - urls__grpcCatalog=http://catalog-api:81
+  #     - urls__grpcOrdering=http://ordering-api:81
+  #     - CatalogUrlHC=http://catalog-api/hc
+  #     - OrderingUrlHC=http://ordering-api/hc
+  #     - IdentityUrlHC=http://identity-api/hc
+  #     - BasketUrlHC=http://basket-api/hc
+  #     - MarketingUrlHC=http://marketing-api/hc
+  #     - PaymentUrlHC=http://payment-api/hc
+  #     - LocationUrlHC=http://locations-api/hc
+  #     - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+  #     - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+  #     - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+  #     - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+  #     - Jaeger__Host=${ESHOP_JAEGER_HOST}
+  #     - Jaeger__Port=${ESHOP_JAEGER_PORT}
+  #     - AWS__Profile=${ESHOP_AWS_PROFILE}
+  #     - AWS__Region=${ESHOP_AWS_REGION}
+  #     - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+  #     - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+  #     - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+  #     - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+  #     - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+  #   ports:
+  #     - "5120:80"
 
   webshoppingagg:
     environment:
@@ -640,7 +640,7 @@ services:
   webhooks-client:
     environment:
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - Token=6168DB8D-DC58-4094-AF24-483278923590      # Webhooks are registered with this token (any value is valid) but the client won't check it
+      - Token=6168DB8D-DC58-4094-AF24-483278923590 # Webhooks are registered with this token (any value is valid) but the client won't check it
       - IdentityUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
       - CallBackUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5114
       - WebhooksUrl=http://webhooks-api
@@ -682,7 +682,7 @@ services:
   #    ## Configures the API URL Fleet Manager should advertise to the outside world (i.e. the)
   #    FM_APPSETTINGS__APIURL: "http://localhostname:5000/api"
 
-  #    ## Configures events database - can be hostname+port (Kafka assumed) or a local directory (embedded events db)      
+  #    ## Configures events database - can be hostname+port (Kafka assumed) or a local directory (embedded events db)
   #    FM_CONNECTIONSTRINGS__EVENTS: "./.fm-events"
 
   #    ## Configures other types of storage - master data (can be MongoDB or SQL Server)

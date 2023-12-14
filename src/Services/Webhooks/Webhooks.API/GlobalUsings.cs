@@ -30,7 +30,6 @@ global using OpenTelemetry.Contrib.Extensions.AWSXRay.Trace;
 global using OpenTelemetry.Metrics;
 global using OpenTelemetry.Resources;
 global using OpenTelemetry.Trace;
-global using Prometheus;
 global using Rebus.Auditing.Messages;
 global using Rebus.AwsSnsAndSqs.Config;
 global using Rebus.Config;

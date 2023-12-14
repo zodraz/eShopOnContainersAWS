@@ -48,11 +48,8 @@ public class Startup
             app.UsePathBase(pathBase);
         }
 
+        app.UseOpenTelemetryPrometheusScrapingEndpoint();
         app.UseRouting();
-        app.UseHttpMetrics(options =>
-        {
-            options.AddCustomLabel("host", context => context.Request.Host.Host);
-        });
         app.UseCors("CorsPolicy");
         app.UseHealthChecks("/hc", new HealthCheckOptions()
         {
@@ -67,7 +64,6 @@ public class Startup
 
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapMetrics();
             endpoints.MapDefaultControllerRoute();
             endpoints.MapControllers();
         });
@@ -374,8 +370,6 @@ static class CustomExtensionMethods
                        }
                    });
         }
-
-        hcBuilder.ForwardToPrometheus();
 
         return services;
     }

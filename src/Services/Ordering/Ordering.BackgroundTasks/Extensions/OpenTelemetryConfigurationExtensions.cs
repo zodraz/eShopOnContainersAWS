@@ -17,55 +17,32 @@ namespace Ordering.BackgroundTasks.Extensions
     {
         public static IServiceCollection AddOpenTelemetry(this IServiceCollection services, OrderingBkgSettings orderingBkgSettings)
         {
-            services.AddOpenTelemetryTracing(builder =>
-            {
-                var traceProviderBuilder = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                        .AddService(orderingBkgSettings.EventBus.EndpointName));
+            services.AddOpenTelemetry()
+               .ConfigureResource(b =>
+               {
+                   b.AddService(orderingBkgSettings.EventBus.EndpointName);
+               })
+               .WithTracing(b =>
+               {
+                   if (orderingBkgSettings.UseAWS && !orderingBkgSettings.LocalStack.UseLocalStack)
+                   {
+                       b.AddXRayTraceId()
+                       .AddAWSInstrumentation();
+                   }
 
-                if (orderingBkgSettings.UseAWS && !orderingBkgSettings.LocalStack.UseLocalStack)
-                {
-                    traceProviderBuilder.AddXRayTraceId()
-                    .AddAWSInstrumentation();
-                }
+                   b.AddAspNetCoreInstrumentation()
+                      .AddHttpClientInstrumentation()
+                      .AddRebusInstrumentation()
+                      .AddOtlpExporter(options => options.Endpoint = new Uri(orderingBkgSettings.OtlpEndpoint));
 
-                var jaegerHost = orderingBkgSettings.Jaeger.Host;
-                var jaegerPort = orderingBkgSettings.Jaeger.Port;
-
-                if (!string.IsNullOrEmpty(jaegerHost))
-                {
-                    traceProviderBuilder.AddJaegerExporter(options =>
-                    {
-                        options.AgentHost = jaegerHost;
-                        options.AgentPort = jaegerPort;
-                        options.ExportProcessorType = ExportProcessorType.Simple;
-                    });
-                }
-
-                traceProviderBuilder.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddRebusInstrumentation()
-                    .AddSqlClientInstrumentation()
-                    .AddOtlpExporter(options =>
-                    {
-                        options.Endpoint = new Uri(orderingBkgSettings.OtlpEndpoint);
-                    });
-
-
-                Sdk.SetDefaultTextMapPropagator(new AWSXRayPropagator());
-            });
-
-            services.AddOpenTelemetryMetrics(builder =>
-            {
-                var meterProviderBuilder = builder.SetResourceBuilder(ResourceBuilder.CreateDefault()
-                       .AddService(orderingBkgSettings.EventBus.EndpointName))
-                .AddHttpClientInstrumentation()
-                .AddAspNetCoreInstrumentation();
-
-                meterProviderBuilder.AddOtlpExporter(options =>
-                {
-                    options.Endpoint = new Uri(orderingBkgSettings.OtlpEndpoint);
-                });
-            });
+                   Sdk.SetDefaultTextMapPropagator(new AWSXRayPropagator());
+               })
+               .WithMetrics(b => b
+                   .AddAspNetCoreInstrumentation()
+                   .AddHttpClientInstrumentation()
+                   .AddRuntimeInstrumentation()
+                   .AddProcessInstrumentation()
+                   .AddPrometheusExporter());
 
             return services;
         }
