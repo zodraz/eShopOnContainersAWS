@@ -24,9 +24,9 @@ services:
       - "3100:3100"
 
   jaeger:
-    image: jaegertracing/all-in-one
+    image: jaegertracing/all-in-one:1.51
     container_name: jaeger
-    command: --query.ui-config=/etc/jaeger/jaeger-ui.json --collector.otlp.enabled=true --prometheus.server-url=http://prometheus:9090
+    command: --query.ui-config=/etc/jaeger/jaeger-ui.json --collector.otlp.enabled=true --prometheus.server-url=http://prometheus:9090 --prometheus.query.support-spanmetrics-connector=true
     environment:
       - METRICS_STORAGE_TYPE=prometheus
       - PROMETHEUS_QUERY_NORMALIZE_CALLS=true
@@ -35,27 +35,7 @@ services:
       - ./configs/jaeger/ui.json:/etc/jaeger/jaeger-ui.json
     restart: unless-stopped
     ports:
-      - 5775:5775/udp
-      - 5778:5778
-      - 6831:6831/udp
-      - 6832:6832/udp
-      - 9411:9411
-      - 14268:14268
-      - 16686:16686 # Jaeger UI
-
-  # jaeger:
-  #   image: jaegertracing/all-in-one:1.51
-  #   container_name: jaeger
-  #   command: --query.ui-config=/etc/jaeger/jaeger-ui.json --collector.otlp.enabled=true --prometheus.server-url=http://prometheus:9090 --prometheus.query.support-spanmetrics-connector=true
-  #   environment:
-  #     - METRICS_STORAGE_TYPE=prometheus
-  #     - PROMETHEUS_QUERY_NORMALIZE_CALLS=true
-  #     - PROMETHEUS_QUERY_NORMALIZE_DURATION=true
-  #   volumes:
-  #     - ./configs/jaeger/ui.json:/etc/jaeger/jaeger-ui.json
-  #   restart: unless-stopped
-  #   ports:
-  #     - "127.0.0.1:16686:16686"
+      - "127.0.0.1:16686:16686"
 
   otel-collector:
     image: amazon/aws-otel-collector:latest

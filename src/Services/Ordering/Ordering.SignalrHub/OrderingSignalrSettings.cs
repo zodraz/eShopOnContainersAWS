@@ -12,7 +12,6 @@ public class OrderingSignalrSettings
     public AWSOptions AWSOptions { get; set; }
     public LocalStack LocalStack { get; set; }
     public EventBusSettings EventBus { get; set; }
-    public Jaeger Jaeger { get; set; }
     public string OtlpEndpoint { get; set; }
     public VaultSettings Vault { get; set; }
 }
@@ -23,11 +22,6 @@ public class LocalStack
     public string LocalStackUrl { get; set; }
 }
 
-public class Jaeger
-{
-    public string Host { get; set; }
-    public int Port { get; set; }
-}
 
 public class VaultSettings
 {

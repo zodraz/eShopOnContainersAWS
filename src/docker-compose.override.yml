@@ -56,8 +56,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS}
@@ -94,8 +92,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopBasketApi}
@@ -134,8 +130,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseCustomizationData=True
       - S3Enabled=False
       - UseAWS=${ESHOP_USE_AWS}
@@ -178,8 +172,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseCustomizationData=True
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
@@ -221,8 +213,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseCustomizationData=True
       - CheckUpdateTime=30000
       - GracePeriodTime=1
@@ -263,8 +253,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - identityUrl=http://identity-api
       - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
       - CampaignDetailFunctionUri=${ESHOP_AWSFUNC_CAMPAIGN_DETAILS_URI}
@@ -305,8 +293,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopPaymentApi}
@@ -346,8 +332,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseDocumentDB=${ESHOP_USE_DOCUMENT_DB}
       - UseVault=${ESHOP_USE_AWS_VAULT}
@@ -384,8 +368,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopWebhookApi}
@@ -450,8 +432,6 @@ services:
   #     - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
   #     - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
   #     - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-  #     - Jaeger__Host=${ESHOP_JAEGER_HOST}
-  #     - Jaeger__Port=${ESHOP_JAEGER_PORT}
   #     - AWS__Profile=${ESHOP_AWS_PROFILE}
   #     - AWS__Region=${ESHOP_AWS_REGION}
   #     - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
@@ -483,8 +463,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - AWS__Profile=${ESHOP_AWS_PROFILE}
       - AWS__Region=${ESHOP_AWS_REGION}
       - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
@@ -514,8 +492,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopWebhookApi}
@@ -567,8 +543,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
@@ -621,8 +595,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseCustomizationData=True
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
@@ -647,8 +619,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - SelfUrl=http://webhooks-client/
       - AWS__Profile=${ESHOP_AWS_PROFILE}
       - AWS__Region=${ESHOP_AWS_REGION}

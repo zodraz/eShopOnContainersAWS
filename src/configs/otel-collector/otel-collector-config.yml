@@ -33,10 +33,10 @@ service:
   pipelines:
     traces:
       receivers: [ otlp ]
-      exporters: [ otlp, logging, awsxray ]
+      exporters: [ otlp, awsxray ]
     metrics:
       receivers: [ otlp ]
-      exporters: [ logging, prometheus, awsemf ]
+      exporters: [ prometheus, awsemf ]
     # logs:
     #   receivers: [ otlp ]
     #   processors: [ resource ]
