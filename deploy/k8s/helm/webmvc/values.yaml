@@ -53,10 +53,6 @@ env:
       key:  all__Serilog__LogstashgUrl
     - name: Serilog__LokiUrl
       key:  all__Serilog__LokiUrl
-    - name: Jaeger__Host
-      key: all__Jaeger__Host
-    - name: Jaeger__Port
-      key: all__Jaeger__Port
     - name: UseAWS
       key: all__UseAWS
     - name: UseVault

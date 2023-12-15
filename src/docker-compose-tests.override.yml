@@ -1,4 +1,4 @@
-version: '3.4'
+version: "3.4"
 
 services:
   rabbitmq-test:
@@ -39,8 +39,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS}
@@ -77,8 +75,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopBasketApi}
@@ -96,10 +92,10 @@ services:
     ports:
       - "5103:80"
     entrypoint:
-        - dotnet
-        - test
-        - --logger
-        - trx;LogFileName=/tests/basket-functional-test-results.xml
+      - dotnet
+      - test
+      - --logger
+      - trx;LogFileName=/tests/basket-functional-test-results.xml
 
   basket-api-unit-test:
     environment:
@@ -123,8 +119,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopBasketApi}
@@ -142,10 +136,10 @@ services:
     ports:
       - "5113:80"
     entrypoint:
-        - dotnet
-        - test
-        - --logger
-        - trx;LogFileName=/tests/basket-unit-test-results.xml
+      - dotnet
+      - test
+      - --logger
+      - trx;LogFileName=/tests/basket-unit-test-results.xml
 
   catalog-api-functional-test:
     environment:
@@ -167,8 +161,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseCustomizationData=True
       - S3Enabled=False
       - UseAWS=${ESHOP_USE_AWS}
@@ -188,10 +180,10 @@ services:
     ports:
       - "5101:80"
     entrypoint:
-        - dotnet
-        - test
-        - --logger
-        - trx;LogFileName=/tests/catalog-functional-test-results.xml
+      - dotnet
+      - test
+      - --logger
+      - trx;LogFileName=/tests/catalog-functional-test-results.xml
 
   catalog-api-unit-test:
     environment:
@@ -213,8 +205,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseCustomizationData=True
       - S3Enabled=False
       - UseAWS=${ESHOP_USE_AWS}
@@ -234,10 +224,10 @@ services:
     ports:
       - "5191:80"
     entrypoint:
-        - dotnet
-        - test
-        - --logger
-        - trx;LogFileName=/tests/catalog-unit-test-results.xml
+      - dotnet
+      - test
+      - --logger
+      - trx;LogFileName=/tests/catalog-unit-test-results.xml
 
   ordering-api-functional-test:
     environment:
@@ -261,8 +251,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseCustomizationData=True
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
@@ -283,10 +271,10 @@ services:
     ports:
       - "5102:80"
     entrypoint:
-        - dotnet
-        - test
-        - --logger
-        - trx;LogFileName=/tests/ordering-functional-test-results.xml
+      - dotnet
+      - test
+      - --logger
+      - trx;LogFileName=/tests/ordering-functional-test-results.xml
 
   ordering-api-unit-test:
     environment:
@@ -310,8 +298,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseCustomizationData=True
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
@@ -332,11 +318,11 @@ services:
     ports:
       - "5112:80"
     entrypoint:
-        - dotnet
-        - test
-        - --logger
-        - trx;LogFileName=/tests/ordering-unit-test-results.xml
-  
+      - dotnet
+      - test
+      - --logger
+      - trx;LogFileName=/tests/ordering-unit-test-results.xml
+
   marketing-api-functional-test:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -359,8 +345,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - identityUrl=http://identity-api
       - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
       - CampaignDetailFunctionUri=${ESHOP_AWSFUNC_CAMPAIGN_DETAILS_URI}
@@ -382,11 +366,11 @@ services:
     ports:
       - "5110:80"
     entrypoint:
-        - dotnet
-        - test
-        - --logger
-        - trx;LogFileName=/tests/marketing-functional-test-results.xml
-        
+      - dotnet
+      - test
+      - --logger
+      - trx;LogFileName=/tests/marketing-functional-test-results.xml
+
   locations-api-functional-test:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -410,8 +394,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseDocumentDB=${ESHOP_USE_DOCUMENT_DB}
       - UseVault=${ESHOP_USE_AWS_VAULT}
@@ -452,8 +434,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseVault=${ESHOP_USE_AWS_VAULT}
       - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopPaymentApi}

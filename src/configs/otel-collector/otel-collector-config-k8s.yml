@@ -12,41 +12,18 @@ exporters:
     endpoint: "jaeger.default.svc.cluster.local:4317"
     tls:
       insecure: true
-
-  loki:
-    endpoint: http://loki.default.svc.cluster.local:3100/loki/api/v1/push
-
+      
   awsxray:
     region: eu-central-1
 
   awsemf:
     region: eu-central-1
 
-connectors:
-  spanmetrics:
-    histogram:
-      explicit:
-        buckets: [ 5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1000ms ]
-
-processors:
-  resource:
-    attributes:
-      - action: insert
-        key: service_name
-        from_attribute: service.name
-      - action: insert
-        key: loki.resource.labels
-        value: service_name
-
 service:
   pipelines:
     traces:
       receivers: [ otlp ]
-      exporters: [ otlp, spanmetrics, awsxray ]
+      exporters: [ otlp, awsxray ]
     metrics:
-      receivers: [ spanmetrics ]
-      exporters: [ prometheus, awsemf ]
-    logs:
       receivers: [ otlp ]
-      processors: [ resource ]
-      exporters: [ loki ]
+      exporters: [ prometheus, awsemf ]

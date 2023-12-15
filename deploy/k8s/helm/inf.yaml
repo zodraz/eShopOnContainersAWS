@@ -56,10 +56,7 @@ inf:
   serilog:
     seqServerUrl: "http://localhost:5341"
     logstashgUrl: "http://localhost"
-    lokiUrl: "http://localhost"
-  jaeger:
-    host: "localhost"
-    port: 6831
+    lokiUrl: "http://loki.default.svc.cluster.local"
   useAWS: true
   useDocumentDb: false
   S3Enabled: true #If catalog api uses AWS S3 or not

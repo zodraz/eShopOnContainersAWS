@@ -44,10 +44,6 @@ env:
       key:  all__Serilog__LogstashgUrl
     - name: Serilog__LokiUrl
       key:  all__Serilog__LokiUrl
-    - name: Jaeger__Host
-      key: all__Jaeger__Host
-    - name: Jaeger__Port
-      key: all__Jaeger__Port
     - name: EventBus__Host
       key: all__EventBus__Host
     - name: EventBus__UserName

@@ -18,8 +18,6 @@ data:
   all__Serilog__SeqServerUrl:  {{ .Values.inf.serilog.seqServerUrl }}
   all__Serilog__LogstashgUrl:  {{ .Values.inf.serilog.logstashgUrl }}
   all__Serilog__LokiUrl:  {{ .Values.inf.serilog.lokiUrl }}
-  all__Jaeger__Host: {{ .Values.inf.jaeger.host }}
-  all__Jaeger__Port: "{{ .Values.inf.jaeger.port }}"
   all__EventBus__Host: {{ .Values.inf.eventbus.host }}
   all__EventBus__UserName: {{ .Values.inf.eventbus.username }}
   all__EventBus__Password: {{ .Values.inf.eventbus.password }}

@@ -35,7 +35,6 @@
 	  <PackageReference Include="OpenTelemetry" Version="1.5.1" />
 	  <PackageReference Include="OpenTelemetry.Contrib.Extensions.AWSXRay" Version="1.2.0" />
 	  <PackageReference Include="OpenTelemetry.Contrib.Instrumentation.AWS" Version="1.0.2" />
-	  <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.2.0" />
 	  <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.5.0-rc.1" />
 	  <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.5.0-rc.1" />
     <PackageReference Include="OpenTelemetry.Instrumentation.GrpcCore" Version="1.0.0-beta.5" />

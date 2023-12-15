@@ -567,8 +567,6 @@ services:
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
       - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
-      - Jaeger__Host=${ESHOP_JAEGER_HOST}
-      - Jaeger__Port=${ESHOP_JAEGER_PORT}
       - UseAWS=${ESHOP_USE_AWS}
       - UseCustomizationData=True
       - OrchestratorType=${ORCHESTRATOR_TYPE}

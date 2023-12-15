@@ -1,12 +1,3 @@
-# apiVersion: 1
-
-# providers:
-#   - name: Default
-#     folder: Services
-#     type: file
-#     options:
-#       path: /var/lib/grafana/dashboards
-
 apiVersion: 1
 providers:
 - name: 'default'

@@ -1700,7 +1700,7 @@ class EKSClusterStack(Stack):
                     },
                     "pushgateway": {
                         "enabled": False
-                    },
+                    }
                 },
             )
             amp_prometheus_chart.node.add_dependency(amp_sa)
@@ -1747,28 +1747,36 @@ class EKSClusterStack(Stack):
                         "datasources.yaml": {
                             "apiVersion":
                             1,
-                            "datasources": [{
-                                "name":
-                                "Prometheus",
-                                "type":
-                                "prometheus",
-                                "access":
-                                "proxy",
-                                "url":
-                                "https://aps-workspaces." + self.region +
-                                ".amazonaws.com/workspaces/" +
-                                amp_workspace_id,
-                                "isDefault":
-                                True,
-                                "editable":
-                                True,
-                                "jsonData": {
-                                    "httpMethod": "POST",
-                                    "sigV4Auth": True,
-                                    "sigV4AuthType": "default",
-                                    "sigV4Region": self.region,
+                            "datasources": [
+                                {
+                                    "name": "Prometheus",
+                                    "type": "prometheus",
+                                    "access": "proxy",
+                                    "url": "https://aps-workspaces." + self.region +
+                                    ".amazonaws.com/workspaces/" + amp_workspace_id,
+                                    "isDefault": True,
+                                    "editable": True,
+                                    "jsonData": {
+                                        "httpMethod": "POST",
+                                        "sigV4Auth": True,
+                                        "sigV4AuthType": "default",
+                                        "sigV4Region": self.region,
+                                    },
                                 },
-                            }],
+                                {
+                                    "name": "Loki",
+                                    "type": "loki",
+                                    "access": "proxy",
+                                    "url": "http://loki.default.svc.cluster.local:3100",
+                                },
+                                {
+                                    "name": "Jaeger",
+                                    "type": "jaeger",
+                                    "uid": "my_jaeger",
+                                    "access": "proxy",
+                                    "url": "http://jaeger.default.svc.cluster.local:16686",
+                                }
+                            ],
                         }
                     },
                     "sidecar": {
@@ -1883,23 +1891,6 @@ class EKSClusterStack(Stack):
                 }
             )
             nginx_chart.node.add_dependency(loki_chart)
-
-            jaeger_chart = eks_cluster.add_helm_chart(
-                "jaeger-chart",
-                chart="jaeger",
-                version="0.72.1",
-                release="jaeger",
-                repository="https://jaegertracing.github.io/helm-charts",
-                namespace="kube-system",
-                create_namespace=False,
-                values={
-                    "serviceAccount": {
-                        "name": "jaeger-service-account",
-                        "create": False,
-                    }
-                }
-            )
-            jaeger_chart.node.add_dependency(nginx_chart)
 
         # Run everything via Fargate (i.e. no EC2 Nodes/Managed Node Group)
         # NOTE: You need to add any namespaces other than kube-system and default to this
