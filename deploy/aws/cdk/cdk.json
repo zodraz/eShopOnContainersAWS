@@ -48,7 +48,7 @@
     "vpc_cidr_mask_public": 26,
     "vpc_cidr_mask_private": 24,
     "existing_vpc_name": "VPC",
-    "eks_version": "1.24",
+    "eks_version": "1.28",
     "eks_deploy_managed_nodegroup": "True",
     "eks_nat_gateways_quantity": 0,
     "eks_node_quantity": 2,
@@ -56,7 +56,7 @@
     "eks_node_disk_size": 20,
     "eks_node_instance_type": "t2.medium",
     "eks_spot_node_instance_type": "c3.large,c4.large,c5.large,c5d.large,c5a.large,c5n.large,c6a.large,c6i.large,c5ad.large,c6id.large",
-    "eks_node_ami_version": "1.24.7-20230105",
+    "eks_node_ami_version": "1.28.3-20231201",
     "eks_node_spot": "True",
     "create_cluster_exports": "True",
     "deploy_aws_lb_controller": "False",
@@ -130,7 +130,7 @@
     "use_certificate":"True",
     "certificate_dns_domain_arn":"arn:aws:acm:us-east-1:791977570179:certificate/9adc3037-8f06-43d9-9e4b-35b7a407cd4b",
     "ssh_key":"",
-    "deploy_loki": "True",
+    "deploy_loki": "False",
     "deploy_jaeger": "True"
   }
 }

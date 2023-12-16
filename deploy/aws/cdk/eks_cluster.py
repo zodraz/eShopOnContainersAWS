@@ -724,7 +724,7 @@ class EKSClusterStack(Stack):
             awsebscsi_chart = eks_cluster.add_helm_chart(
                 "aws-ebs-csi-driver",
                 chart="aws-ebs-csi-driver",
-                version="2.2.0",
+                version="2.26.0",
                 release="awsebscsidriver",
                 repository="https://kubernetes-sigs.github.io/aws-ebs-csi-driver",
                 namespace="kube-system",
@@ -860,7 +860,7 @@ class EKSClusterStack(Stack):
             clusterautoscaler_chart = eks_cluster.add_helm_chart(
                 "cluster-autoscaler",
                 chart="cluster-autoscaler",
-                version="9.10.7",
+                version="9.34.0",
                 release="clusterautoscaler",
                 repository="https://kubernetes.github.io/autoscaler",
                 namespace="kube-system",
@@ -1647,7 +1647,7 @@ class EKSClusterStack(Stack):
             amp_prometheus_chart = eks_cluster.add_helm_chart(
                 "prometheus-chart",
                 chart="prometheus",
-                version="14.9.2",
+                version="25.8.2",
                 release="prometheus-for-amp",
                 repository="https://prometheus-community.github.io/helm-charts",
                 namespace="kube-system",
@@ -1717,7 +1717,7 @@ class EKSClusterStack(Stack):
             amp_grafana_chart = eks_cluster.add_helm_chart(
                 "amp-grafana-chart",
                 chart="grafana",
-                version="6.16.14",
+                version="7.0.17",
                 release="grafana-for-amp",
                 repository="https://grafana.github.io/helm-charts",
                 namespace="kube-system",
@@ -1875,22 +1875,17 @@ class EKSClusterStack(Stack):
             )
             loki_chart.node.add_dependency(amp_grafana_chart)
 
-            nginx_chart = eks_cluster.add_helm_chart(
-                "nginx-chart",
-                chart="ingress-nginx",
-                version="4.8.4",
-                release="ingress-nginx",
-                repository="https://kubernetes.github.io/ingress-nginx",
-                namespace="ingress-nginx",
-                create_namespace=True,
-                values={
-                    "serviceAccount": {
-                        "name": "nginx-service-account",
-                        "create": False,
-                    }
-                }
-            )
-            nginx_chart.node.add_dependency(loki_chart)
+        nginx_chart = eks_cluster.add_helm_chart(
+            "nginx-chart",
+            chart="ingress-nginx",
+            version="4.8.4",
+            release="ingress-nginx",
+            repository="https://kubernetes.github.io/ingress-nginx",
+            namespace="ingress-nginx",
+            create_namespace=True
+        )
+
+        # nginx_chart.node.add_dependency(loki_chart)
 
         # Run everything via Fargate (i.e. no EC2 Nodes/Managed Node Group)
         # NOTE: You need to add any namespaces other than kube-system and default to this
