@@ -39,7 +39,7 @@ inf:
       svc: keystore-data    # Name of k8s svc for keystore-data redis
       constr: eshop-aws-redis.rgggmg.0001.euc1.cache.amazonaws.com:6379 # Connection string to Redis used as a Keystore (by Identity API)
   eventbus:
-    host: b-20dd549c-2551-49aa-b408-cbd9c7de6ca4.mq.eu-central-1.amazonaws.com         # Name of rabbitmq aws host
+    host: b-04949bac-b88b-43d9-9c4e-603a4fccc1b1.mq.eu-central-1.amazonaws.com         # Name of rabbitmq aws host
     username: admin            # Rabbitmq username
     password: "password1234"    # Rabbitmq password
     isSecure: true            # Rabbitmq secure connection

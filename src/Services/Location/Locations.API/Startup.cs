@@ -362,10 +362,10 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
                             t.EnableDiagnosticSources();
                         });
 
-                    if (eventBusSettings.OutboxEnabled)
-                    {
-                        rebusConfig.Outbox(o => o.StoreInSqlServer(locationSettings.ConnectionString, "Outbox"));
-                    }
+                    // if (eventBusSettings.OutboxEnabled)
+                    // {
+                    //     rebusConfig.Outbox(o => o.StoreInSqlServer(locationSettings.ConnectionString, "Outbox"));
+                    // }
                     if (eventBusSettings.AuditEnabled)
                     {
                         rebusConfig.Options(t => t.EnableMessageAuditing(auditQueue: "Audit"));

@@ -182,10 +182,10 @@ public static class CustomExtensionMethods
                         t.EnableDiagnosticSources();
                     });
 
-                if (eventBusSettings.OutboxEnabled)
-                {
-                    rebusConfig.Outbox(o => o.StoreInSqlServer(configuration["ConnectionString"], "Outbox"));
-                }
+                // if (eventBusSettings.OutboxEnabled)
+                // {
+                //     rebusConfig.Outbox(o => o.StoreInSqlServer(configuration["ConnectionString"], "Outbox"));
+                // }
                 if (eventBusSettings.AuditEnabled)
                 {
                     rebusConfig.Options(t => t.EnableMessageAuditing(auditQueue: "Audit"));

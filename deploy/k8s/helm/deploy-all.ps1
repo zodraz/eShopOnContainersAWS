@@ -2,7 +2,8 @@ Param(
     [parameter(Mandatory = $false)][string]$registry = "791977570179.dkr.ecr.eu-central-1.amazonaws.com",
     [parameter(Mandatory = $false)][string]$dockerUser = "AWS",
     [parameter(Mandatory = $false)][string]$dockerPassword = "",
-    [parameter(Mandatory = $false)][string]$externalDns = "eshoponcontainersaws.com",
+    # [parameter(Mandatory = $false)][string]$externalDns = "eshoponcontainersaws.com",
+    [parameter(Mandatory = $false)][string]$externalDns = "",
     [parameter(Mandatory = $false)][string]$appName = "eshop",
     [parameter(Mandatory = $false)][bool]$deployInfrastructure = $false,
     [parameter(Mandatory = $false)][bool]$deployCharts = $true,
@@ -11,7 +12,7 @@ Param(
     [parameter(Mandatory = $false)][bool]$useLocalk8s = $false,
     [parameter(Mandatory = $false)][bool]$useMesh = $false,
     [parameter(Mandatory = $false)][string][ValidateSet('Always', 'IfNotPresent', 'Never', IgnoreCase = $false)]$imagePullPolicy = "Always",
-    [parameter(Mandatory = $false)][string][ValidateSet('prod', 'staging', 'none', 'custom', IgnoreCase = $false)]$sslSupport = "prod",
+    [parameter(Mandatory = $false)][string][ValidateSet('prod', 'staging', 'none', 'custom', IgnoreCase = $false)]$sslSupport = "none",
     [parameter(Mandatory = $false)][string]$tlsSecretName = "eshop-tls-custom",
     [parameter(Mandatory = $false)][string]$chartsToDeploy = "*",
     [parameter(Mandatory = $false)][string]$ingressMeshAnnotationsFile = "ingress_values_linkerd.yaml"
