@@ -34,7 +34,7 @@ env:
     - name: DPConnectionString
       key: webspa__keystore
     - name: MarketingUrl
-      key: internalurls__apigwws
+      key: urls__apigwwm
     - name: PurchaseUrl
       key: urls__apigwws
     - name: CallBackUrl

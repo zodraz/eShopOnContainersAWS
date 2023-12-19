@@ -20,7 +20,8 @@ data:
   marketing__ConnectionString: Server={{ $sqlsrv }};Initial Catalog={{ .Values.inf.sql.marketing.db }};User Id={{ .Values.inf.sql.common.user }};Password={{ .Values.inf.sql.common.pwd }};TrustServerCertificate=True;
   marketing__MongoConnectionString: mongodb://{{ $mongo }}
   marketing__MongoDatabase: {{ .Values.inf.mongo.marketing.database }} 
-  marketing__PicBaseUrl: {{ $protocol }}://{{ $webshoppingapigw }}/c/api/v1/catalog/items/[0]/pic/
+  # marketing__PicBaseUrl: {{ $protocol }}://{{ $webshoppingapigw }}/c/api/v1/catalog/items/[0]/pic/
+  marketing__PicBaseUrl: {{ .Values.inf.picBaseUrl }}
   all__Serilog__SeqServerUrl:  {{ .Values.inf.serilog.seqServerUrl }}
   all__Serilog__LogstashgUrl:  {{ .Values.inf.serilog.logstashgUrl }}
   all__Serilog__LokiUrl:  {{ .Values.inf.serilog.lokiUrl }}

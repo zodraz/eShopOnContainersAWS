@@ -7,7 +7,7 @@ from cloudfront_s3 import CloudFrontS3Stack
 from elasticache_redis import ElastiCacheRedisStack
 from lambda_function_url import LambdaFunctionUrlStack
 from documentdb import DocumentDbStack
-# from waf_alb import WAFALBStack
+from waf_alb import WAFALBStack
 from amq_rabbitmq import AmazonMQRabbitMQStack
 from secrets_manager import SecretsManagerStack
 from route53 import Route53Stack
@@ -30,7 +30,10 @@ environment = Environment(account=account, region=region)
 
 route53 = Route53Stack(app, "Route53Stack", env=environment)
 
-cloudfrontS3 = CloudFrontS3Stack(app, "CloudFrontS3Stack", env=environment)
+environmentCloudFront = Environment(account=account, region="us-east-1")
+
+cloudfrontS3 = CloudFrontS3Stack(
+    app, "CloudFrontS3Stack", env=environmentCloudFront)
 
 vpc = VpcStack(app, id="VPCStack", env=environment)
 
@@ -57,12 +60,12 @@ lambda_url = LambdaFunctionUrlStack(
 documentdb = DocumentDbStack(
     app, "DocumentDbStack", vpc.vpc, env=environment)
 
-# waf_alb = WAFALBStack(app, "WAFALBStack", alb, env=environment)
-
 amq_rabbitmq = AmazonMQRabbitMQStack(
     app, "AmazonMQRabbitMQStack", vpc.vpc, env=environment)
 
 secrets_manager = SecretsManagerStack(
     app, "SecretsManagerStack", env=environment)
+
+waf_alb = WAFALBStack(app, "WAFALBStack", env=environmentCloudFront)
 
 app.synth()

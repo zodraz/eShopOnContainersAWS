@@ -34,7 +34,7 @@ env:
     - name: DPConnectionString
       key: webmvc__keystore
     - name: MarketingUrl
-      key: internalurls__apigwws
+      key: internalurls__apigwwm
     - name: PurchaseUrl
       key: internalurls__apigwws
     - name: ExternalPurchaseUrl

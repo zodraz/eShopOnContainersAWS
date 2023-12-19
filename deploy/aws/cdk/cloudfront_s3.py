@@ -78,73 +78,75 @@ class CloudFrontS3Stack(Stack):
         #     )
         # )
 
-        # ##############################################################################
-        # # Create the WAF
-        # ##############################################################################
+        if (self.node.try_get_context("deploy_waf_cloudfront") == "True"):
 
-        # waf = wafv2.CfnWebACL(
-        #     self,
-        #     "CloudFrontWebACL",
-        #     ####################################################################################
-        #     # Set this to allow|block to enable/prevent access to requests not matching a rule
-        #     ####################################################################################
-        #     default_action=wafv2.CfnWebACL.DefaultActionProperty(block={}),
-        #     scope="CLOUDFRONT",
-        #     visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
-        #         cloud_watch_metrics_enabled=True,
-        #         metric_name="WAF",
-        #         sampled_requests_enabled=True,
-        #     ),
-        #     rules=[
-        #         # blocks any user agents NOT matching the regex
-        #         wafv2.CfnWebACL.RuleProperty(
-        #             name="Permitted-User-Agents",
-        #             priority=0,
-        #             action=wafv2.CfnWebACL.RuleActionProperty(block={}),
-        #             visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
-        #                 sampled_requests_enabled=True,
-        #                 cloud_watch_metrics_enabled=True,
-        #                 metric_name="allow-permitted-devices",
-        #             ),
-        #             statement=wafv2.CfnWebACL.StatementProperty(
-        #                 not_statement=wafv2.CfnWebACL.NotStatementProperty(
-        #                     statement=wafv2.CfnWebACL.StatementProperty(
-        #                         regex_pattern_set_reference_statement=regex_statement
-        #                     )
-        #                 )
-        #             ),
-        #         ),
-        #         wafv2.CfnWebACL.RuleProperty(
-        #             name="Permitted-IPs",
-        #             priority=1,
-        #             action=wafv2.CfnWebACL.RuleActionProperty(allow={}),
-        #             visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
-        #                 sampled_requests_enabled=True,
-        #                 cloud_watch_metrics_enabled=True,
-        #                 metric_name="allow-permitted-ips",
-        #             ),
-        #             statement=wafv2.CfnWebACL.StatementProperty(
-        #                 ip_set_reference_statement=ip_ref_statement_v4
-        #             ),
-        #         ),
-        #         wafv2.CfnWebACL.RuleProperty(
-        #             name="AWS-AWSManagedRulesCommonRuleSet",
-        #             priority=3,
-        #             statement=wafv2.CfnWebACL.StatementProperty(
-        #                 managed_rule_group_statement=wafv2.CfnWebACL.ManagedRuleGroupStatementProperty(
-        #                     vendor_name="AWS", name="AWSManagedRulesCommonRuleSet"
-        #                 )
-        #             ),
-        #             override_action=wafv2.CfnWebACL.OverrideActionProperty(
-        #                 none={}),
-        #             visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
-        #                 sampled_requests_enabled=True,
-        #                 cloud_watch_metrics_enabled=True,
-        #                 metric_name="AWS-AWSManagedRulesCommonRuleSet",
-        #             ),
-        #         ),
-        #     ],
-        # )
+            # ##############################################################################
+            # # Create the WAF
+            # ##############################################################################
+
+            cfnWebACL = wafv2.CfnWebACL(
+                self,
+                "CloudFrontWebACL",
+                ####################################################################################
+                # Set this to allow|block to enable/prevent access to requests not matching a rule
+                ####################################################################################
+                default_action=wafv2.CfnWebACL.DefaultActionProperty(allow={}),
+                scope="CLOUDFRONT",
+                visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
+                    cloud_watch_metrics_enabled=True,
+                    metric_name="WAF",
+                    sampled_requests_enabled=True,
+                ),
+                rules=[
+                    # blocks any user agents NOT matching the regex
+                    # wafv2.CfnWebACL.RuleProperty(
+                    #     name="Permitted-User-Agents",
+                    #     priority=0,
+                    #     action=wafv2.CfnWebACL.RuleActionProperty(block={}),
+                    #     visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
+                    #         sampled_requests_enabled=True,
+                    #         cloud_watch_metrics_enabled=True,
+                    #         metric_name="allow-permitted-devices",
+                    #     ),
+                    #     statement=wafv2.CfnWebACL.StatementProperty(
+                    #         not_statement=wafv2.CfnWebACL.NotStatementProperty(
+                    #             statement=wafv2.CfnWebACL.StatementProperty(
+                    #                 regex_pattern_set_reference_statement=regex_statement
+                    #             )
+                    #         )
+                    #     ),
+                    # ),
+                    # wafv2.CfnWebACL.RuleProperty(
+                    #     name="Permitted-IPs",
+                    #     priority=1,
+                    #     action=wafv2.CfnWebACL.RuleActionProperty(allow={}),
+                    #     visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
+                    #         sampled_requests_enabled=True,
+                    #         cloud_watch_metrics_enabled=True,
+                    #         metric_name="allow-permitted-ips",
+                    #     ),
+                    #     statement=wafv2.CfnWebACL.StatementProperty(
+                    #         ip_set_reference_statement=ip_ref_statement_v4
+                    #     ),
+                    # ),
+                    wafv2.CfnWebACL.RuleProperty(
+                        name="AWS-AWSManagedRulesCommonRuleSet",
+                        priority=3,
+                        statement=wafv2.CfnWebACL.StatementProperty(
+                            managed_rule_group_statement=wafv2.CfnWebACL.ManagedRuleGroupStatementProperty(
+                                vendor_name="AWS", name="AWSManagedRulesCommonRuleSet"
+                            )
+                        ),
+                        override_action=wafv2.CfnWebACL.OverrideActionProperty(
+                            none={}),
+                        visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
+                            sampled_requests_enabled=True,
+                            cloud_watch_metrics_enabled=True,
+                            metric_name="AWS-AWSManagedRulesCommonRuleSet",
+                        ),
+                    ),
+                ],
+            )
 
         logs_bucket = s3.Bucket(
             scope=self,
@@ -183,7 +185,7 @@ class CloudFrontS3Stack(Stack):
             server_access_logs_bucket=logs_bucket,
             public_read_access=False,
             removal_policy=RemovalPolicy.DESTROY,
-            versioned=False          
+            versioned=False
         )
 
         oai = cloudfront.OriginAccessIdentity(
@@ -214,7 +216,8 @@ class CloudFrontS3Stack(Stack):
         distribution = cloudfront.Distribution(
             self,
             "CloudFrontDistribution",
-            # web_acl_id=waf.attr_arn,
+            web_acl_id=cfnWebACL.attr_arn if self.node.try_get_context(
+                "deploy_waf_cloudfront") == "True" else None,
             log_bucket=cloudfront_logs_bucket,
             certificate=certificate,
             enable_logging=True,

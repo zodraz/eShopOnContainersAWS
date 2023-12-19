@@ -131,6 +131,9 @@
     "certificate_dns_domain_arn":"arn:aws:acm:us-east-1:791977570179:certificate/9adc3037-8f06-43d9-9e4b-35b7a407cd4b",
     "ssh_key":"",
     "deploy_loki": "False",
-    "deploy_jaeger": "True"
+    "deploy_jaeger": "True",
+    "deploy_waf_cloudfront": "True",
+    "deploy_waf_loadbalancer": "False",
+    "load_balancer_arn":""
   }
 }

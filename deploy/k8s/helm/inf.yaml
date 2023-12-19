@@ -8,10 +8,10 @@ inf:
     enabled: true           # True to enable TLS (set by deploy-all.ps1)
     issuer: ""              # cert-manager issuer to use for retrieving certs (set by deploy-all.ps1)
   sql:                      # inf.sql defines the sql server databases & logins
-    host:  sqlserverstack-rdsqlserverea747c72-vznkum394sof.cug71fym5n3i.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
+    host:  sqlserverstack-rdsqlserverea747c72-tutuenhilnzv.cug71fym5n3i.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
     common:
       user: adminuser              # SQL user
-      pwd: nry?rWfpMmP+w>=T5[rV+(W7DFK2d!-q        # SQL pwd
+      pwd: Asdf1234567890       # SQL pwd
       pid: Developer
     catalog:                # inf.sql.catalog: settings for the catalog-api sql (user, pwd, db)
       db: CatalogDb         # Catalog API SQL db name
@@ -39,7 +39,7 @@ inf:
       svc: keystore-data    # Name of k8s svc for keystore-data redis
       constr: eshop-aws-redis.rgggmg.0001.euc1.cache.amazonaws.com:6379 # Connection string to Redis used as a Keystore (by Identity API)
   eventbus:
-    host: b-04949bac-b88b-43d9-9c4e-603a4fccc1b1.mq.eu-central-1.amazonaws.com         # Name of rabbitmq aws host
+    host: b-91305678-936a-42a0-9c64-ebb561e8c8be.mq.eu-central-1.amazonaws.com         # Name of rabbitmq aws host
     username: admin            # Rabbitmq username
     password: "password1234"    # Rabbitmq password
     isSecure: true            # Rabbitmq secure connection
@@ -71,6 +71,7 @@ inf:
   k8s:                      # inf.k8s defines Kubernetes cluster global config
     dns:  "eshoponcontainersaws.com" # k8s external  DNS. This value or ip value MUST BE PROVIDED
     local: false            # True when deploying on "local K8s" provided by Docker Desktop.
+  picBaseUrl: "https://store.eshoponcontainersaws.com/"
   registry:                 # Uncomment "registry" to specify registry secret
     secretName:             # secretName is the name of the secret inside k8s   
     server:                 "791977570179.dkr.ecr.eu-central-1.amazonaws.com"
