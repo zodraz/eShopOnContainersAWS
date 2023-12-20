@@ -42,8 +42,6 @@ COPY "Web/WebhookClient/WebhookClient.csproj" "Web/WebhookClient/WebhookClient.c
 COPY "Web/WebMVC/WebMVC.csproj" "Web/WebMVC/WebMVC.csproj"
 COPY "Web/WebSPA/WebSPA.csproj" "Web/WebSPA/WebSPA.csproj"
 COPY "Web/WebStatus/WebStatus.csproj" "Web/WebStatus/WebStatus.csproj"
-COPY "Web/WebMVC/wwwroot/lib/jquery/jquery.min.js" "/app/wwwroot/lib/jquery/jquery.min.js"
-COPY "Web/WebMVC/wwwroot/lib/bootstrap/dist/js/bootstrap.js" "/app/wwwroot/lib/bootstrap/dist/js/bootstrap.js"
 
 COPY "docker-compose.dcproj" "docker-compose.dcproj"
 
@@ -55,9 +53,9 @@ COPY . .
 WORKDIR /src/Web/WebMVC
 RUN dotnet publish --no-restore -c Release -o /app
 
-#WORKDIR /src
-#COPY "Web/WebMVC/wwwroot/lib/jquery/jquery.min.js" "/app/wwwroot/lib/jquery/jquery.min.js"
-#COPY "Web/WebMVC/wwwroot/lib/bootstrap/dist/js/bootstrap.js" "/app/wwwroot/lib/bootstrap/dist/js/bootstrap.js"
+WORKDIR /src
+COPY "Web/WebMVC/wwwroot/lib/jquery/jquery.min.js" "/app/wwwroot/lib/jquery/jquery.min.js"
+COPY "Web/WebMVC/wwwroot/lib/bootstrap/dist/js/bootstrap.js" "/app/wwwroot/lib/bootstrap/dist/js/bootstrap.js"
 
 FROM build AS publish
 

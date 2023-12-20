@@ -34,9 +34,9 @@ bld/
 src/Web/WebMVC/wwwroot/js/site*
 
 # Uncomment if you have tasks that create the project's static files in wwwroot
-**/wwwroot/lib/
-!/wwwroot/lib/signalr
-!/wwwroot/lib/toastr
+#**/wwwroot/lib/
+#!/wwwroot/lib/signalr
+#!/wwwroot/lib/toastr
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -269,8 +269,8 @@ pub/
 
 #Ignore marker-file used to know which docker files we have.
 .eshopdocker_*
-/src/Web/WebMVC/wwwroot/lib
-/src/Web/WebMVC/wwwroot/css/site.min.css
+#/src/Web/WebMVC/wwwroot/lib
+#/src/Web/WebMVC/wwwroot/css/site.min.css
 **/.kube/**
 .mfractor
 
