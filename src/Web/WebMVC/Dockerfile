@@ -55,7 +55,7 @@ RUN dotnet publish --no-restore -c Release -o /app
 
 WORKDIR /src/Web/WebMVC/wwwroot
 COPY "lib/jquery/jquery.min.js" "/app/wwwroot/lib/jquery/jquery.min.js"
-COPY "lib/bootstrap/dist/js/bootstrap.min.js" "/app/wwwroot/lib/bootstrap/dist/js/bootstrap.min.js"
+COPY "lib/bootstrap/dist/js/bootstrap.js" "/app/wwwroot/lib/bootstrap/dist/js/bootstrap.js"
 
 FROM build AS publish
 
