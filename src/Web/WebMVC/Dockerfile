@@ -54,8 +54,11 @@ WORKDIR /src/Web/WebMVC
 RUN dotnet publish --no-restore -c Release -o /app
 
 WORKDIR /src
-COPY "Web/WebMVC/wwwroot/lib/jquery/jquery.min.js" "/app/wwwroot/lib/jquery/jquery.min.js"
-COPY "Web/WebMVC/wwwroot/lib/bootstrap/dist/js/bootstrap.js" "/app/wwwroot/lib/bootstrap/dist/js/bootstrap.js"
+
+COPY "Web/WebMVC/wwwroot/js/site.js" "/app/wwwroot/js/site.js"
+COPY "Web/WebMVC/wwwroot/js/bootstrap.js" "/app/wwwroot/lib/bootstrap/dist/js/bootstrap.js"
+COPY "Web/WebMVC/wwwroot/js/jquery.js" "/app/wwwroot/lib/jquery/jquery.js"
+
 
 FROM build AS publish
 

@@ -70,6 +70,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="wwwroot\js\bootstrap.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\js\bootstrap.min.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\js\jquery.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\lib\%40microsoft\signalr\dist\browser\signalr.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
