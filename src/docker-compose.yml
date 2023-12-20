@@ -214,30 +214,30 @@ services:
     depends_on:
       - sqldata
 
-  # mobileshoppingapigw:
-  #   image: envoyproxy/envoy:v1.11.1
-  #   container_name: mobileshoppingapigw
-  #   restart: always
+  mobileshoppingapigw:
+    image: envoyproxy/envoy:v1.11.1
+    container_name: mobileshoppingapigw
+    restart: always
 
-  # mobilemarketingapigw:
-  #   image: envoyproxy/envoy:v1.11.1
-  #   container_name: mobilemarketingapigw
-  #   restart: always
+  mobilemarketingapigw:
+    image: envoyproxy/envoy:v1.11.1
+    container_name: mobilemarketingapigw
+    restart: always
 
-  # mobileshoppingagg:
-  #   image: ${REGISTRY:-eshop}/mobileshoppingagg:${PLATFORM:-linux}-${TAG:-latest}
-  #   build:
-  #     context: .
-  #     dockerfile: ApiGateways/Mobile.Bff.Shopping/aggregator/Dockerfile
-  #   restart: always
-  #   depends_on:
-  #     - nosqldata
-  #     - sqldata
-  #     - identity-api
-  #     - rabbitmq
-  #     - ordering-api
-  #     - catalog-api
-  #     - basket-api
+  mobileshoppingagg:
+    image: ${REGISTRY:-eshop}/mobileshoppingagg:${PLATFORM:-linux}-${TAG:-latest}
+    build:
+      context: .
+      dockerfile: ApiGateways/Mobile.Bff.Shopping/aggregator/Dockerfile
+    restart: always
+    depends_on:
+      - nosqldata
+      - sqldata
+      - identity-api
+      - rabbitmq
+      - ordering-api
+      - catalog-api
+      - basket-api
 
   webshoppingagg:
     image: ${REGISTRY:-eshop}/webshoppingagg:${PLATFORM:-linux}-${TAG:-latest}
