@@ -8,20 +8,20 @@
       "wwwroot/css/**/*.css"
     ]
   },
-  {
-    "outputFileName": "wwwroot/js/site.js",
-    "inputFiles": [
-      "wwwroot/lib/@microsoft/signalr/dist/browser/signalr.js",
-      "wwwroot/lib/toastr/toastr.min.js"
-    ],
-    // Optionally specify minification options
-    "minify": {
-      "enabled": false,
-      "renameLocals": true
-    },
-    // Optinally generate .map file
-    "sourceMap": false
-  },
+  //{
+  //  "outputFileName": "wwwroot/js/site.js",
+  //  "inputFiles": [
+  //    "wwwroot/lib/@microsoft/signalr/dist/browser/signalr.js",
+  //    "wwwroot/lib/toastr/toastr.min.js"
+  //  ],
+  //  // Optionally specify minification options
+  //  "minify": {
+  //    "enabled": false,
+  //    "renameLocals": true
+  //  },
+  //  // Optinally generate .map file
+  //  "sourceMap": false
+  //},
   {
     "outputFileName": "wwwroot/js/site.min.js",
     "inputFiles": [
