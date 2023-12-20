@@ -24,20 +24,20 @@
   //},
 
 
-  {
-    "outputFileName": "wwwroot/lib/bootstrap/dist/js/bootstrap.js",
-    // An array of relative input file paths. Globbing patterns supported
-    "inputFiles": [
-      "wwwroot/**/bootstrap.js"
-    ]
-  },
-  {
-    "outputFileName": "wwwroot/lib/jquery/jquery.js",
-    // An array of relative input file paths. Globbing patterns supported
-    "inputFiles": [
-      "wwwroot/**/jquery.js"
-    ]
-  },
+  //{
+  //  "outputFileName": "wwwroot/lib/bootstrap/dist/js/bootstrap.js",
+  //  // An array of relative input file paths. Globbing patterns supported
+  //  "inputFiles": [
+  //    "wwwroot/**/bootstrap.js"
+  //  ]
+  //},
+  //{
+  //  "outputFileName": "wwwroot/lib/jquery/jquery.js",
+  //  // An array of relative input file paths. Globbing patterns supported
+  //  "inputFiles": [
+  //    "wwwroot/**/jquery.js"
+  //  ]
+  //},
   {
     "outputFileName": "wwwroot/js/site.min.js",
     "inputFiles": [

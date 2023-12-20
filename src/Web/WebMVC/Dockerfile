@@ -53,6 +53,8 @@ COPY . .
 WORKDIR /src/Web/WebMVC
 RUN dotnet publish --no-restore -c Release -o /app
 
+COPY wwwroot /app/wwwroot
+
 FROM build AS publish
 
 FROM base AS final
