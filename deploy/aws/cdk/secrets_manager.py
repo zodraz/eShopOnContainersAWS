@@ -13,15 +13,17 @@ class SecretsManagerStack(Stack):
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        appsettings_files = self.node.try_get_context(
-            "secrets_manager_appsettings_files")
+        if (self.node.try_get_context("deploy_secretsmanager") == "True"):
 
-        for key, file_path in appsettings_files.items():
-            with open(file_path) as f:
-                secrets = json.load(f)
-            secretsmanager.CfnSecret(
-                self,
-                key,
-                name=key,
-                secret_string=json.dumps(secrets)
-            )
+            appsettings_files = self.node.try_get_context(
+                "secrets_manager_appsettings_files")
+
+            for key, file_path in appsettings_files.items():
+                with open(file_path) as f:
+                    secrets = json.load(f)
+                secretsmanager.CfnSecret(
+                    self,
+                    key,
+                    name=key,
+                    secret_string=json.dumps(secrets)
+                )
