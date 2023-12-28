@@ -1,5 +1,5 @@
 cd  D:\git_personal\eShopOnContainersAWS\deploy\k8s\nginx-ingress
-k apply -f local-cm.yaml
+k create -f local-cm.yaml
 
 helm upgrade --reuse-values -f ../../../src/configs/prometheus/prometheus-k8s.yml  prometheus-for-amp prometheus
 

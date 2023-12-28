@@ -1,13 +1,11 @@
-aws-cdk-lib==2.80.0
-aws-cdk.lambda-layer-kubectl-v24==2.0.190
+aws-cdk-lib==2.116.1
+aws-cdk.lambda-layer-kubectl-v28==2.1.0
 constructs>=10.0.0,<11.0.0
 attrs==21.2.0
 cattrs==22.2.0
-jsii==1.81.0
+jsii==1.93.0
 publication==0.0.3
 python-dateutil==2.8.2
 PyYAML==6.0
 six==1.16.0
 typing-extensions==4.4.0
-aws-solutions-constructs.aws-cloudfront-s3==2.30.0
-aws_solutions_constructs.aws_wafwebacl_alb==2.30.0

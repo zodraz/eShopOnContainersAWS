@@ -1,6 +1,7 @@
 from aws_cdk import (App, Environment)
 import os
 from eks_cluster import EKSClusterStack
+from eks_cluster_extensions import EKSClusterStackExtensions
 from vpc import VpcStack
 from rds_sqlserver import RDSSQLServerStack
 from cloudfront_s3 import CloudFrontS3Stack
@@ -46,6 +47,13 @@ eks_cluster = EKSClusterStack(app,
                               "EKSClusterStack",
                               vpc.vpc,
                               env=environment)
+
+eks_cluster_extensions = EKSClusterStackExtensions(app,
+                                                   "EKSClusterStackExtensions",
+                                                   vpc.vpc,
+                                                   env=environment)
+
+eks_cluster_extensions.add_dependency(eks_cluster)
 
 oidcstack = IamOICProviderStack(app, 'IamOICProviderStack', env=environment)
 
