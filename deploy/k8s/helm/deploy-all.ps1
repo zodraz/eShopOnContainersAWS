@@ -1,5 +1,5 @@
 Param(
-    [parameter(Mandatory = $false)][string]$registry = "691088110908.dkr.ecr.eu-central-1.amazonaws.com/eshop",
+    [parameter(Mandatory = $false)][string]$registry = "144070732019.dkr.ecr.eu-central-1.amazonaws.com/eshop",
     [parameter(Mandatory = $false)][string]$dockerUser = "AWS",
     [parameter(Mandatory = $false)][string]$dockerPassword = "",
     [parameter(Mandatory = $false)][string]$externalDns = "eshoponcontainersaws.com",
@@ -44,7 +44,8 @@ function Install-Chart {
 $dns = $externalDns
 $sslEnabled = $false
 $sslIssuer = ""
-$dockerPassword = (Get-ECRLoginCommand).Password 
+# $dockerPassword = (Get-ECRLoginCommand).Password
+$dockerPassword = aws ecr get-login-password  --region eu-central-1  
 
 if ($sslSupport -eq "staging") {
     $sslEnabled = $true
