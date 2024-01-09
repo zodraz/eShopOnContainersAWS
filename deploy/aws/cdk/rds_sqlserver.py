@@ -1,4 +1,5 @@
 from aws_cdk import (
+    SecretValue,
     Stack,
     aws_rds as rds,
     aws_ec2 as ec2,
@@ -17,14 +18,17 @@ class RDSSQLServerStack(Stack):
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        db_password = secretsmanager.Secret(
-            self,
-            "sqlServerPwd",
-            description="SQLServer auth",
-            generate_secret_string=secretsmanager.SecretStringGenerator(
-                exclude_characters='/"@;:'))
+        # db_password = secretsmanager.Secret(
+        #     self,
+        #     "sqlServerPwd",
+        #     description="SQLServer auth",
+        #     generate_secret_string=secretsmanager.SecretStringGenerator(
+        #         exclude_characters='/\\`"@;:|=][],'))
 
         db_user = "adminuser"
+
+        db_password = secretsmanager.Secret(self, "sqlserverCredentials",
+                                            secret_string_value=SecretValue("PAssw0rd"))
 
         db_security_group = ec2.SecurityGroup(self,
                                               "SQLServerSecurityGroup",
@@ -71,12 +75,14 @@ class RDSSQLServerStack(Stack):
                 self,
                 "RDSQLServer",
                 engine=rds.DatabaseInstanceEngine.sql_server_ex(
-                    version=rds.SqlServerEngineVersion.VER_15),
+                    version=rds.SqlServerEngineVersion.VER_14_00_3465_1_V1),
                 vpc=vpc,
                 credentials=rds.Credentials.from_password(
                     db_user, db_password.secret_value),
-                instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3,
-                                                  ec2.InstanceSize.SMALL),
+                instance_type=ec2.InstanceType('t2.micro'),
+                allocated_storage=20,  # Storage size in GB
+                max_allocated_storage=100,  # Maximum storage size (optional)
+                auto_minor_version_upgrade=False,
                 security_groups=[db_security_group],
                 subnet_group=db_subnet_group,
                 multi_az=False,

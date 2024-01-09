@@ -1,4 +1,6 @@
-﻿namespace Microsoft.eShopOnContainers.Services.Identity.API
+﻿using IdentityServer4.Extensions;
+
+namespace Microsoft.eShopOnContainers.Services.Identity.API
 {
     public class Startup
     {
@@ -119,6 +121,12 @@
             app.Use(async (context, next) =>
             {
                 context.Response.Headers.Add("Content-Security-Policy", "script-src 'unsafe-inline'");
+                await next();
+            });
+
+            app.Use(async (ctx, next) =>
+            {
+                ctx.SetIdentityServerOrigin(Configuration.GetValue<string>("PublicOrigin"));
                 await next();
             });
 

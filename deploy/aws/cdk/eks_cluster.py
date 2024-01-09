@@ -96,73 +96,71 @@ class EKSClusterStack(Stack):
             vpc_subnets=vpc_subnets,
             cluster_logging=[eks.ClusterLoggingTypes.API, eks.ClusterLoggingTypes.AUTHENTICATOR, eks.ClusterLoggingTypes.SCHEDULER])
 
-        # Create the CF exports that let you rehydrate the Cluster object in other stack(s)
-        if self.node.try_get_context("create_cluster_exports") == "True":
-            # Output the EKS Cluster Name and Export it
-            CfnOutput(
-                self,
-                "EKSClusterName",
-                value=eks_cluster.cluster_name,
-                description="The name of the EKS Cluster",
-                export_name="EKSClusterName",
-            )
-            # Output the EKS Cluster OIDC Issuer and Export it
-            CfnOutput(
-                self,
-                "EKSClusterOIDCProviderARN",
-                value=eks_cluster.open_id_connect_provider.
-                open_id_connect_provider_arn,
-                description="The EKS Cluster's OIDC Provider ARN",
-                export_name="EKSClusterOIDCProviderARN",
-            )
-            # Output the EKS Cluster kubectl Role ARN
-            CfnOutput(
-                self,
-                "EKSClusterKubectlRoleARN",
-                value=eks_cluster.kubectl_role.role_arn,
-                description="The EKS Cluster's kubectl Role ARN",
-                export_name="EKSClusterKubectlRoleARN",
-            )
-            # Output the EKS Cluster kubectl LambdaRole ARN
-            CfnOutput(
-                self,
-                "EKSClusterKubectlLambdaRoleARN",
-                value=eks_cluster.kubectl_lambda_role.role_arn,
-                description="The EKS Cluster's kubectl Lambda Role ARN",
-                export_name="EKSClusterKubectlLambdaRoleARN",
-            )
-            # Output the EKS Cluster SG ID
-            CfnOutput(
-                self,
-                "EKSSGID",
-                value=eks_cluster.kubectl_security_group.security_group_id,
-                description="The EKS Cluster's kubectl SG ID",
-                export_name="EKSSGID",
-            )
+        # Output the EKS Cluster Name and Export it
+        CfnOutput(
+            self,
+            "EKSClusterName",
+            value=eks_cluster.cluster_name,
+            description="The name of the EKS Cluster",
+            export_name="EKSClusterName",
+        )
+        # Output the EKS Cluster OIDC Issuer and Export it
+        CfnOutput(
+            self,
+            "EKSClusterOIDCProviderARN",
+            value=eks_cluster.open_id_connect_provider.
+            open_id_connect_provider_arn,
+            description="The EKS Cluster's OIDC Provider ARN",
+            export_name="EKSClusterOIDCProviderARN",
+        )
+        # Output the EKS Cluster kubectl Role ARN
+        CfnOutput(
+            self,
+            "EKSClusterKubectlRoleARN",
+            value=eks_cluster.kubectl_role.role_arn,
+            description="The EKS Cluster's kubectl Role ARN",
+            export_name="EKSClusterKubectlRoleARN",
+        )
+        # Output the EKS Cluster kubectl LambdaRole ARN
+        CfnOutput(
+            self,
+            "EKSClusterKubectlLambdaRoleARN",
+            value=eks_cluster.kubectl_lambda_role.role_arn,
+            description="The EKS Cluster's kubectl Lambda Role ARN",
+            export_name="EKSClusterKubectlLambdaRoleARN",
+        )
+        # Output the EKS Cluster SG ID
+        CfnOutput(
+            self,
+            "EKSSGID",
+            value=eks_cluster.kubectl_security_group.security_group_id,
+            description="The EKS Cluster's kubectl SG ID",
+            export_name="EKSSGID",
+        )
 
-            CfnOutput(
-                self,
-                id="EKSClusterOIDCProvider",
-                value=eks_cluster.cluster_open_id_connect_issuer,
-                description="The EKS Cluster's OIDC Provider",
-                export_name="EKSClusterOIDCProvider",
-            )
+        CfnOutput(
+            self,
+            id="EKSClusterOIDCProvider",
+            value=eks_cluster.cluster_open_id_connect_issuer,
+            description="The EKS Cluster's OIDC Provider",
+            export_name="EKSClusterOIDCProvider",
+        )
 
-            CfnOutput(
-                self,
-                id="EKSClusterMasterIAMRole",
-                value=eks_cluster.admin_role.role_arn,
-                description="The EKS Cluster Master Admin Role ARN",
-                export_name="EKSClusterMasterIAMRole",
-            )
+        CfnOutput(
+            self,
+            id="EKSClusterMasterIAMRole",
+            value=eks_cluster.admin_role.role_arn,
+            description="The EKS Cluster Master Admin Role ARN",
+            export_name="EKSClusterMasterIAMRole",
+        )
 
-            CfnOutput(
-                self,
-                id="EKSClusterControlPlaneIAMRole",
-                value=eks_cluster.role.role_arn,
-                description="The EKS Cluster Control Plane Role ARN",
-                export_name="EKSClusterControlPlaneIAMRole",
-            )
+        CfnOutput(
+            self,
+            id="EKSClusterControlPlaneIAMRole",
+            value=eks_cluster.role.role_arn,
+            description="The EKS Cluster Control Plane Role ARN",
+            export_name="EKSClusterControlPlaneIAMRole",
+        )
 
         # Add a Managed Node Group
         if self.node.try_get_context("eks_deploy_managed_nodegroup") == "True":

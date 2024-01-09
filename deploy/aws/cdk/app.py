@@ -13,6 +13,7 @@ from amq_rabbitmq import AmazonMQRabbitMQStack
 from secrets_manager import SecretsManagerStack
 from route53 import Route53Stack
 from iam_oic_provider import IamOICProviderStack
+from eks_codebuild import EKSCodeBuildStack
 
 app = App()
 if app.node.try_get_context("account").strip() != "":
@@ -74,6 +75,9 @@ amq_rabbitmq = AmazonMQRabbitMQStack(
 secrets_manager = SecretsManagerStack(
     app, "SecretsManagerStack", env=environment)
 
-waf_alb = WAFALBStack(app, "WAFALBStack", env=environmentCloudFront)
+waf_alb = WAFALBStack(app, "WAFALBStack", env=environment)
+
+eks_codebuild_stack = EKSCodeBuildStack(
+    app, "EKSCodeBuildStack", env=environment)
 
 app.synth()

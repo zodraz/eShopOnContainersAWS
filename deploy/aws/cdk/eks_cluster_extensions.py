@@ -10,7 +10,7 @@ NOTE: This pulls many parameters/options for what you'd like from the cdk.json c
 Have a look there for many options you can change to customise this template for your environments/needs.
 """
 
-from aws_cdk import (aws_ec2 as ec2, aws_eks as eks, aws_iam as iam,
+from aws_cdk import (CfnJson, aws_ec2 as ec2, aws_eks as eks, aws_iam as iam,
                      aws_opensearchservice as opensearch, aws_logs as logs,
                      aws_certificatemanager as cm, CfnOutput,
                      RemovalPolicy, Stack, aws_route53 as route53,
@@ -41,6 +41,9 @@ class EKSClusterStackExtensions(Stack):
         eks_open_id_connect_provider_arn = Fn.import_value(
             "EKSClusterOIDCProviderARN")
 
+        eks_open_id_connect_provider_url = Fn.import_value(
+            "EKSClusterOIDCProvider")
+
         eks_cluster = eks.Cluster.from_cluster_attributes(self, "eks_cluster",
                                                           vpc=vpc,
                                                           cluster_name=eks_cluster_name,
@@ -62,254 +65,304 @@ class EKSClusterStackExtensions(Stack):
             ],
         )
 
+        def string_like(name_space, sa_name):
+            string = CfnJson(
+                self, f'JsonCondition{sa_name}',
+                value={
+                    f'{eks_open_id_connect_provider_url}:sub': f'system:serviceaccount:{name_space}:{sa_name}',
+                    f'{eks_open_id_connect_provider_url}:aud': 'sts.amazonaws.com'
+                }
+            )
+            return string
+
         # AWS Load Balancer Controller
         if self.node.try_get_context("deploy_aws_lb_controller") == "True":
+
             awslbcontroller_service_account = eks_cluster.add_service_account(
                 "aws-load-balancer-controller",
                 name="aws-load-balancer-controller",
                 namespace="kube-system",
+                annotations={
+                    "eks.amazonaws.com/role-arn": "arn:aws:iam::" + self.account + ":role/eshop-lb-role"
+                }
             )
 
             # Create the PolicyStatements to attach to the role
             # Got the required policy from https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
-            awslbcontroller_policy_document_json = {
-                "Version":
-                "2012-10-17",
-                "Statement": [
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "iam:CreateServiceLinkedRole",
-                            "ec2:DescribeAccountAttributes",
-                            "ec2:DescribeAddresses",
-                            "ec2:DescribeAvailabilityZones",
-                            "ec2:DescribeInternetGateways",
-                            "ec2:DescribeVpcs",
-                            "ec2:DescribeSubnets",
-                            "ec2:DescribeSecurityGroups",
-                            "ec2:DescribeInstances",
-                            "ec2:DescribeNetworkInterfaces",
-                            "ec2:DescribeTags",
-                            "ec2:GetCoipPoolUsage",
-                            "ec2:DescribeCoipPools",
-                            "elasticloadbalancing:DescribeLoadBalancers",
-                            "elasticloadbalancing:DescribeLoadBalancerAttributes",
-                            "elasticloadbalancing:DescribeListeners",
-                            "elasticloadbalancing:DescribeListenerCertificates",
-                            "elasticloadbalancing:DescribeSSLPolicies",
-                            "elasticloadbalancing:DescribeRules",
-                            "elasticloadbalancing:DescribeTargetGroups",
-                            "elasticloadbalancing:DescribeTargetGroupAttributes",
-                            "elasticloadbalancing:DescribeTargetHealth",
-                            "elasticloadbalancing:DescribeTags",
-                        ],
-                        "Resource":
-                        "*",
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "cognito-idp:DescribeUserPoolClient",
-                            "acm:ListCertificates",
-                            "acm:DescribeCertificate",
-                            "iam:ListServerCertificates",
-                            "iam:GetServerCertificate",
-                            "waf-regional:GetWebACL",
-                            "waf-regional:GetWebACLForResource",
-                            "waf-regional:AssociateWebACL",
-                            "waf-regional:DisassociateWebACL",
-                            "wafv2:GetWebACL",
-                            "wafv2:GetWebACLForResource",
-                            "wafv2:AssociateWebACL",
-                            "wafv2:DisassociateWebACL",
-                            "shield:GetSubscriptionState",
-                            "shield:DescribeProtection",
-                            "shield:CreateProtection",
-                            "shield:DeleteProtection",
-                        ],
-                        "Resource":
-                        "*",
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "ec2:AuthorizeSecurityGroupIngress",
-                            "ec2:RevokeSecurityGroupIngress",
-                        ],
-                        "Resource":
-                        "*",
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:CreateSecurityGroup"],
-                        "Resource": "*",
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:CreateTags"],
-                        "Resource": "arn:aws:ec2:*:*:security-group/*",
-                        "Condition": {
+            awslbcontroller_policy_1 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "iam:CreateServiceLinkedRole",
+                    "ec2:DescribeAccountAttributes",
+                    "ec2:DescribeAddresses",
+                    "ec2:DescribeAvailabilityZones",
+                    "ec2:DescribeInternetGateways",
+                    "ec2:DescribeVpcs",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeSecurityGroups",
+                    "ec2:DescribeInstances",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DescribeTags",
+                    "ec2:GetCoipPoolUsage",
+                    "ec2:DescribeCoipPools",
+                    "elasticloadbalancing:DescribeLoadBalancers",
+                    "elasticloadbalancing:DescribeLoadBalancerAttributes",
+                    "elasticloadbalancing:DescribeListeners",
+                    "elasticloadbalancing:DescribeListenerCertificates",
+                    "elasticloadbalancing:DescribeSSLPolicies",
+                    "elasticloadbalancing:DescribeRules",
+                    "elasticloadbalancing:DescribeTargetGroups",
+                    "elasticloadbalancing:DescribeTargetGroupAttributes",
+                    "elasticloadbalancing:DescribeTargetHealth",
+                    "elasticloadbalancing:DescribeTags",
+                ],
+                "Resource":
+                "*",
+            })
+            awslbcontroller_policy_2 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "cognito-idp:DescribeUserPoolClient",
+                    "acm:ListCertificates",
+                    "acm:DescribeCertificate",
+                    "iam:ListServerCertificates",
+                    "iam:GetServerCertificate",
+                    "waf-regional:GetWebACL",
+                    "waf-regional:GetWebACLForResource",
+                    "waf-regional:AssociateWebACL",
+                    "waf-regional:DisassociateWebACL",
+                    "wafv2:GetWebACL",
+                    "wafv2:GetWebACLForResource",
+                    "wafv2:AssociateWebACL",
+                    "wafv2:DisassociateWebACL",
+                    "shield:GetSubscriptionState",
+                    "shield:DescribeProtection",
+                    "shield:CreateProtection",
+                    "shield:DeleteProtection",
+                ],
+                "Resource":
+                "*",
+            })
+            awslbcontroller_policy_3 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "ec2:AuthorizeSecurityGroupIngress",
+                    "ec2:RevokeSecurityGroupIngress",
+                ],
+                "Resource":
+                "*",
+            })
+            awslbcontroller_policy_4 = iam.PolicyStatement.from_json({
+                "Effect": "Allow",
+                "Action": ["ec2:CreateSecurityGroup"],
+                "Resource": "*",
+            })
+            awslbcontroller_policy_5 = iam.PolicyStatement.from_json({
+                "Effect": "Allow",
+                "Action": ["ec2:CreateTags"],
+                "Resource": "arn:aws:ec2:*:*:security-group/*",
+                "Condition": {
                             "StringEquals": {
                                 "ec2:CreateAction": "CreateSecurityGroup"
                             },
-                            "Null": {
+                    "Null": {
                                 "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
                             },
-                        },
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:CreateTags", "ec2:DeleteTags"],
-                        "Resource": "arn:aws:ec2:*:*:security-group/*",
-                        "Condition": {
+                },
+            })
+            awslbcontroller_policy_6 = iam.PolicyStatement.from_json({
+                "Effect": "Allow",
+                "Action": ["ec2:CreateTags", "ec2:DeleteTags"],
+                "Resource": "arn:aws:ec2:*:*:security-group/*",
+                "Condition": {
                             "Null": {
                                 "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
                                 "aws:ResourceTag/elbv2.k8s.aws/cluster":
                                 "false",
                             }
-                        },
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "ec2:AuthorizeSecurityGroupIngress",
-                            "ec2:RevokeSecurityGroupIngress",
-                            "ec2:DeleteSecurityGroup",
-                        ],
-                        "Resource":
-                        "*",
-                        "Condition": {
-                            "Null": {
-                                "aws:ResourceTag/elbv2.k8s.aws/cluster":
-                                "false"
-                            }
-                        },
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "elasticloadbalancing:CreateLoadBalancer",
-                            "elasticloadbalancing:CreateTargetGroup",
-                        ],
-                        "Resource":
-                        "*",
-                        "Condition": {
-                            "Null": {
-                                "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
-                            }
-                        },
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "elasticloadbalancing:CreateListener",
-                            "elasticloadbalancing:DeleteListener",
-                            "elasticloadbalancing:CreateRule",
-                            "elasticloadbalancing:DeleteRule",
-                        ],
-                        "Resource":
-                        "*",
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "elasticloadbalancing:AddTags",
-                            "elasticloadbalancing:RemoveTags",
-                        ],
-                        "Resource": [
-                            "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
-                            "arn:aws:elasticloadbalancing:*:*:loadbalancer/net/*/*",
-                            "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/*/*",
-                        ],
-                        "Condition": {
-                            "Null": {
-                                "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
-                                "aws:ResourceTag/elbv2.k8s.aws/cluster":
-                                "false",
-                            }
-                        },
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "elasticloadbalancing:AddTags",
-                            "elasticloadbalancing:RemoveTags",
-                        ],
-                        "Resource": [
-                            "arn:aws:elasticloadbalancing:*:*:listener/net/*/*/*",
-                            "arn:aws:elasticloadbalancing:*:*:listener/app/*/*/*",
-                            "arn:aws:elasticloadbalancing:*:*:listener-rule/net/*/*/*",
-                            "arn:aws:elasticloadbalancing:*:*:listener-rule/app/*/*/*",
-                        ],
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "elasticloadbalancing:ModifyLoadBalancerAttributes",
-                            "elasticloadbalancing:SetIpAddressType",
-                            "elasticloadbalancing:SetSecurityGroups",
-                            "elasticloadbalancing:SetSubnets",
-                            "elasticloadbalancing:DeleteLoadBalancer",
-                            "elasticloadbalancing:ModifyTargetGroup",
-                            "elasticloadbalancing:ModifyTargetGroupAttributes",
-                            "elasticloadbalancing:DeleteTargetGroup",
-                        ],
-                        "Resource":
-                        "*",
-                        "Condition": {
-                            "Null": {
-                                "aws:ResourceTag/elbv2.k8s.aws/cluster":
-                                "false"
-                            }
-                        },
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "elasticloadbalancing:RegisterTargets",
-                            "elasticloadbalancing:DeregisterTargets",
-                        ],
-                        "Resource":
-                        "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "elasticloadbalancing:SetWebAcl",
-                            "elasticloadbalancing:ModifyListener",
-                            "elasticloadbalancing:AddListenerCertificates",
-                            "elasticloadbalancing:RemoveListenerCertificates",
-                            "elasticloadbalancing:ModifyRule",
-                        ],
-                        "Resource":
-                        "*",
-                    },
+                },
+            })
+            awslbcontroller_policy_7 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "ec2:AuthorizeSecurityGroupIngress",
+                    "ec2:RevokeSecurityGroupIngress",
+                    "ec2:DeleteSecurityGroup",
                 ],
-            }
+                "Resource":
+                "*",
+                "Condition": {
+                    "Null": {
+                        "aws:ResourceTag/elbv2.k8s.aws/cluster":
+                        "false"
+                    }
+                },
+            })
+            awslbcontroller_policy_8 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "elasticloadbalancing:CreateLoadBalancer",
+                    "elasticloadbalancing:CreateTargetGroup",
+                ],
+                "Resource":
+                "*",
+                "Condition": {
+                    "Null": {
+                        "aws:RequestTag/elbv2.k8s.aws/cluster": "false"
+                    }
+                },
+            })
+            awslbcontroller_policy_9 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "elasticloadbalancing:CreateListener",
+                    "elasticloadbalancing:DeleteListener",
+                    "elasticloadbalancing:CreateRule",
+                    "elasticloadbalancing:DeleteRule",
+                ],
+                "Resource":
+                "*",
+            })
+            awslbcontroller_policy_10 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "elasticloadbalancing:AddTags",
+                    "elasticloadbalancing:RemoveTags",
+                ],
+                "Resource": [
+                    "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
+                    "arn:aws:elasticloadbalancing:*:*:loadbalancer/net/*/*",
+                    "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/*/*",
+                ],
+                # "Condition": {
+                #     "Null": {
+                #         "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
+                #         "aws:ResourceTag/elbv2.k8s.aws/cluster":
+                #         "false",
+                #     }
+                # },
+            })
+            awslbcontroller_policy_11 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "elasticloadbalancing:AddTags",
+                    "elasticloadbalancing:RemoveTags",
+                ],
+                "Resource": [
+                    "arn:aws:elasticloadbalancing:*:*:listener/net/*/*/*",
+                    "arn:aws:elasticloadbalancing:*:*:listener/app/*/*/*",
+                    "arn:aws:elasticloadbalancing:*:*:listener-rule/net/*/*/*",
+                    "arn:aws:elasticloadbalancing:*:*:listener-rule/app/*/*/*",
+                ],
+            })
+            awslbcontroller_policy_12 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                    "elasticloadbalancing:SetIpAddressType",
+                    "elasticloadbalancing:SetSecurityGroups",
+                    "elasticloadbalancing:SetSubnets",
+                    "elasticloadbalancing:DeleteLoadBalancer",
+                    "elasticloadbalancing:ModifyTargetGroup",
+                    "elasticloadbalancing:ModifyTargetGroupAttributes",
+                    "elasticloadbalancing:DeleteTargetGroup",
+                ],
+                "Resource":
+                "*",
+                "Condition": {
+                    "Null": {
+                        "aws:ResourceTag/elbv2.k8s.aws/cluster":
+                        "false"
+                    }
+                },
+            })
+            awslbcontroller_policy_13 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "elasticloadbalancing:RegisterTargets",
+                    "elasticloadbalancing:DeregisterTargets",
+                ],
+                "Resource":
+                "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
+            })
+            awslbcontroller_policy_14 = iam.PolicyStatement.from_json({
+                "Effect":
+                "Allow",
+                "Action": [
+                    "elasticloadbalancing:SetWebAcl",
+                    "elasticloadbalancing:ModifyListener",
+                    "elasticloadbalancing:AddListenerCertificates",
+                    "elasticloadbalancing:RemoveListenerCertificates",
+                    "elasticloadbalancing:ModifyRule",
+                ],
+                "Resource":
+                "*",
+            })
+
+            awslbcontroller_role = iam.Role(
+                self,
+                'AwsLbControllerRole',
+                role_name="eshop-lb-role",
+                # for Role's Trust relationships
+                assumed_by=iam.FederatedPrincipal(
+                    federated=eks_cluster.open_id_connect_provider.
+                    open_id_connect_provider_arn,
+                    conditions={'StringEquals': string_like(
+                        'kube-system', 'aws-load-balancer-controller')},
+                    assume_role_action='sts:AssumeRoleWithWebIdentity'
+                )
+            )
 
             # Attach the necessary permissions
-            awslbcontroller_policy = iam.Policy(
-                self,
-                "awslbcontrollerpolicy",
-                document=iam.PolicyDocument.from_json(
-                    awslbcontroller_policy_document_json),
-            )
-            awslbcontroller_service_account.role.attach_inline_policy(
-                awslbcontroller_policy)
+            # awslbcontroller_policy = iam.Policy(
+            #     self,
+            #     "awslbcontrollerpolicy",
+            #     document=iam.PolicyDocument.from_json(
+            #         awslbcontroller_policy_14)
+            # )
+            # awslbcontroller_service_account.add_to_principal_policy(
+            #     awslbcontroller_policy)
+
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_1)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_2)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_3)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_4)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_5)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_6)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_7)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_8)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_9)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_10)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_11)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_12)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_13)
+            awslbcontroller_role.add_to_principal_policy(
+                awslbcontroller_policy_14)
 
             # Deploy the AWS Load Balancer Controller from the AWS Helm Chart
-            # For more info check out https://github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller
             awslbcontroller_chart = eks_cluster.add_helm_chart(
                 "aws-load-balancer-controller",
                 chart="aws-load-balancer-controller",
@@ -319,11 +372,42 @@ class EKSClusterStackExtensions(Stack):
                 namespace="kube-system",
                 values={
                     "clusterName": eks_cluster.cluster_name,
+                    "ingressClass": "aws-alb",
                     "region": self.region,
                     "vpcId": vpc.vpc_id,
                     "serviceAccount": {
                         "create": False,
                         "name": "aws-load-balancer-controller",
+                    },
+                    "ingressClassParams": {
+                        "spec": {
+                            "scheme": "internet-facing",
+                            "group": {
+                                "name": "eks-alb-ingress"
+                            },
+                            "loadBalancerAttributes": [
+                                {
+                                    "key": "deletion_protection.enabled",
+                                    "value": "true"
+                                },
+                                {
+                                    "key": "idle_timeout.timeout_seconds",
+                                    "value": "120"
+                                },
+                                {
+                                    "key": "routing.http.drop_invalid_header_fields.enabled",
+                                    "value": "true"
+                                },
+                                {
+                                    "key": "routing.http2.enabled",
+                                    "value": "true"
+                                },
+                                {
+                                    "key": "routing.http.preserve_host_header.enabled",
+                                    "value": "true"
+                                }
+                            ]
+                        }
                     },
                     "replicaCount": 2,
                 },
@@ -392,325 +476,65 @@ class EKSClusterStackExtensions(Stack):
             )
             externaldns_chart.node.add_dependency(externaldns_service_account)
 
-        # AWS EBS CSI Driver
-        if (self.node.try_get_context("deploy_aws_ebs_csi") == "True" and
-                self.node.try_get_context("fargate_only_cluster") == "False"):
-            awsebscsidriver_service_account = eks_cluster.add_service_account(
-                "awsebscsidriver",
-                name="awsebscsidriver",
-                namespace="kube-system")
-
-            # Create the IAM Policy Document
-            # For more info see https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/docs/example-iam-policy.json
-            awsebscsidriver_policy_document_json = {
-                "Version":
-                "2012-10-17",
-                "Statement": [
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": [
-                            "ec2:CreateSnapshot",
-                            "ec2:AttachVolume",
-                            "ec2:DetachVolume",
-                            "ec2:ModifyVolume",
-                            "ec2:DescribeAvailabilityZones",
-                            "ec2:DescribeInstances",
-                            "ec2:DescribeSnapshots",
-                            "ec2:DescribeTags",
-                            "ec2:DescribeVolumes",
-                            "ec2:DescribeVolumesModifications",
-                        ],
-                        "Resource":
-                        "*",
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": ["ec2:CreateTags"],
-                        "Resource": [
-                            "arn:aws:ec2:*:*:volume/*",
-                            "arn:aws:ec2:*:*:snapshot/*",
-                        ],
-                        "Condition": {
-                            "StringEquals": {
-                                "ec2:CreateAction":
-                                ["CreateVolume", "CreateSnapshot"]
-                            }
-                        },
-                    },
-                    {
-                        "Effect":
-                        "Allow",
-                        "Action": ["ec2:DeleteTags"],
-                        "Resource": [
-                            "arn:aws:ec2:*:*:volume/*",
-                            "arn:aws:ec2:*:*:snapshot/*",
-                        ],
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:CreateVolume"],
-                        "Resource": "*",
-                        "Condition": {
-                            "StringLike": {
-                                "aws:RequestTag/ebs.csi.aws.com/cluster":
-                                "true"
-                            }
-                        },
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:CreateVolume"],
-                        "Resource": "*",
-                        "Condition": {
-                            "StringLike": {
-                                "aws:RequestTag/CSIVolumeName": "*"
-                            }
-                        },
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:CreateVolume"],
-                        "Resource": "*",
-                        "Condition": {
-                            "StringLike": {
-                                "aws:RequestTag/kubernetes.io/cluster/*":
-                                "owned"
-                            }
-                        },
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:DeleteVolume"],
-                        "Resource": "*",
-                        "Condition": {
-                            "StringLike": {
-                                "ec2:ResourceTag/ebs.csi.aws.com/cluster":
-                                "true"
-                            }
-                        },
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:DeleteVolume"],
-                        "Resource": "*",
-                        "Condition": {
-                            "StringLike": {
-                                "ec2:ResourceTag/CSIVolumeName": "*"
-                            }
-                        },
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:DeleteVolume"],
-                        "Resource": "*",
-                        "Condition": {
-                            "StringLike": {
-                                "ec2:ResourceTag/kubernetes.io/cluster/*":
-                                "owned"
-                            }
-                        },
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:DeleteSnapshot"],
-                        "Resource": "*",
-                        "Condition": {
-                            "StringLike": {
-                                "ec2:ResourceTag/CSIVolumeSnapshotName": "*"
-                            }
-                        },
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Action": ["ec2:DeleteSnapshot"],
-                        "Resource": "*",
-                        "Condition": {
-                            "StringLike": {
-                                "ec2:ResourceTag/ebs.csi.aws.com/cluster":
-                                "true"
-                            }
-                        },
-                    },
-                ],
-            }
-
-            # Attach the necessary permissions
-            awsebscsidriver_policy = iam.Policy(
-                self,
-                "awsebscsidriverpolicy",
-                document=iam.PolicyDocument.from_json(
-                    awsebscsidriver_policy_document_json),
-            )
-            awsebscsidriver_service_account.role.attach_inline_policy(
-                awsebscsidriver_policy)
-
-            # Install the AWS EBS CSI Driver
-            # For more info see https://github.com/kubernetes-sigs/aws-ebs-csi-driver
-            awsebscsi_chart = eks_cluster.add_helm_chart(
-                "aws-ebs-csi-driver",
-                chart="aws-ebs-csi-driver",
-                version="2.26.0",
-                release="awsebscsidriver",
-                repository="https://kubernetes-sigs.github.io/aws-ebs-csi-driver",
-                namespace="kube-system",
-                values={
-                    "controller": {
-                        "region": self.region,
-                        "serviceAccount": {
-                            "create": False,
-                            "name": "awsebscsidriver"
-                        },
-                    },
-                    "node": {
-                        "serviceAccount": {
-                            "create": False,
-                            "name": "awsebscsidriver"
-                        }
-                    },
-                },
-            )
-            awsebscsi_chart.node.add_dependency(
-                awsebscsidriver_service_account)
-
-        # AWS EFS CSI Driver
-        if (self.node.try_get_context("deploy_aws_efs_csi") == "True" and
-                self.node.try_get_context("fargate_only_cluster") == "False"):
-            awsefscsidriver_service_account = eks_cluster.add_service_account(
-                "awsefscsidriver",
-                name="awsefscsidriver",
+        # Cluster Autoscaler
+        if (self.node.try_get_context("deploy_cluster_autoscaler") == "True"
+                and self.node.try_get_context("fargate_only_cluster")
+                == "False"):
+            clusterautoscaler_service_account = eks_cluster.add_service_account(
+                "clusterautoscaler",
+                name="clusterautoscaler",
                 namespace="kube-system")
 
             # Create the PolicyStatements to attach to the role
-            awsefscsidriver_policy_statement_json_1 = {
+            clusterautoscaler_policy_statement_json_1 = {
                 "Effect":
                 "Allow",
                 "Action": [
-                    "elasticfilesystem:DescribeAccessPoints",
-                    "elasticfilesystem:DescribeFileSystems",
+                    "autoscaling:DescribeAutoScalingGroups",
+                    "autoscaling:DescribeAutoScalingInstances",
+                    "autoscaling:DescribeLaunchConfigurations",
+                    "autoscaling:DescribeTags",
+                    "autoscaling:SetDesiredCapacity",
+                    "autoscaling:TerminateInstanceInAutoScalingGroup",
                 ],
                 "Resource":
                 "*",
             }
-            awsefscsidriver_policy_statement_json_2 = {
-                "Effect": "Allow",
-                "Action": ["elasticfilesystem:CreateAccessPoint"],
-                "Resource": "*",
-                "Condition": {
-                    "StringLike": {
-                        "aws:RequestTag/efs.csi.aws.com/cluster": "true"
-                    }
-                },
-            }
-            awsefscsidriver_policy_statement_json_3 = {
-                "Effect": "Allow",
-                "Action": "elasticfilesystem:DeleteAccessPoint",
-                "Resource": "*",
-                "Condition": {
-                    "StringEquals": {
-                        "aws:ResourceTag/efs.csi.aws.com/cluster": "true"
-                    }
-                },
-            }
 
             # Attach the necessary permissions
-            awsefscsidriver_service_account.add_to_principal_policy(
+            clusterautoscaler_service_account.add_to_principal_policy(
                 iam.PolicyStatement.from_json(
-                    awsefscsidriver_policy_statement_json_1))
-            awsefscsidriver_service_account.add_to_principal_policy(
-                iam.PolicyStatement.from_json(
-                    awsefscsidriver_policy_statement_json_2))
-            awsefscsidriver_service_account.add_to_principal_policy(
-                iam.PolicyStatement.from_json(
-                    awsefscsidriver_policy_statement_json_3))
+                    clusterautoscaler_policy_statement_json_1))
 
-            # Install the AWS EFS CSI Driver
-            # For more info see https://github.com/kubernetes-sigs/aws-efs-csi-driver
-            awsefscsi_chart = eks_cluster.add_helm_chart(
-                "aws-efs-csi-driver",
-                chart="aws-efs-csi-driver",
-                version="2.2.0",
-                release="awsefscsidriver",
-                repository="https://kubernetes-sigs.github.io/aws-efs-csi-driver/",
+            # Install the Cluster Autoscaler
+            # For more info see https://github.com/kubernetes/autoscaler
+            clusterautoscaler_chart = eks_cluster.add_helm_chart(
+                "cluster-autoscaler",
+                chart="cluster-autoscaler",
+                version="9.34.0",
+                release="clusterautoscaler",
+                repository="https://kubernetes.github.io/autoscaler",
                 namespace="kube-system",
                 values={
-                    "controller": {
+                    "autoDiscovery": {
+                        "clusterName": eks_cluster.cluster_name
+                    },
+                    "awsRegion": self.region,
+                    "rbac": {
                         "serviceAccount": {
                             "create": False,
-                            "name": "awsefscsidriver"
+                            "name": "clusterautoscaler"
                         }
                     },
-                    "node": {
-                        "serviceAccount": {
-                            "create": False,
-                            "name": "awsefscsidriver"
-                        }
+                    "replicaCount": 2,
+                    "extraArgs": {
+                        "skip-nodes-with-system-pods": False,
+                        "balance-similar-node-groups": True,
                     },
                 },
             )
-            awsefscsi_chart.node.add_dependency(
-                awsefscsidriver_service_account)
-
-            # Cluster Autoscaler
-            if (self.node.try_get_context("deploy_cluster_autoscaler") == "True"
-                    and self.node.try_get_context("fargate_only_cluster")
-                    == "False"):
-                clusterautoscaler_service_account = eks_cluster.add_service_account(
-                    "clusterautoscaler",
-                    name="clusterautoscaler",
-                    namespace="kube-system")
-
-                # Create the PolicyStatements to attach to the role
-                clusterautoscaler_policy_statement_json_1 = {
-                    "Effect":
-                    "Allow",
-                    "Action": [
-                        "autoscaling:DescribeAutoScalingGroups",
-                        "autoscaling:DescribeAutoScalingInstances",
-                        "autoscaling:DescribeLaunchConfigurations",
-                        "autoscaling:DescribeTags",
-                        "autoscaling:SetDesiredCapacity",
-                        "autoscaling:TerminateInstanceInAutoScalingGroup",
-                    ],
-                    "Resource":
-                    "*",
-                }
-
-                # Attach the necessary permissions
-                clusterautoscaler_service_account.add_to_principal_policy(
-                    iam.PolicyStatement.from_json(
-                        clusterautoscaler_policy_statement_json_1))
-
-                # Install the Cluster Autoscaler
-                # For more info see https://github.com/kubernetes/autoscaler
-                clusterautoscaler_chart = eks_cluster.add_helm_chart(
-                    "cluster-autoscaler",
-                    chart="cluster-autoscaler",
-                    version="9.34.0",
-                    release="clusterautoscaler",
-                    repository="https://kubernetes.github.io/autoscaler",
-                    namespace="kube-system",
-                    values={
-                        "autoDiscovery": {
-                            "clusterName": eks_cluster.cluster_name
-                        },
-                        "awsRegion": self.region,
-                        "rbac": {
-                            "serviceAccount": {
-                                "create": False,
-                                "name": "clusterautoscaler"
-                            }
-                        },
-                        "replicaCount": 2,
-                        "extraArgs": {
-                            "skip-nodes-with-system-pods": False,
-                            "balance-similar-node-groups": True,
-                        },
-                    },
-                )
-                clusterautoscaler_chart.node.add_dependency(
-                    clusterautoscaler_service_account)
+            clusterautoscaler_chart.node.add_dependency(
+                clusterautoscaler_service_account)
 
         # Amazon OpenSearch and a fluent-bit to ship our container logs there
         if self.node.try_get_context("deploy_managed_opensearch") == "True":
@@ -846,40 +670,6 @@ class EKSClusterStackExtensions(Stack):
                     }
                 },
             )
-
-        # Calico to enforce NetworkPolicies
-        if (self.node.try_get_context("deploy_calico_np") == "True" and
-                self.node.try_get_context("fargate_only_cluster") == "False"):
-            # For more info see https://docs.aws.amazon.com/eks/latest/userguide/calico.html
-
-            # First we need to install the Calico Operator components out of the calico-operator.yaml file
-            calico_operator_yaml_file = open("calico-operator.yaml", "r")
-            calico_operator_yaml = list(
-                yaml.load_all(calico_operator_yaml_file,
-                              Loader=yaml.FullLoader))
-            calico_operator_yaml_file.close()
-            loop_iteration = 0
-            calico_operator_manifests = []
-            for value in calico_operator_yaml:
-                # print(value)
-                loop_iteration = loop_iteration + 1
-                manifest_id = "CalicoOperator" + str(loop_iteration)
-                calico_operator_manifest = eks_cluster.add_manifest(
-                    manifest_id, value)
-                calico_operator_manifests.append(calico_operator_manifest)
-                if loop_iteration != 1:
-                    calico_operator_manifest.node.add_dependency(
-                        calico_operator_manifests[0])
-
-            # Then we need to install the config for the operator out of the calico-crs.yaml file
-            calico_crs_yaml_file = open("calico-crs.yaml", "r")
-            calico_crs_yaml = list(
-                yaml.load_all(calico_crs_yaml_file, Loader=yaml.FullLoader))
-            calico_crs_yaml_file.close()
-            calico_crs_manifest = eks_cluster.add_manifest(
-                "CalicoCRS", calico_crs_yaml.pop(0))
-            calico_crs_manifest.node.add_dependency(
-                calico_operator_manifest)
 
         # Bastion Instance
         if self.node.try_get_context("deploy_bastion") == "True":
@@ -1042,8 +832,7 @@ class EKSClusterStackExtensions(Stack):
             )
 
         # CloudWatch Container Insights - Metrics
-        if (self.node.try_get_context(
-                "deploy_cloudwatch_container_insights_metrics") == "True"):
+        if (self.node.try_get_context("deploy_cloudwatch_container_insights_metrics") == "True"):
             # For more info see https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-setup-metrics.html
 
             # Create the Service Account
@@ -1145,221 +934,6 @@ class EKSClusterStackExtensions(Stack):
             )
             fluentbit_chart_cw.node.add_dependency(
                 fluentbit_cw_service_account)
-
-        # Security Group for Pods
-        if self.node.try_get_context("deploy_sg_for_pods") == "True":
-            # The EKS Cluster was still defaulting to 1.7.5 on 12/9/21 and SG for Pods requires 1.7.7
-            # Upgrading that to the latest version 1.9.0 via the Helm Chart
-            # If this process somehow breaks the CNI you can repair it manually by following the steps here:
-            # https://docs.aws.amazon.com/eks/latest/userguide/managing-vpc-cni.html#updating-vpc-cni-add-on
-            # TODO: Move this to the CNI Managed Add-on when that supports flipping the required ENABLE_POD_ENI setting
-
-            # Adopting the existing aws-node resources to Helm
-            patch_types = ["DaemonSet",
-                           "ClusterRole", "ClusterRoleBinding"]
-            patches = []
-            for kind in patch_types:
-                patch = eks.KubernetesPatch(
-                    self,
-                    "CNI-Patch-" + kind,
-                    cluster=eks_cluster,
-                    resource_name=kind + "/aws-node",
-                    resource_namespace="kube-system",
-                    apply_patch={
-                        "metadata": {
-                            "annotations": {
-                                "meta.helm.sh/release-name": "aws-vpc-cni",
-                                "meta.helm.sh/release-namespace":
-                                "kube-system",
-                            },
-                            "labels": {
-                                "app.kubernetes.io/managed-by": "Helm"
-                            },
-                        }
-                    },
-                    restore_patch={},
-                    patch_type=eks.PatchType.STRATEGIC,
-                )
-                # We don't want to clean this up on Delete - it is a one-time patch to let the Helm Chart own the resources
-                patch_resource = patch.node.find_child("Resource")
-                patch_resource.apply_removal_policy(RemovalPolicy.RETAIN)
-                # Keep track of all the patches to set dependencies down below
-                patches.append(patch)
-
-            # Create the Service Account
-            sg_pods_service_account = eks_cluster.add_service_account(
-                "aws-node", name="aws-node-helm", namespace="kube-system")
-
-            # Give it the required policies
-            sg_pods_service_account.role.add_managed_policy(
-                iam.ManagedPolicy.from_aws_managed_policy_name(
-                    "AmazonEKS_CNI_Policy"))
-            # sg_pods_service_account.role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("AmazonEKSVPCResourceController"))
-
-            eks_role_control_plane = iam.Role.from_role_arn(
-                self, "EKSClusterControlPlaneIAMRole", role_arn=eks_cluster_control_plane_role_arn)
-
-            eks_role_control_plane.add_managed_policy(
-                iam.ManagedPolicy.from_aws_managed_policy_name(
-                    "AmazonEKSVPCResourceController"))
-
-            # Deploy the Helm chart
-            # For more info check out https://github.com/aws/eks-charts/tree/master/stable/aws-vpc-cni
-            # Note that for some regions different account # required - https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html
-            sg_pods_chart = eks_cluster.add_helm_chart(
-                "aws-vpc-cni",
-                chart="aws-vpc-cni",
-                version="1.1.9",
-                release="aws-vpc-cni",
-                repository="https://aws.github.io/eks-charts",
-                namespace="kube-system",
-                values={
-                    "init": {
-                        "image": {
-                            "region": self.region,
-                            "account": "602401143452",
-                        },
-                        "env": {
-                            "DISABLE_TCP_EARLY_DEMUX": True
-                        },
-                    },
-                    "image": {
-                        "region": self.region,
-                        "account": "602401143452"
-                    },
-                    "env": {
-                        "ENABLE_POD_ENI": True
-                    },
-                    "serviceAccount": {
-                        "create": False,
-                        "name": "aws-node-helm"
-                    },
-                    "crd": {
-                        "create": False
-                    },
-                    "originalMatchLabels": True,
-                },
-            )
-            # This depends both on the service account and the patches to the existing CNI resources having been done first
-            sg_pods_chart.node.add_dependency(sg_pods_service_account)
-            for patch in patches:
-                sg_pods_chart.node.add_dependency(patch)
-
-        # Secrets Manager CSI Driver
-        if (self.node.try_get_context("deploy_secretsmanager_csi") == "True"
-                and self.node.try_get_context("fargate_only_cluster")
-                == "False"):
-            # For more information see https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html
-
-            # First we install the Secrets Store CSI Driver Helm Chart
-            # For mor information see https://github.com/kubernetes-sigs/secrets-store-csi-driver/tree/main/charts/secrets-store-csi-driver
-            csi_secrets_store_chart = eks_cluster.add_helm_chart(
-                "csi-secrets-store",
-                chart="secrets-store-csi-driver",
-                version="1.0.0",
-                release="csi-secrets-store",
-                repository="https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts",
-                namespace="kube-system",
-                # Since sometimes you want these secrets as environment variables enabling syncSecret
-                # For more info see https://secrets-store-csi-driver.sigs.k8s.io/topics/sync-as-kubernetes-secret.html
-                values={"syncSecret": {
-                    "enabled": True
-                }},
-            )
-
-            # Install the AWS Provider
-            # See https://github.com/aws/secrets-store-csi-driver-provider-aws for more info
-
-            # Create the IRSA Mapping
-            secrets_csi_sa = eks_cluster.add_service_account(
-                "secrets-csi-sa",
-                name="csi-secrets-store-provider-aws",
-                namespace="kube-system",
-            )
-
-            # Associate the IAM Policy
-            # NOTE: you really want to specify the secret ARN rather than * in the Resource
-            # Consider namespacing these by cluster/environment name or some such as in this example:
-            # "Resource": ["arn:aws:secretsmanager:Region:AccountId:secret:TestEnv/*"]
-            secrets_csi_policy_statement_json_1 = {
-                "Effect":
-                "Allow",
-                "Action": [
-                    "secretsmanager:GetSecretValue",
-                    "secretsmanager:DescribeSecret",
-                ],
-                "Resource": ["*"],
-            }
-            secrets_csi_sa.add_to_principal_policy(
-                iam.PolicyStatement.from_json(
-                    secrets_csi_policy_statement_json_1))
-
-            # Deploy the manifests from secrets-store-csi-driver-provider-aws.yaml
-            secrets_csi_provider_yaml_file = open(
-                "secrets-store-csi-driver-provider-aws.yaml", "r")
-            secrets_csi_provider_yaml = list(
-                yaml.load_all(secrets_csi_provider_yaml_file,
-                              Loader=yaml.FullLoader))
-            secrets_csi_provider_yaml_file.close()
-            loop_iteration = 0
-            for value in secrets_csi_provider_yaml:
-                # print(value)
-                loop_iteration = loop_iteration + 1
-                manifest_id = "SecretsCSIProviderManifest" + \
-                    str(loop_iteration)
-                manifest = eks_cluster.add_manifest(manifest_id, value)
-                manifest.node.add_dependency(secrets_csi_sa)
-
-        # Kubernetes External Secrets
-        if self.node.try_get_context("deploy_external_secrets") == "True":
-            # For more information see https://github.com/external-secrets/kubernetes-external-secrets
-            # Deploy the External Secrets Controller
-            # Create the Service Account
-            externalsecrets_service_account = eks_cluster.add_service_account(
-                "kubernetes-external-secrets",
-                name="kubernetes-external-secrets",
-                namespace="kube-system",
-            )
-
-            # Define the policy in JSON
-            externalsecrets_policy_statement_json_1 = {
-                "Effect":
-                "Allow",
-                "Action": [
-                    "secretsmanager:GetResourcePolicy",
-                    "secretsmanager:GetSecretValue",
-                    "secretsmanager:DescribeSecret",
-                    "secretsmanager:ListSecretVersionIds",
-                ],
-                "Resource": ["*"],
-            }
-
-            # Add the policies to the service account
-            externalsecrets_service_account.add_to_principal_policy(
-                iam.PolicyStatement.from_json(
-                    externalsecrets_policy_statement_json_1))
-
-            # Deploy the Helm Chart
-            external_secrets_chart = eks_cluster.add_helm_chart(
-                "external-secrets",
-                chart="kubernetes-external-secrets",
-                version="8.3.0",
-                repository="https://external-secrets.github.io/kubernetes-external-secrets/",
-                namespace="kube-system",
-                release="external-secrets",
-                values={
-                    "env": {
-                        "AWS_REGION": self.region
-                    },
-                    "serviceAccount": {
-                        "name": "kubernetes-external-secrets",
-                        "create": False,
-                    },
-                    "securityContext": {
-                        "fsGroup": 65534
-                    },
-                },
-            )
 
         # Kubecost
         if (self.node.try_get_context("deploy_kubecost") == "True" and
@@ -1699,7 +1273,7 @@ class EKSClusterStackExtensions(Stack):
                             "type": "s3"
                         },
                         "s3": {
-                            "region": "eu-central-1"
+                            "region": self.region
                         },
                         "bucketNames": {
                             "chunks": "loki-chunk",
@@ -1709,17 +1283,16 @@ class EKSClusterStackExtensions(Stack):
                     }
                 }
             )
-            loki_chart.node.add_dependency(amp_grafana_chart)
 
-        nginx_chart = eks_cluster.add_helm_chart(
-            "nginx-chart",
-            chart="ingress-nginx",
-            version="4.9.0",
-            release="ingress-nginx",
-            repository="https://kubernetes.github.io/ingress-nginx",
-            namespace="ingress-nginx",
-            create_namespace=True
-        )
+        # nginx_chart = eks_cluster.add_helm_chart(
+        #     "nginx-chart",
+        #     chart="ingress-nginx",
+        #     version="4.9.0",
+        #     release="ingress-nginx",
+        #     repository="https://kubernetes.github.io/ingress-nginx",
+        #     namespace="ingress-nginx",
+        #     create_namespace=True
+        # )
 
         # nginx_chart.node.add_dependency(loki_chart)
 
@@ -1847,29 +1420,6 @@ class EKSClusterStackExtensions(Stack):
         # # At the moment better to use CloudWatch logs which seperates by source logstream and onward
         # # stream from that to OpenSearch?
 
-        eks_cluster.add_service_account(
-            "ServiceAccountForIRSAPods",
-            name="eshop-eks-sa",
-            namespace="default",
-            annotations={'eks.amazonaws.com/role-arn': 'arn:aws:iam::' +
-                         self.node.try_get_context(
-                             "account") + ':role/EshopEksForOidcSa'})
-
-        # Deploy the manifests from service-accounts.yaml
-        service_accounts_yaml_file = open(
-            "service-accounts.yaml", "r")
-        service_accounts_yaml = list(
-            yaml.load_all(service_accounts_yaml_file,
-                          Loader=yaml.FullLoader))
-        service_accounts_yaml_file.close()
-        loop_iteration = 0
-        for value in service_accounts_yaml:
-            # print(value)
-            loop_iteration = loop_iteration + 1
-            manifest_id = "ServiceAccountsManifest" + \
-                str(loop_iteration)
-            manifest = eks_cluster.add_manifest(manifest_id, value)
-
         if self.node.try_get_context(
                 "fargate_logs_to_managed_opensearch") == "True":
             if self.node.try_get_context(
@@ -1924,3 +1474,107 @@ class EKSClusterStackExtensions(Stack):
                 print(
                     "You need to set only one destination for Fargate Logs to True"
                 )
+
+        if self.node.try_get_context("deploy_cert_manager") == "True":
+
+            certmanager_chart = eks_cluster.add_helm_chart(
+                "certmanager",
+                chart="cert-manager",
+                version="1.13.3",
+                repository="https://charts.jetstack.io",
+                namespace="cert-manager",
+                release="cert-manager",
+                create_namespace=True,
+                values={
+                        "installCRDs": True
+                }
+            )
+
+        if (self.node.try_get_context("deploy_ebs_csi") == "True" and
+                self.node.try_get_context("fargate_only_cluster") == "False"):
+
+            ebs_csi_addon_role = iam.Role(
+                self,
+                'EbsCsiAddonRole',
+                # for Role's Trust relationships
+                assumed_by=iam.FederatedPrincipal(
+                    federated=eks_cluster.open_id_connect_provider.
+                    open_id_connect_provider_arn,
+                    conditions={'StringEquals': string_like(
+                        'kube-system', 'ebs-csi-controller-sa')},
+                    assume_role_action='sts:AssumeRoleWithWebIdentity'
+                )
+            )
+            ebs_csi_addon_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name(
+                "service-role/AmazonEBSCSIDriverPolicy"))
+
+            # Add EBS CSI add-on
+            ebs_csi_addon = eks.CfnAddon(
+                self,
+                "EbsCsiAddon",
+                addon_name="aws-ebs-csi-driver",
+                cluster_name=eks_cluster.cluster_name,
+                resolve_conflicts="OVERWRITE",
+                addon_version="v1.26.0-eksbuild.1",
+                service_account_role_arn=ebs_csi_addon_role.role_arn
+            )
+
+        if self.node.try_get_context("deply_adot") == "True":
+
+            adot_addon_role = iam.Role(
+                self,
+                'AdotAddonRole',
+                # for Role's Trust relationships
+                assumed_by=iam.FederatedPrincipal(
+                    federated=eks_cluster.open_id_connect_provider.open_id_connect_provider_arn,
+                    conditions={'StringEquals': string_like(
+                        'opentelemetry-operator-system', 'opentelemetry-operator')},
+                    assume_role_action='sts:AssumeRoleWithWebIdentity'
+                ),
+                role_name="Adot_Addon_Role"
+            )
+            adot_addon_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name(
+                "CloudWatchAgentServerPolicy"))
+            adot_addon_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name(
+                "AmazonPrometheusRemoteWriteAccess"))
+            adot_addon_role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name(
+                "AWSXRayDaemonWriteAccess"))
+
+            # with open('example.yaml', 'r') as file:
+            #     data = yaml.safe_load(file)
+
+            # Add ADOT add-on
+            adot_addon = eks.CfnAddon(
+                self,
+                "AdotAddon",
+                addon_name="adot",
+                cluster_name=eks_cluster.cluster_name,
+                resolve_conflicts="OVERWRITE",
+                addon_version="v0.88.0-eksbuild.2",
+                service_account_role_arn=adot_addon_role.role_arn
+            )
+
+            adot_addon.node.add_dependency(certmanager_chart)
+
+        eks_cluster.add_service_account(
+            "ServiceAccountForIRSAPods",
+            name="eshop-eks-sa",
+            namespace="default",
+            annotations={'eks.amazonaws.com/role-arn': 'arn:aws:iam::' +
+                         self.node.try_get_context(
+                             "account") + ':role/EshopEksForOidcSa'})
+
+        # Deploy the manifests from service-accounts.yaml
+        service_accounts_yaml_file = open(
+            "service-accounts.yaml", "r")
+        service_accounts_yaml = list(
+            yaml.load_all(service_accounts_yaml_file,
+                          Loader=yaml.FullLoader))
+        service_accounts_yaml_file.close()
+        loop_iteration = 0
+        for value in service_accounts_yaml:
+            # print(value)
+            loop_iteration = loop_iteration + 1
+            manifest_id = "ServiceAccountsManifest" + \
+                str(loop_iteration)
+            manifest = eks_cluster.add_manifest(manifest_id, value)

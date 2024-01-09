@@ -26,6 +26,7 @@ https://github.com/RafaelLiendo/Rebus.Extensions.SharedNothing
 https://github.com/P47Phoenix/Rebus.AwsSnsAndSqs
 https://github.com/dotnet-architecture/eShopOnContainers
 https://github.com/chs1380/quickstart-eks-cdk-python
+https://github.com/fluxcd/flux2-kustomize-helm-example/
 
 Thanks to (and not including) all third party nuget dependencies and open source libraries like:
 Rebus https://github.com/rebus-org/Rebus

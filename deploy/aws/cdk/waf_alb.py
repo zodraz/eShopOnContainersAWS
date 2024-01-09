@@ -88,6 +88,7 @@ class WAFALBStack(Stack):
                 ####################################################################################
                 default_action=wafv2.CfnWebACL.DefaultActionProperty(allow={}),
                 scope="REGIONAL",
+                name="ALB-WAF",
                 visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
                     cloud_watch_metrics_enabled=True,
                     metric_name="WAF",
@@ -125,9 +126,11 @@ class WAFALBStack(Stack):
                     #         ip_set_reference_statement=ip_ref_statement_v4
                     #     ),
                     # ),
+
+                    # Common Rule Set aligns with major portions of OWASP Core Rule Set
                     wafv2.CfnWebACL.RuleProperty(
                         name="AWS-AWSManagedRulesCommonRuleSet",
-                        priority=3,
+                        priority=0,
                         statement=wafv2.CfnWebACL.StatementProperty(
                             managed_rule_group_statement=wafv2.CfnWebACL.ManagedRuleGroupStatementProperty(
                                 vendor_name="AWS", name="AWSManagedRulesCommonRuleSet"
@@ -141,11 +144,71 @@ class WAFALBStack(Stack):
                             metric_name="AWS-AWSManagedRulesCommonRuleSet",
                         ),
                     ),
+                    # Blocks common SQL Injection
+                    wafv2.CfnWebACL.RuleProperty(
+                        name="AWS-AWSManagedRulesSQLiRuleSet",
+                        priority=1,
+                        override_action=wafv2.CfnWebACL.OverrideActionProperty(
+                            none={}),
+                        statement=wafv2.CfnWebACL.StatementProperty(
+                            managed_rule_group_statement=wafv2.CfnWebACL.ManagedRuleGroupStatementProperty(
+                                name="AWSManagedRulesSQLiRuleSet",
+                                vendor_name="AWS",
+                            )
+                        ),
+                        visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
+                            cloud_watch_metrics_enabled=True,
+                            metric_name="AWS-AWSManagedRulesSQLiRuleSet",
+                            sampled_requests_enabled=True,
+                        ),
+                    ),
+                    # AWS IP Reputation list includes known malicious actors/bots and is regularly updated
+                    wafv2.CfnWebACL.RuleProperty(
+                        name="AWS-AWSManagedRulesAmazonIpReputationList",
+                        priority=2,
+                        override_action=wafv2.CfnWebACL.OverrideActionProperty(
+                            none={}),
+                        statement=wafv2.CfnWebACL.StatementProperty(
+                            managed_rule_group_statement=wafv2.CfnWebACL.ManagedRuleGroupStatementProperty(
+                                name="AWSManagedRulesAmazonIpReputationList",
+                                vendor_name="AWS",
+                            )
+                        ),
+                        visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
+                            cloud_watch_metrics_enabled=True,
+                            metric_name="AWS-AWSManagedRulesAmazonIpReputationList",
+                            sampled_requests_enabled=True,
+                        ),
+                    )
                 ],
             )
 
-            cfn_web_aCLAssociation = wafv2.CfnWebACLAssociation(self, "WAFWebACLAssociation",
-                                                                resource_arn=self.node.try_get_context(
-                                                                    "load_balancer_arn"),
-                                                                web_acl_arn=cfnWebACL.attrArn
-                                                                )
+            # hosted_zone = route53.HostedZone.from_lookup(
+            #     self, 'HostedZone', domain_name=self.node.try_get_context("dns_domain"))
+
+            # certificate = None
+            # domain_names = None
+            # if self.node.try_get_context("use_certificate") == "True":
+            #     domain_names = "store." + \
+            #         self.node.try_get_context("dns_domain")
+            #     # domain_names = self.node.try_get_context("dns_domain")
+            #     if self.node.try_get_context("create_new_certificate") == "True":
+            #         certificate = acm.Certificate(
+            #             self,
+            #             "Certificate",
+            #             domain_name=self.node.try_get_context("dns_domain"),
+            #             validation=acm.CertificateValidation.from_dns(
+            #                 hosted_zone=hosted_zone)
+            #         )
+            #     else:
+            #         certificate = acm.Certificate.from_certificate_arn(self,
+            #                                                            "Certificate",
+            #                                                            self.node.try_get_context("certificate_dns_domain_arn"))
+
+            alb = elbv2.ApplicationLoadBalancer.from_lookup(
+                self, "K8sELB",
+                load_balancer_arn=self.node.try_get_context(
+                    "load_balancer_arn"))
+
+            wafv2.CfnWebACLAssociation(
+                self, "ACLAssociation", resource_arn=alb.load_balancer_arn, web_acl_arn=cfnWebACL.attr_arn)

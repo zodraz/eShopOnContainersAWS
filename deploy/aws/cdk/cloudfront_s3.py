@@ -6,6 +6,7 @@ from aws_cdk import (
     aws_cloudfront as cloudfront,
     aws_cloudfront_origins as cloudfront_origins,
     aws_s3 as s3,
+    aws_elasticloadbalancingv2 as elb,
     aws_certificatemanager as acm,
     aws_route53 as route53,
     aws_wafv2 as wafv2,
@@ -129,9 +130,10 @@ class CloudFrontS3Stack(Stack):
                     #         ip_set_reference_statement=ip_ref_statement_v4
                     #     ),
                     # ),
+                    # Common Rule Set aligns with major portions of OWASP Core Rule Set
                     wafv2.CfnWebACL.RuleProperty(
                         name="AWS-AWSManagedRulesCommonRuleSet",
-                        priority=3,
+                        priority=0,
                         statement=wafv2.CfnWebACL.StatementProperty(
                             managed_rule_group_statement=wafv2.CfnWebACL.ManagedRuleGroupStatementProperty(
                                 vendor_name="AWS", name="AWSManagedRulesCommonRuleSet"
@@ -145,6 +147,42 @@ class CloudFrontS3Stack(Stack):
                             metric_name="AWS-AWSManagedRulesCommonRuleSet",
                         ),
                     ),
+                    # Blocks common SQL Injection
+                    wafv2.CfnWebACL.RuleProperty(
+                        name="AWS-AWSManagedRulesSQLiRuleSet",
+                        priority=1,
+                        override_action=wafv2.CfnWebACL.OverrideActionProperty(
+                            none={}),
+                        statement=wafv2.CfnWebACL.StatementProperty(
+                            managed_rule_group_statement=wafv2.CfnWebACL.ManagedRuleGroupStatementProperty(
+                                name="AWSManagedRulesSQLiRuleSet",
+                                vendor_name="AWS",
+                            )
+                        ),
+                        visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
+                            cloud_watch_metrics_enabled=True,
+                            metric_name="AWS-AWSManagedRulesSQLiRuleSet",
+                            sampled_requests_enabled=True,
+                        ),
+                    ),
+                    # AWS IP Reputation list includes known malicious actors/bots and is regularly updated
+                    wafv2.CfnWebACL.RuleProperty(
+                        name="AWS-AWSManagedRulesAmazonIpReputationList",
+                        priority=2,
+                        override_action=wafv2.CfnWebACL.OverrideActionProperty(
+                            none={}),
+                        statement=wafv2.CfnWebACL.StatementProperty(
+                            managed_rule_group_statement=wafv2.CfnWebACL.ManagedRuleGroupStatementProperty(
+                                name="AWSManagedRulesAmazonIpReputationList",
+                                vendor_name="AWS",
+                            )
+                        ),
+                        visibility_config=wafv2.CfnWebACL.VisibilityConfigProperty(
+                            cloud_watch_metrics_enabled=True,
+                            metric_name="AWS-AWSManagedRulesAmazonIpReputationList",
+                            sampled_requests_enabled=True,
+                        ),
+                    )
                 ],
             )
 
@@ -200,6 +238,7 @@ class CloudFrontS3Stack(Stack):
         domain_names = None
         if self.node.try_get_context("use_certificate") == "True":
             domain_names = "store." + self.node.try_get_context("dns_domain")
+            # domain_names = self.node.try_get_context("dns_domain")
             if self.node.try_get_context("create_new_certificate") == "True":
                 certificate = acm.Certificate(
                     self,
@@ -240,6 +279,97 @@ class CloudFrontS3Stack(Stack):
                 )
             ]
         )
+
+        # if (self.node.try_get_context("deploy_k8s_cloudfront") == "True"):
+
+        #     alb = elb.ApplicationLoadBalancer.from_application_load_balancer_attributes(
+        #         self, "K8sELB",
+        #         load_balancer_arn=self.node.try_get_context(
+        #             "load_balancer_arn"),
+        #         security_group_id=self.node.try_get_context(
+        #             "load_balancer_security_group_id"),
+        #         load_balancer_dns_name=self.node.try_get_context("load_balancer_dns_name"))
+
+        #     eks_dynamic_cache_policy = cloudfront.CachePolicy(
+        #         self,
+        #         'EKSDynamicCachePolicy',
+        #         cache_policy_name='EKSDynamicCachePolicy',
+        #         comment='A policy for EKS dynamic origin',
+        #         default_ttl=Duration.seconds(0),
+        #         min_ttl=Duration.seconds(0),
+        #         max_ttl=Duration.days(3600),
+        #         cookie_behavior=cloudfront.CacheCookieBehavior.all(),
+        #         # header_behavior=cloudfront.CacheHeaderBehavior.allow_list('X-CustomHeader'),
+        #         query_string_behavior=cloudfront.CacheQueryStringBehavior.all(),
+        #         enable_accept_encoding_gzip=True,
+        #         enable_accept_encoding_brotli=True,
+        #     )
+
+        #     eks_cache_policy = cloudfront.CachePolicy(
+        #         self,
+        #         'EKSCachePolicy',
+        #         cache_policy_name='EKSCachePolicy',
+        #         comment='A policy for EKS origin',
+        #         default_ttl=Duration.seconds(3600),
+        #         min_ttl=Duration.seconds(3600),
+        #         max_ttl=Duration.days(36000),
+        #         cookie_behavior=cloudfront.CacheCookieBehavior.all(),
+        #         # header_behavior=cloudfront.CacheHeaderBehavior.allow_list('X-CustomHeader'),
+        #         query_string_behavior=cloudfront.CacheQueryStringBehavior.all(),
+        #         enable_accept_encoding_gzip=True,
+        #         enable_accept_encoding_brotli=True,
+        #     )
+
+        #     distribution.add_behavior(path_pattern="/",
+        #                               origin=cloudfront_origins.LoadBalancerV2Origin(
+        #                                   load_balancer=alb,
+        #                                   connection_attempts=3,
+        #                                   connection_timeout=Duration.seconds(
+        #                                       5),
+        #                                   read_timeout=Duration.seconds(45),
+        #                                   keepalive_timeout=Duration.seconds(
+        #                                       45),
+        #                                   protocol_policy=cloudfront.OriginProtocolPolicy.HTTP_ONLY
+        #                               ),
+        #                               allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL,
+        #                               viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        #                               compress=True,
+        #                               cached_methods=cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+        #                               cache_policy=eks_dynamic_cache_policy)
+
+        #     distribution.add_behavior(path_pattern="*.js",
+        #                               origin=cloudfront_origins.LoadBalancerV2Origin(
+        #                                   load_balancer=alb,
+        #                                   connection_attempts=3,
+        #                                   connection_timeout=Duration.seconds(
+        #                                       5),
+        #                                   read_timeout=Duration.seconds(45),
+        #                                   keepalive_timeout=Duration.seconds(
+        #                                       45),
+        #                                   protocol_policy=cloudfront.OriginProtocolPolicy.HTTP_ONLY
+        #                               ),
+        #                               allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL,
+        #                               viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        #                               compress=True,
+        #                               cached_methods=cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+        #                               cache_policy=eks_cache_policy)
+
+        #     distribution.add_behavior(path_pattern="*.css",
+        #                               origin=cloudfront_origins.LoadBalancerV2Origin(
+        #                                   load_balancer=alb,
+        #                                   connection_attempts=3,
+        #                                   connection_timeout=Duration.seconds(
+        #                                       5),
+        #                                   read_timeout=Duration.seconds(45),
+        #                                   keepalive_timeout=Duration.seconds(
+        #                                       45),
+        #                                   protocol_policy=cloudfront.OriginProtocolPolicy.HTTP_ONLY
+        #                               ),
+        #                               allowed_methods=cloudfront.AllowedMethods.ALLOW_ALL,
+        #                               viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        #                               compress=True,
+        #                               cached_methods=cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+        #                               cache_policy=eks_cache_policy)
 
         s3deploy.BucketDeployment(
             self, "DeployCatalogImages",

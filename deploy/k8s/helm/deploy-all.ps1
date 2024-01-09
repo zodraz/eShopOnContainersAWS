@@ -1,5 +1,5 @@
 Param(
-    [parameter(Mandatory = $false)][string]$registry = "144070732019.dkr.ecr.eu-central-1.amazonaws.com/eshop",
+    [parameter(Mandatory = $false)][string]$registry = "144070732019.dkr.ecr.eu-central-1.amazonaws.com",
     [parameter(Mandatory = $false)][string]$dockerUser = "AWS",
     [parameter(Mandatory = $false)][string]$dockerPassword = "",
     [parameter(Mandatory = $false)][string]$externalDns = "eshoponcontainersaws.com",
@@ -112,7 +112,7 @@ $charts = ("eshop-common", "basket-api", "catalog-api", "identity-api", "locatio
 $gateways = ("apigwmm", "apigwms", "apigwwm", "apigwws")
 
 # $deployInfrastructure = $false
-# $charts = ("catalog-api")
+# $charts = ("identity-api")
 
 
 if ($deployInfrastructure) {
@@ -136,7 +136,7 @@ if ($deployCharts) {
     foreach ($chart in $gateways) {
         if ($chartsToDeploy -eq "*" -or $chartsToDeploy.Contains($chart)) {
             Write-Host "Installing Api Gateway Chart: $chart" -ForegroundColor Green
-            Install-Chart $chart "-f app.yaml -f inf.yaml -f $ingressValuesFile  --set app.name=$appName --set inf.k8s.dns=$dns  --set image.pullPolicy=$imagePullPolicy --set inf.mesh.enabled=$useMesh --set ingress.hosts={$dns} --set inf.tls.enabled=$sslEnabled" $false
+            Install-Chart $chart "-f app.yaml -f inf.yaml -f $ingressValuesFile --set app.name=$appName --set inf.k8s.dns=$dns  --set image.pullPolicy=$imagePullPolicy --set inf.mesh.enabled=$useMesh --set ingress.hosts={$dns} --set inf.tls.enabled=$sslEnabled" $false
             
         }
     }

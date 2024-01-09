@@ -4,19 +4,19 @@ pathBase: /webmarketingapigw
 
 image:
   repository: envoyproxy/envoy
-  tag: v1.21.1
+  tag: v1.21.0
 
 service:
-  type: ClusterIP
+  type: NodePort
   port: 80
   adminPort: 8001  
 
 ingress:
   enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-    nginx.ingress.kubernetes.io/use-regex: "true"
+  class: aws-alb
+  # annotations:
+  #   nginx.ingress.kubernetes.io/rewrite-target: "/"
+  #   ingress.kubernetes.io/rewrite-target: "/"
   tls: []
 
 resources: {}

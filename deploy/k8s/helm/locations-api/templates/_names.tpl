@@ -28,7 +28,7 @@
 {{- if eq $name "" -}}
 {{- $ctx.Values.inf.k8s.dns -}}
 {{- else -}}
-{{- printf "%s/%s" $ctx.Values.inf.k8s.dns $name -}}                {{/*Value is just <dns>/<name> */}}
+{{- printf "%s.%s" $name $ctx.Values.inf.k8s.dns -}}                {{/*Value is just <name>.<dns> */}}
 {{- end -}}
 {{- end -}}
 
