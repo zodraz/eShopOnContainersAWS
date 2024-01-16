@@ -8,9 +8,9 @@ inf:
     enabled: true           # True to enable TLS (set by deploy-all.ps1)
     issuer: ""              # cert-manager issuer to use for retrieving certs (set by deploy-all.ps1)
     lb:
-      enabled: true         # True to enable TLS only on ALB
+      enabled: false         # True to enable TLS only on ALB
   sql:                      # inf.sql defines the sql server databases & logins
-    host: sqlserverstack-rdsqlserverea747c72-lf0ytxmpnusd.cncc8m2sav26.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
+    host: sqlserverstack-rdsqlserverea747c72-1fxcgdllreyo.cncc8m2sav26.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
     common:
       user: adminuser              # SQL user
       pwd: PAssw0rd   # SQL pwd

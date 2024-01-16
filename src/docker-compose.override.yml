@@ -52,6 +52,9 @@ services:
       - WebShoppingAggClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5121
       - WebhooksApiClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5113
       - WebhooksWebClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5114
+      - LocationsApi=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5109
+      - MarketingApi=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5110
+      - PublicOrigin=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
       - UseCustomizationData=True
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
@@ -570,7 +573,7 @@ services:
       - UseAWS=${ESHOP_USE_AWS}
       - UseCustomizationData=True
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - SignalrHubUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5202
+      - SignalrHubUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5112
       - AWS__Profile=${ESHOP_AWS_PROFILE}
       - AWS__Region=${ESHOP_AWS_REGION}
       - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
@@ -588,7 +591,7 @@ services:
       - PurchaseUrl=http://webshoppingapigw
       - IdentityUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
       - MarketingUrl=http://webmarketingapigw
-      - SignalrHubUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5202
+      - SignalrHubUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5112
       - IdentityUrlHC=http://identity-api/hc
       - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
       - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}

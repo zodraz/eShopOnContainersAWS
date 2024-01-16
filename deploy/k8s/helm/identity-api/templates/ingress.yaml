@@ -33,16 +33,18 @@ spec:
       secretName: {{ .secretName }}
   {{- end }}
 {{- end }}
-  ingressClassName: {{ .Values.ingress.class }} 
+  ingressClassName: {{ .Values.ingress.class }}
   rules:
-    - host: {{ $serviceName }}.{{ .Values.inf.k8s.dns }}
+    {{- range .Values.ingress.hosts }}
+    - host: {{ . }}
       http:
         paths:
-          - path: /
+          - path: {{ $ingressPath }}
             pathType: Prefix
             backend:
               service:
                 name: {{ $serviceName }}
                 port:
                   number: 80
+  {{- end }}
 {{- end }}

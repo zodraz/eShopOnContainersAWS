@@ -28,7 +28,7 @@
 {{- if eq $name "" -}}
 {{- $ctx.Values.inf.k8s.dns -}}
 {{- else -}}
-{{- printf "%s.%s" $name $ctx.Values.inf.k8s.dns -}}                {{/*Value is just <name>.<dns> */}}
+{{- printf "%s/%s" $ctx.Values.inf.k8s.dns $name -}}                {{/*Value is just <dns>/<name> */}}
 {{- end -}}
 {{- end -}}
 
@@ -47,5 +47,13 @@
 {{- printf "%s/%s" .Values.inf.registry.server .Values.image.repository -}}
 {{- else -}}
 {{- .Values.image.repository -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "protocol" -}}
+{{- if or .Values.inf.tls.enabled  .Values.inf.tls.lb.enabled  -}}
+{{- printf "%s" "https" -}}
+{{- else -}}
+{{- printf "%s" "http" -}}
 {{- end -}}
 {{- end -}}

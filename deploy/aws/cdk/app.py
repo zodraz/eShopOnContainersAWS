@@ -34,8 +34,11 @@ route53 = Route53Stack(app, "Route53Stack", env=environment)
 
 environmentCloudFront = Environment(account=account, region="us-east-1")
 
+# cloudfrontS3 = CloudFrontS3Stack(
+#     app, "CloudFrontS3Stack", env=environmentCloudFront)
+
 cloudfrontS3 = CloudFrontS3Stack(
-    app, "CloudFrontS3Stack", env=environmentCloudFront)
+    app, "CloudFrontS3Stack", env=environment)
 
 vpc = VpcStack(app, id="VPCStack", env=environment)
 

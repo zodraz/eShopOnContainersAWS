@@ -12,16 +12,16 @@ Have a look there for many options you can change to customise this template for
 """
 
 from aws_cdk import (
+    Stack,
     aws_iam as iam,
-    aws_codebuild as codebuild,
-    core,
+    aws_codebuild as codebuild
 )
 import os
 
 from constructs import Construct
 
 
-class EKSCodeBuildStack(core.Stack):
+class EKSCodeBuildStack(Stack):
 
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -47,7 +47,7 @@ class EKSCodeBuildStack(core.Stack):
                 webhook=True,
                 webhook_filters=[
                     codebuild.FilterGroup.in_event_of(codebuild.EventAction.PUSH).and_branch_is(
-                        self.node.try_get_context("github_branch")).and_file_path_is("cluster-bootstrap/*")
+                        self.node.try_get_context("github_branch")).and_file_path_is("deploy/aws/cdk/*")
                 ]
             )
 
@@ -61,5 +61,5 @@ class EKSCodeBuildStack(core.Stack):
                     compute_type=codebuild.ComputeType.LARGE
                 ),
                 build_spec=codebuild.BuildSpec.from_source_filename(
-                    "cluster-bootstrap/buildspec.yml")
+                    "deploy/aws/cdk/buildspec.yml")
             )
