@@ -41,7 +41,7 @@ aws eks create-addon --addon-name adot --cluster-name clusterC5B25D0D-9f5912074f
 
 aws eks describe-addon --addon-name adot --cluster-name clusterC5B25D0D-9f5912074f8a48088d5d4941610b19af 
 
-helm install my-nginx ingress-nginx/ingress-nginx --create-namespace --namespace ingress-nginx --set controller.metrics.enabled=true --set ingressClassResource.default=true  --set-string controller.metrics.service.annotations."prometheus\.io/port"="10254" --set-string controller.metrics.service.annotations."prometheus\.io/scrape"="true"
+helm install nginx ingress-nginx/ingress-nginx --create-namespace --namespace ingress-nginx --set controller.metrics.enabled=true --set ingressClassResource.default=true  --set-string controller.metrics.service.annotations."prometheus\.io/port"="10254" --set-string controller.metrics.service.annotations."prometheus\.io/scrape"="true"
 
 
 eksctl create iamserviceaccount `

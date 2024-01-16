@@ -30,7 +30,7 @@ public class Startup
             .AddCustomMvc()
             .AddCustomHealthCheck(Configuration, eventBusSettings, CurrentEnvironment)
             .AddCustomDbContext(Configuration)
-            .AddCustomSwagger(Configuration)
+            //.AddCustomSwagger(Configuration)
             .AddCustomIntegrations(Configuration)
             .AddCustomConfiguration(Configuration)
             .AddEventBus(Configuration, eventBusSettings)
