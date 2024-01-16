@@ -27,34 +27,37 @@ public class Startup
         .AddApplicationPart(typeof(BasketController).Assembly)
         .AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);
 
-        services.AddSwaggerGen(options =>
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
         {
-            options.SwaggerDoc("v1", new OpenApiInfo
+            services.AddSwaggerGen(options =>
             {
-                Title = "eShopOnContainers - Basket HTTP API",
-                Version = "v1",
-                Description = "The Basket Service HTTP API"
-            });
-
-            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-            {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows()
+                options.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Implicit = new OpenApiOAuthFlow()
+                    Title = "eShopOnContainers - Basket HTTP API",
+                    Version = "v1",
+                    Description = "The Basket Service HTTP API"
+                });
+
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows()
                     {
-                        AuthorizationUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
-                        TokenUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
-                        Scopes = new Dictionary<string, string>()
+                        Implicit = new OpenApiOAuthFlow()
+                        {
+                            AuthorizationUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
+                            TokenUrl = new Uri($"{Configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
+                            Scopes = new Dictionary<string, string>()
                         {
                             { "basket", "Basket API" }
                         }
+                        }
                     }
-                }
-            });
+                });
 
-            options.OperationFilter<AuthorizeCheckOperationFilter>();
-        });
+                options.OperationFilter<AuthorizeCheckOperationFilter>();
+            });
+        }
 
         ConfigureAuthService(services);
 

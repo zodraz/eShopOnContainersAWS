@@ -253,7 +253,7 @@ static class CustomExtensionsMethods
         }
 
         services.AddSwaggerGen(options =>
-        {          
+        {       
             options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "eShopOnContainers - Ordering HTTP API",

@@ -117,37 +117,40 @@ public static class ServiceCollectionExtensions
         services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.WriteIndented = true);
 
-        services.AddSwaggerGen(options =>
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
         {
-            options.DescribeAllEnumsAsStrings();
-
-            options.SwaggerDoc("v1", new OpenApiInfo
+            services.AddSwaggerGen(options =>
             {
-                Title = "Shopping Aggregator for Web Clients",
-                Version = "v1",
-                Description = "Shopping Aggregator for Web Clients"
-            });
+                options.DescribeAllEnumsAsStrings();
 
-            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-            {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows()
+                options.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Implicit = new OpenApiOAuthFlow()
-                    {
-                        AuthorizationUrl = new Uri($"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
-                        TokenUrl = new Uri($"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
+                    Title = "Shopping Aggregator for Web Clients",
+                    Version = "v1",
+                    Description = "Shopping Aggregator for Web Clients"
+                });
 
-                        Scopes = new Dictionary<string, string>()
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows()
+                    {
+                        Implicit = new OpenApiOAuthFlow()
+                        {
+                            AuthorizationUrl = new Uri($"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/authorize"),
+                            TokenUrl = new Uri($"{configuration.GetValue<string>("IdentityUrlExternal")}/connect/token"),
+
+                            Scopes = new Dictionary<string, string>()
                         {
                             { "webshoppingagg", "Shopping Aggregator for Web Clients" }
                         }
+                        }
                     }
-                }
-            });
+                });
 
-            options.OperationFilter<AuthorizeCheckOperationFilter>();
-        });
+                options.OperationFilter<AuthorizeCheckOperationFilter>();
+            });
+        }
 
         services.AddCors(options =>
         {

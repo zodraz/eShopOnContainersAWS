@@ -259,6 +259,11 @@ public static class CustomExtensionMethods
 
     public static IServiceCollection AddSwagger(this IServiceCollection services, IConfiguration configuration)
     {
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+        {
+            return services;
+        }
+
         services.AddSwaggerGen(options =>
         {         
             options.SwaggerDoc("v1", new OpenApiInfo

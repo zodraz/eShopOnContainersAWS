@@ -181,6 +181,11 @@
 
         private void AddCustomSwagger(IServiceCollection services)
         {
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                return;
+            }
+
             services.AddSwaggerGen(options =>
              {
                  options.SwaggerDoc("v1", new OpenApiInfo
