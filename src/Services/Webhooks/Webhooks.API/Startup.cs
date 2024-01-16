@@ -68,13 +68,16 @@ public class Startup
             endpoints.MapControllers();
         });
 
-        app.UseSwagger()
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
+        {
+            app.UseSwagger()
             .UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Webhooks.API V1");
+                c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Webhooks.API V1");
                 c.OAuthClientId("webhooksswaggerui");
                 c.OAuthAppName("WebHooks Service Swagger UI");
             });
+        }
     }
 
     protected virtual void ConfigureAuth(IApplicationBuilder app)

@@ -49,11 +49,14 @@ public class Startup
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-        app.UseSwagger()
-            .UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Catalog.API V1");
-            });
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
+        {
+            app.UseSwagger()
+           .UseSwaggerUI(c =>
+           {
+               c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Catalog.API V1");
+           });
+        }
 
         app.UseRouting();
         app.UseCors("CorsPolicy");

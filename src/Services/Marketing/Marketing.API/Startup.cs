@@ -168,13 +168,16 @@
                 endpoints.MapControllers();
             });
 
-            app.UseSwagger()
-               .UseSwaggerUI(setup =>
-               {
-                   setup.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Marketing.API V1");
-                   setup.OAuthClientId("marketingswaggerui");
-                   setup.OAuthAppName("Marketing Swagger UI");
-               });
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
+            {
+                app.UseSwagger()
+              .UseSwaggerUI(setup =>
+              {
+                  setup.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Marketing.API V1");
+                  setup.OAuthClientId("marketingswaggerui");
+                  setup.OAuthAppName("Marketing Swagger UI");
+              });
+            }
 
             app.UseOpenTelemetryPrometheusScrapingEndpoint();
         }

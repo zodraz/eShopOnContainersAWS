@@ -118,13 +118,16 @@ public class Startup
         }
         app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-        app.UseSwagger()
-            .UseSwaggerUI(setup =>
-            {
-                setup.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Basket.API V1");
-                setup.OAuthClientId("basketswaggerui");
-                setup.OAuthAppName("Basket Swagger UI");
-            });
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
+        {
+            app.UseSwagger()
+           .UseSwaggerUI(setup =>
+           {
+               setup.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Basket.API V1");
+               setup.OAuthClientId("basketswaggerui");
+               setup.OAuthAppName("Basket Swagger UI");
+           });
+        }
 
         app.UseRouting();
         app.UseCors("CorsPolicy");

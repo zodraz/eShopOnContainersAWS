@@ -44,15 +44,18 @@ public class Startup
             app.UseDeveloperExceptionPage();
         }
 
-        app.UseSwagger().UseSwaggerUI(c =>
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
         {
-            c.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Purchase BFF V1");
+            app.UseSwagger().UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Purchase BFF V1");
 
-            c.OAuthClientId("mobileshoppingaggswaggerui");
-            c.OAuthClientSecret(string.Empty);
-            c.OAuthRealm(string.Empty);
-            c.OAuthAppName("Purchase BFF Swagger UI");
-        });
+                c.OAuthClientId("mobileshoppingaggswaggerui");
+                c.OAuthClientSecret(string.Empty);
+                c.OAuthRealm(string.Empty);
+                c.OAuthAppName("Purchase BFF Swagger UI");
+            });
+        }
 
         app.UseRouting();
         

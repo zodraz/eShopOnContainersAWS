@@ -172,13 +172,16 @@ namespace Microsoft.eShopOnContainers.Services.Locations.API
                 endpoints.MapControllers();
             });
 
-            app.UseSwagger()
-              .UseSwaggerUI(c =>
-              {
-                  c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Locations.API V1");
-                  c.OAuthClientId("locationsswaggerui");
-                  c.OAuthAppName("Locations Swagger UI");
-              });
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
+            {
+                app.UseSwagger()
+                    .UseSwaggerUI(c =>
+                        {
+                            c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Locations.API V1");
+                            c.OAuthClientId("locationsswaggerui");
+                            c.OAuthAppName("Locations Swagger UI");
+                        });
+            }
 
             var locationSettings = Configuration.Get<LocationSettings>();
             locationSettings.AWSOptions = Configuration.GetAWSOptions();

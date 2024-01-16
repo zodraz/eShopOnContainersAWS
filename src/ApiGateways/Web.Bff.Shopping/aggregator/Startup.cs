@@ -48,15 +48,18 @@ public class Startup
 
         app.UseHttpsRedirection();
 
-        app.UseSwagger().UseSwaggerUI(c =>
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
         {
-            c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Purchase BFF V1");
+            app.UseSwagger().UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Purchase BFF V1");
 
-            c.OAuthClientId("webshoppingaggswaggerui");
-            c.OAuthClientSecret(string.Empty);
-            c.OAuthRealm(string.Empty);
-            c.OAuthAppName("web shopping bff Swagger UI");
-        });
+                c.OAuthClientId("webshoppingaggswaggerui");
+                c.OAuthClientSecret(string.Empty);
+                c.OAuthRealm(string.Empty);
+                c.OAuthAppName("web shopping bff Swagger UI");
+            });
+        }
 
         app.UseRouting();
         

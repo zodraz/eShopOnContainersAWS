@@ -58,14 +58,17 @@ public class Startup
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-        app.UseSwagger()
-            .UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Ordering.API V1");
-                c.OAuthClientId("orderingswaggerui");
-                c.OAuthAppName("Ordering Swagger UI");
-            });
-
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production")
+        {
+            app.UseSwagger()
+           .UseSwaggerUI(c =>
+           {
+               c.SwaggerEndpoint($"{(!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty)}/swagger/v1/swagger.json", "Ordering.API V1");
+               c.OAuthClientId("orderingswaggerui");
+               c.OAuthAppName("Ordering Swagger UI");
+           });
+        }
+           
         app.UseRouting();
 
         app.UseCors("CorsPolicy");
