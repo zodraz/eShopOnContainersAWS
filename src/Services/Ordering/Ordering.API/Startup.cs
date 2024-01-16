@@ -30,7 +30,7 @@ public class Startup
             .AddCustomMvc()
             .AddCustomHealthCheck(Configuration, eventBusSettings, CurrentEnvironment)
             .AddCustomDbContext(Configuration)
-            //.AddCustomSwagger(Configuration)
+            .AddCustomSwagger(Configuration)
             .AddCustomIntegrations(Configuration)
             .AddCustomConfiguration(Configuration)
             .AddEventBus(Configuration, eventBusSettings)
@@ -247,6 +247,11 @@ static class CustomExtensionsMethods
 
     public static IServiceCollection AddCustomSwagger(this IServiceCollection services, IConfiguration configuration)
     {
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")== "Production")
+        {
+            return services;
+        }
+
         services.AddSwaggerGen(options =>
         {          
             options.SwaggerDoc("v1", new OpenApiInfo
