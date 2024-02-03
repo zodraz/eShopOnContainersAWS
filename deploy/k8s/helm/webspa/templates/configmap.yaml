@@ -1,0 +1,35 @@
+{{- $name := include "webspa.fullname" . -}}
+{{- $identity := include "url-of" (list .Values.app.ingress.entries.identity .) -}}
+{{- $webshoppingapigw := include "url-of" (list .Values.app.ingress.entries.webshoppingapigw .) -}}
+{{- $webmarketingapigw := include "url-of" (list .Values.app.ingress.entries.webmarketingapigw .) -}}
+{{- $spa := include "url-of" (list .Values.app.ingress.entries.spa .) -}}
+{{- $mongo := include "mongo-name" . -}}
+{{- $protocol := include "protocol" . -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "cfg-{{ $name }}"
+  labels:
+    app: {{ template "webspa.name" . }}
+    chart: {{ template "webspa.chart" .}}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  webspa__keystore: {{ .Values.inf.redis.keystore.constr }}
+  internalurls__apigwws: http://{{ .Values.app.svc.webshoppingapigw }}
+  internalurls__identity__hc: http://{{ .Values.app.svc.identity }}/hc
+  urls__apigwws: {{ $protocol }}://{{ $webshoppingapigw }}
+  urls__apigwwm: {{ $protocol }}://{{ $webmarketingapigw }}
+  urls__spa: {{ $protocol }}://{{ $spa }}
+  urls__IdentityUrl: {{ $protocol }}://{{ $identity }}
+  all__Serilog__SeqServerUrl:  {{ .Values.inf.serilog.seqServerUrl }}
+  all__Serilog__LogstashgUrl:  {{ .Values.inf.serilog.logstashgUrl }}
+  all__Serilog__LokiUrl:  {{ .Values.inf.serilog.lokiUrl }}
+  all__UseAWS: "{{ .Values.inf.useAWS }}"
+  all__UseVault: "{{ .Values.inf.useVault }}"
+  all__OtlpEndpoint: {{ .Values.inf.otlpEndpoint }}
+  all__LocalStack__UseLocalStack: "{{ .Values.inf.localstack.useLocalStack }}"
+  all__LocalStack__LocalStackUrl: {{ .Values.inf.localstack.localStackUrl }}
+  all__AWS__Profile: {{ .Values.inf.aws.profile }}
+  all__AWS__Region: {{ .Values.inf.aws.region }}

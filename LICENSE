@@ -1,0 +1,42 @@
+MIT License
+
+Copyright (c) zodraz and Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Special thanks to the included forked and updated projects:
+
+https://github.com/RafaelLiendo/Rebus.Extensions.SharedNothing
+https://github.com/P47Phoenix/Rebus.AwsSnsAndSqs
+https://github.com/dotnet-architecture/eShopOnContainers
+https://github.com/chs1380/quickstart-eks-cdk-python
+https://github.com/fluxcd/flux2-kustomize-helm-example/
+
+Thanks to (and not including) all third party nuget dependencies and open source libraries like:
+Rebus https://github.com/rebus-org/Rebus
+AspNetCore.Diagnostics.HealthChecks https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks
+AWSSDK https://github.com/aws/aws-sdk-net
+OpenTeleemtry https://github.com/open-telemetry/opentelemetry-dotnet
+Prometheus .net https://github.com/prometheus-net/prometheus-net
+Autofac https://github.com/autofac/Autofac
+AWSSecretsManagerConfigurationExtensions https://github.com/Kralizek/AWSSecretsManagerConfigurationExtensions
+Microsoft and Microsoft .NET Foundation https://dotnetfoundation.org/
+Google (Angular, Protobuf)
+Serilog https://serilog.net/
+Swashbuckle https://github.com/domaindrivendev/Swashbuckle.AspNetCore

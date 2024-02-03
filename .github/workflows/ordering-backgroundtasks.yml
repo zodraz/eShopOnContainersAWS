@@ -1,0 +1,56 @@
+name: ordering-backgroundtasks
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - dev
+
+    paths:
+    - src/BuildingBlocks/**
+    - src/Services/Ordering/**
+    - .github/workflows/ordering-backgroundtasks.yml
+  
+  pull_request:
+    branches:
+    - dev
+
+    paths:
+    - src/BuildingBlocks/**
+    - src/Services/Ordering/**
+    - .github/workflows/ordering-backgroundtasks.yml
+env:
+  SERVICE: ordering-backgroundtasks
+  IMAGE: ordering.backgroundtasks
+
+jobs:
+
+  BuildContainersForPR_Linux:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - uses: ./.github/workflows/composite/build
+      with:
+        service: ${{ env.SERVICE }}
+        registry_endpoint: ${{ secrets.REGISTRY_ENDPOINT }}
+        image_name: ${{ env.IMAGE }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+  BuildLinux:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - uses: ./.github/workflows/composite/build-push
+      with:
+        service: ${{ env.SERVICE }}
+        registry_endpoint: ${{ secrets.REGISTRY_ENDPOINT }}
+        image_name: ${{ env.IMAGE }}
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}

@@ -1,0 +1,82 @@
+# This helm values file defines all infrastructure used by eShopOnContainers.
+# It is used on all charts, so ** MUST BE INCLUDED ** on every deployment
+
+inf:
+  mesh:
+    enabled: false          # True to enable Linkerd (set by deploy-all.ps1)
+  tls:
+    enabled: true           # True to enable TLS (set by deploy-all.ps1)
+    issuer: ""              # cert-manager issuer to use for retrieving certs (set by deploy-all.ps1)
+    lb:
+      enabled: false         # True to enable TLS only on ALB
+  sql:                      # inf.sql defines the sql server databases & logins
+    host: sqlserverstack-rdsqlserverea747c72-1fxcgdllreyo.cncc8m2sav26.eu-central-1.rds.amazonaws.com # Uncomment to specify a custom sql-server to be used. By default "sql-data-<appname>" will be used  
+    common:
+      user: adminuser              # SQL user
+      pwd: PAssw0rd   # SQL pwd
+      pid: Developer
+    catalog:                # inf.sql.catalog: settings for the catalog-api sql (user, pwd, db)
+      db: CatalogDb         # Catalog API SQL db name
+    ordering:               # inf.sql.ordering: settings for the ordering-api sql (user, pwd, db)
+      db: OrderingDb        # Ordering API SQL db name
+    marketing:
+      db: MarketingDb       # Marketing API SQL db name
+    identity:
+      db: IdentityDb        # Ordering API SQL db name
+    webhooks:
+      db: WebhooksDb        # Webhooks DB
+    signalrhub:
+      db: SignalRHubDb      # SignalR db name
+  mongo:
+    host: my-nosql-data    # Uncomment to use specify custom mongo host. By default nosql-data is used
+    locations:
+      database: LocationsDb
+    marketing:
+      database: MarketingDb
+  redis:                    # inf.redis defines the redis' connection strings
+    basket:     
+      svc: basket-data      # Name of k8s svc for basket redis     
+      constr: eshop-aws-redis.uqm60v.0001.euc1.cache.amazonaws.com:6379   # Connection string to Redis used by Basket API
+    keystore:
+      svc: keystore-data    # Name of k8s svc for keystore-data redis
+      constr: eshop-aws-redis.uqm60v.0001.euc1.cache.amazonaws.com:6379 # Connection string to Redis used as a Keystore (by Identity API)
+  eventbus:
+    host: b-54eeecb2-3302-42ef-a669-68bb95d026ae.mq.eu-central-1.amazonaws.com         # Name of rabbitmq aws host
+    username: admin            # Rabbitmq username
+    password: "password1234"    # Rabbitmq password
+    isSecure: true            # Rabbitmq secure connection
+    persistenceEnabled: false # Rebus persistence enabled
+    outboxEnabled: false      # Rebus Outbox functionality enabled
+    rabbitmqEnabled: false    # True for Rabbitmq enabled. False to use SQS and SNS
+    retryCount: 5             # Rebus number of retries
+    auditEnabled: true        # Rebus audit functionality enabled
+    fleetManager:         
+      enabled: false          # Rebus FleetManager functionality enabled
+      url: "http://kkkk"      # Rebus FleetManager url
+      apiKey: "xxxxxxxxxx"    # Rebus FleetManager API key
+    svc: rabbitmq             # Name of k8s svc for rabbitmq
+  serilog:
+    seqServerUrl: "http://localhost:5341"
+    logstashgUrl: "http://localhost"
+    lokiUrl: "http://loki.default.svc.cluster.local"
+  useAWS: true
+  useDocumentDb: false
+  S3Enabled: true #If catalog api uses AWS S3 or not
+  useVault: false
+  aws:
+    profile: default
+    region: eu-central-1
+  localstack:
+    useLocalStack: false
+    localStackUrl: "http://localhost:4566"
+  otlpEndpoint: http://adot-collector.default.svc.cluster.local:4317
+  k8s:                      # inf.k8s defines Kubernetes cluster global config
+    dns:  "eshoponcontainersaws.com" # k8s external  DNS. This value or ip value MUST BE PROVIDED
+    local: false            # True when deploying on "local K8s" provided by Docker Desktop.
+  picBaseUrl: "https://store.eshoponcontainersaws.com/"
+  registry:                 # Uncomment "registry" to specify registry secret
+    secretName:             # secretName is the name of the secret inside k8s   
+    server:                 "111111111111.dkr.ecr.eu-central-1.amazonaws.com"
+    login:                  # User login
+    pwd:                    # User pwd
+

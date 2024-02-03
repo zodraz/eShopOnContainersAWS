@@ -1,0 +1,77 @@
+name: "Deploy Helm to AKS"
+description: "Deploys a helm chart to EKS"
+
+inputs:
+  cluster_name:
+    description: "Name of EKS cluster"
+    required: true
+  registry_endpoint:
+    description: "Image registry repo e.g. aws_account_id.dkr.ecr.region.amazonaws.com/eshop"
+    required: true
+  image_name:
+    description: "Name of image"
+    required: true
+  aws-access-key-id:
+    description: "AWS Acces Key Id"
+    required: true
+  aws-secret-access-key:
+    description: "AWS Secret Access Key"
+    required: true
+  aws-region: 
+    description: "AWS Region"
+    required: true
+  chart:
+    description: "Chart name"
+    required: true
+  chart_root:
+    description: "Root folder of chart"
+    required: true
+  namespace:
+    description: "Namespace to deploy to"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+  - name: Configure AWS credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-access-key-id: ${{ inputs.aws-access-key-id }}
+      aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+      aws-region: ${{ inputs.aws-region }}
+
+  - name: Login to Amazon ECR
+    id: login-ecr
+    uses: aws-actions/amazon-ecr-login@v1
+
+  - uses: azure/aks-set-context@v1
+    name: Set AKS context
+    with:
+      creds: '${{ inputs.azure_credentials }}'
+      cluster-name: ${{ inputs.cluster_name }}
+      resource-group: ${{ inputs.resource_group }}
+  
+  - name: kubeconfig
+    shell: bash
+    run: |
+      aws eks update-kubeconfig --name ${{ inputs.cluster_name }} --region ${{ inputs.aws-region }}
+      echo "KUBE_CONFIG_DATA=$(cat ~/.kube/config | base64)" >> $GITHUB_ENV
+
+  - name: Login to Amazon ECR
+    id: login-ecr
+    uses: aws-actions/amazon-ecr-login@v1
+
+  - name: Set branch name as env variable
+    shell: bash
+    run: |
+      currentbranch=$(echo ${GITHUB_REF##*/})
+      echo "running on $currentbranch"
+      echo "BRANCH=$currentbranch" >> $GITHUB_ENV
+  
+  - name: Deploy Chart
+    shell: bash
+    run: |
+      ./deploy-chart.sh -c ${{ inputs.chart }} --eks-name ${{ inputs.cluster_name }} -r ${{ steps.login-ecr.outputs.registry }}/${{ inputs.service }} -t $TAG --namespace ${{ inputs.namespace }}
+    env:
+      TAG: ${{ env.BRANCH }}
+    working-directory: ${{ inputs.chart_root }}

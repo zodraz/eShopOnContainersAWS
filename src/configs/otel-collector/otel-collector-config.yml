@@ -1,0 +1,43 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+
+  otlp:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+
+  # logging:
+  #     loglevel: info
+
+  awsxray:
+    region: eu-central-1
+
+  awsemf:
+    region: eu-central-1
+
+# processors:
+#   resource:
+#     attributes:
+#       - action: insert
+#         key: service_name
+#         from_attribute: service.name
+
+service:
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      exporters: [ otlp, awsxray ]
+    metrics:
+      receivers: [ otlp ]
+      exporters: [ prometheus, awsemf ]
+    # logs:
+    #   receivers: [ otlp ]
+    #   processors: [ resource ]
+    #   exporters: [ logging ]

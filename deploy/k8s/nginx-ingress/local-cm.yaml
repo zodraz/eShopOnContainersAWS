@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+  name: nginx-ingress-nginx-controller
+  namespace: ingress-nginx
+data:
+  client-header-buffer-size: 64k
+  large-client-header-buffers: 4 64k
+  http2-max-field-size: 16k
+  http2-max-header-size: 128k
+  proxy-buffer-size: 128k
+  proxy-buffers: 4 256k
+  proxy-busy-buffers-size: 256k

@@ -1,0 +1,66 @@
+{
+  "hosted-zone:account=111111111111:domainName=eshoponcontainersaws.com:region=eu-central-1": {
+    "Id": "/hostedzone/Z02720062FZ70PEG44VB2",
+    "Name": "eshoponcontainersaws.com."
+  },
+  "hosted-zone:account=111111111111:domainName=eshoponcontainersaws.com:region=us-east-1": {
+    "Id": "/hostedzone/Z02720062FZ70PEG44VB2",
+    "Name": "eshoponcontainersaws.com."
+  },
+  "availability-zones:account=111111111111:region=eu-central-1": [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c"
+  ],
+  "load-balancer:account=111111111111:loadBalancerArn=arn$:aws$:elasticloadbalancing$:eu-central-1$:111111111111$:loadbalancer/app/k8s-eksalbingress-5384cf65e6/c958b780844eae6e:loadBalancerType=application:region=eu-central-1": {
+    "loadBalancerArn": "arn:aws:elasticloadbalancing:eu-central-1:111111111111:loadbalancer/app/k8s-eksalbingress-5384cf65e6/c958b780844eae6e",
+    "loadBalancerCanonicalHostedZoneId": "Z215JYRZR1TBD5",
+    "loadBalancerDnsName": "k8s-eksalbingress-5384cf65e6-98880511.eu-central-1.elb.amazonaws.com",
+    "vpcId": "vpc-0d7031cf1dc9146eb",
+    "securityGroupIds": [
+      "sg-0ef70e0ca4768b9a2",
+      "sg-0a2b4eecb2d5526f2"
+    ],
+    "ipAddressType": "ipv4"
+  },
+  "vpc-provider:account=111111111111:filter.vpc-id=vpc-0d7031cf1dc9146eb:region=eu-central-1:returnAsymmetricSubnets=true": {
+    "vpcId": "vpc-0d7031cf1dc9146eb",
+    "vpcCidrBlock": "10.0.0.0/22",
+    "ownerAccountId": "111111111111",
+    "availabilityZones": [],
+    "subnetGroups": [
+      {
+        "name": "Public",
+        "type": "Public",
+        "subnets": [
+          {
+            "subnetId": "subnet-062d43eca73aa0407",
+            "cidr": "10.0.0.0/24",
+            "availabilityZone": "eu-central-1a",
+            "routeTableId": "rtb-0d93b70218ec51d6d"
+          },
+          {
+            "subnetId": "subnet-05c5586aa00b303cf",
+            "cidr": "10.0.1.0/24",
+            "availabilityZone": "eu-central-1b",
+            "routeTableId": "rtb-0736c8a27d3e100cf"
+          },
+          {
+            "subnetId": "subnet-00f2df7438d5d07c4",
+            "cidr": "10.0.2.0/24",
+            "availabilityZone": "eu-central-1c",
+            "routeTableId": "rtb-0a685ab2ff75aa68b"
+          }
+        ]
+      }
+    ]
+  },
+  "security-group:account=111111111111:region=eu-central-1:securityGroupId=sg-0ef70e0ca4768b9a2": {
+    "securityGroupId": "sg-0ef70e0ca4768b9a2",
+    "allowAllOutbound": false
+  },
+  "security-group:account=111111111111:region=eu-central-1:securityGroupId=sg-0a2b4eecb2d5526f2": {
+    "securityGroupId": "sg-0a2b4eecb2d5526f2",
+    "allowAllOutbound": false
+  }
+}

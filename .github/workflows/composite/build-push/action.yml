@@ -1,0 +1,126 @@
+name: "Build and push image"
+description: "Builds and pushes an image to a registry"
+
+inputs:
+  service:
+    description: "Service to build"
+    required: true
+  registry_endpoint:
+    description: "Image registry repo e.g. aws_account_id.dkr.ecr.region.amazonaws.com/eshop"
+    required: true
+  image_name:
+    description: "Name of image"
+    required: true
+  aws-access-key-id:
+    description: "AWS Acces Key Id"
+    required: true
+  aws-secret-access-key:
+    description: "AWS Secret Access Key"
+    required: true
+  aws-region: 
+    description: "AWS Region"
+    required: true
+  
+runs:
+  using: "composite"
+  steps:
+
+  - name: Configure AWS credentials
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      aws-access-key-id: ${{ inputs.aws-access-key-id }}
+      aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+      aws-region: ${{ inputs.aws-region }}
+
+  - name: Login to Amazon ECR
+    id: login-ecr
+    uses: aws-actions/amazon-ecr-login@v1
+
+  - name: Set branch name as env variable
+    run: |
+      currentbranch=$(echo ${GITHUB_REF##*/})
+      echo "running on $currentbranch"
+      echo "BRANCH=$currentbranch" >> $GITHUB_ENV
+    shell: bash
+
+  - name: Create ECR repository if not exists eshop/${{ inputs.image_name }}
+    uses: int128/create-ecr-repository-action@v1
+    id: ecr
+    with:
+     repository: eshop/${{ inputs.image_name }}
+
+  - name: Compose build ${{ inputs.service }}
+    shell: bash
+    run: sudo -E docker-compose build ${{ inputs.service }}
+    working-directory: ./src
+    env:
+      TAG: ${{ env.BRANCH }}
+      REGISTRY: ${{ inputs.registry_endpoint }}
+
+  - name: Compose push ${{ inputs.service }}
+    shell: bash
+    run: sudo -E docker-compose push ${{ inputs.service }}
+    working-directory: ./src
+    env:
+      TAG: ${{ env.BRANCH }}
+      REGISTRY: ${{ inputs.registry_endpoint }}
+
+  # - name: Docker tag for ECR ${{ inputs.service }}
+  #   shell: bash
+  #   run: |
+  #     IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
+  #     echo "IMAGE_ID: $IMAGE_ID"
+  #     sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
+  #   working-directory: ./src
+
+  # - name: Docker tag for ECR on Linux ${{ inputs.service }}
+  #   shell: bash
+  #   run: |
+  #     IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
+  #     echo "IMAGE_ID: $IMAGE_ID"
+  #     sudo -E docker tag $IMAGE_ID ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
+  #   working-directory: ./src
+
+  - name: Docker tag for ECR on Linux ${{ inputs.service }}
+    shell: bash
+    run: |
+      IMAGE_ID=$(sudo docker images --filter=reference=${{ inputs.registry_endpoint }}/${{ inputs.image_name }} --format "{{.ID}}")
+      echo "IMAGE_ID: $IMAGE_ID"
+      sudo -E docker tag $IMAGE_ID ${{ inputs.registry_endpoint }}/${{ inputs.image_name }}:latest
+    working-directory: ./src
+
+  - name: Run Trivy vulnerability scanner
+    uses: aquasecurity/trivy-action@master
+    with:
+       image-ref: '${{ inputs.registry_endpoint }}/${{ inputs.image_name }}:linux-${{ env.BRANCH  }}'
+       format: 'table'
+       ignore-unfixed: true
+       exit-code: '0'
+       vuln-type: 'os,library'
+       severity: 'CRITICAL,HIGH'
+
+  - name: Docker list images
+    shell: bash
+    run: sudo -E docker images
+    working-directory: ./src
+
+  # - name: Docker push ${{ inputs.service }}
+  #   shell: bash
+  #   run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:${{ env.BRANCH }}
+  #   working-directory: ./src
+  
+  # - name: Docker push ${{ inputs.service }}
+  #   shell: bash
+  #   run: sudo -E docker push ${{ steps.ecr.outputs.repository-uri }}:linux-${{ env.BRANCH  }}
+  #   working-directory: ./src
+
+  - name: Docker push ${{ inputs.service }}
+    shell: bash
+    run: sudo -E docker push ${{ inputs.registry_endpoint }}/${{ inputs.image_name }}:latest
+    working-directory: ./src
+
+  - name: Create multiarch manifest
+    shell: bash
+    run: |
+      docker --config ~/.docker manifest create ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:linux-${{ env.BRANCH  }} ${{ inputs.registry_endpoint  }}/${{ inputs.image_name  }}:latest
+      docker --config ~/.docker manifest push ${{ inputs.registry_endpoint  }}/${{ inputs.image_name }}:${{ env.BRANCH  }}

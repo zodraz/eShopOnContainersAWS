@@ -1,0 +1,29 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+
+  otlp:
+    endpoint: "jaeger.default.svc.cluster.local:4317"
+    tls:
+      insecure: true
+      
+  awsxray:
+    region: eu-central-1
+
+  awsemf:
+    region: eu-central-1
+
+service:
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      exporters: [ otlp, awsxray ]
+    metrics:
+      receivers: [ otlp ]
+      exporters: [ prometheus, awsemf ]

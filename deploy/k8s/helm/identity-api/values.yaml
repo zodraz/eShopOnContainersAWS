@@ -1,0 +1,109 @@
+replicaCount: 1
+clusterName: eshop-eks
+pathBase: /identity-api
+serviceAccountName: eshop-eks-sa
+
+image:
+  repository: eshop/identity.api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  class: nginx
+  annotations: {}
+  tls: []
+
+resources: {}
+
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+env:
+  urls:
+  configmap:
+    - name: ConnectionString
+      key: identity__ConnectionString
+    - name: DPConnectionString
+      key: identity__keystore
+    - name: PublicOrigin
+      key: public_origin
+    - name: MvcClient
+      key: mvc_e
+    - name: SpaClient
+      key: spa_e
+    - name: BasketApiClient
+      key: basket_e
+    - name: OrderingApiClient
+      key: ordering_e
+    - name: MobileShoppingAggClient
+      key: mobileshoppingagg_e
+    - name: WebShoppingAggClient
+      key: webshoppingagg_e
+    - name: XamarinCallback
+      key: xamarin_callback_e
+    - name: WebhooksApiClient
+      key: webhooksapi_e
+    - name: WebhooksWebClient
+      key: webhooksweb_e
+    - name: LocationsApiClient
+      key: locations_e
+    - name: MarketingApiClient
+      key: marketing_e
+    - name: Serilog__SeqServerUrl
+      key: all__Serilog__SeqServerUrl
+    - name: Serilog__LogstashgUrl
+      key:  all__Serilog__LogstashgUrl
+    - name: Serilog__LokiUrl
+      key:  all__Serilog__LokiUrl
+    - name: UseAWS
+      key: all__UseAWS
+    - name: UseVault
+      key: all__UseVault
+    - name: OtlpEndpoint
+      key: all__OtlpEndpoint
+    - name: LocalStack__UseLocalStack
+      key: all__LocalStack__UseLocalStack
+    - name: LocalStack__LocalStackUrl
+      key: all__LocalStack__LocalStackUrl
+    - name: AWS__Profile
+      key: all__AWS__Profile
+    - name: AWS__Region
+      key: all__AWS__Region
+  values:
+    - name: TokenLifetimeMinutes
+      value: 120
+    - name: PermanentTokenLifetimeDays
+      value: 365
+    - name: UseCustomizationData
+      value: false
+    - name: ASPNETCORE_ENVIRONMENT
+      value: Production
+    - name: OrchestratorType
+      value: 'K8S'
+    - name: IsClusterEnv
+      value: 'True'
+    - name:  Vault__SecretGroups
+      value: EshopIdentityApi
+probes:
+  liveness:
+    path: /liveness
+    initialDelaySeconds: 10
+    periodSeconds: 15
+    port: 80
+  readiness:
+    path: /hc
+    timeoutSeconds: 5
+    initialDelaySeconds: 90
+    periodSeconds: 60
+    port: 80
+
+enableDevspaces: "false"

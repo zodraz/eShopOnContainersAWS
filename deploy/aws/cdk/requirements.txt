@@ -1,0 +1,11 @@
+aws-cdk-lib==2.116.1
+aws-cdk.lambda-layer-kubectl-v28==2.1.0
+constructs>=10.0.0,<11.0.0
+attrs==21.2.0
+cattrs==22.2.0
+jsii==1.93.0
+publication==0.0.3
+python-dateutil==2.8.2
+PyYAML==6.0
+six==1.16.0
+typing-extensions==4.4.0
