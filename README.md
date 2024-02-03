@@ -4,27 +4,82 @@
 
 # .NET Microservices Sample Reference Application for AWS
 
-Sample .NET Core reference application, powered by Microsoft, based on a simplified microservices architecture and Docker containers.
+This is a fork and opiniated project to translate all the eshopOnContainers sample application from Azure cloud to AWS. 
 
-## SPA Application (Angular)
+## AWS Components
 
-![](img/eshop-spa-app-home.png)
+- IAM 
+- Route53 
+- VPC 
+- CloudWatch 
+- CloudFront 
+- EC2
+- ECR
+- CertificateManager
+- S3 
+- CDK 
+- EKS 
+- Lambda 
+- RDS
+- DocumentDB
+- ElasticCache
+- SecretsManager
+- AMP
+- Grafana
+- WAF
+- AMQ
+- SQS
+- SNS
+- XRay
+- CodeBuild
+- LocalStack
+- ALB
+- Nat Gateway
+- FarGate
+- VPN
+- Bastion
+
+## K8s components 
+
+- Istio
+- Helm
+- Flux
+- Kustomization
+- GateKeeper
+- External DNS
+- ALB Controller
+- Metrics Server
+- HPA
+- Cluster Autoscaler
+- ContainerInsights
+- NGINX
+- KubeCost
+- Weaver
+- EBS CSI
+
+## Other components
+
+- GitHub actions
+- Rebus
+- Jaeger
+- Loki
+- OTEL (Open Telemetry)
 
 ## Build Status (GitHub Actions)
 
 | Image | Status | Image | Status |
 | ------------- | ------------- | ------------- | ------------- |
-| Web Status |  [![Web Status](https://github.com/zodraz/eShopOnContainersAWS/workflows/webstatus/badge.svg?branch=aws)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebstatus) | Shopping Aggregator (Web) | [![Web Shopping Aggregator](https://github.com/zodraz/eShopOnContainersAWS/workflows/webshoppingagg/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebshoppingagg) |
-| Basket API | [![Basket API](https://github.com/zodraz/eShopOnContainersAWS/workflows/basket-api/badge.svg?branch=aws)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Abasket-api) | Shopping Aggregator (Mobile) | [![Mobile Shopping Aggregator](https://github.com/zodraz/eShopOnContainersAWS/workflows/mobileshoppingagg/badge.svg?branch=aws)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Amobileshoppingagg) |
-| Catalog API | [![Catalog API](https://github.com/zodraz/eShopOnContainersAWS/workflows/catalog-api/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Acatalog-api) | Web Client (MVC) | [![WebMVC Client](https://github.com/zodraz/eShopOnContainersAWS/workflows/webmvc/badge.svg?branch=aws)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebmvc) |
-|Identity API | [![Identity API](https://github.com/zodraz/eShopOnContainersAWS/workflows/identity-api/badge.svg?branch=aws)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Aidentity-api) | Web Client (SPA) | [![WebSPA Client](https://github.com/zodraz/eShopOnContainersAWS/workflows/webspa/badge.svg?branch=aws)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebspa) |
-| Ordering API | [![Ordering API](https://github.com/zodraz/eShopOnContainersAWS/workflows/ordering-api/badge.svg?branch=aws)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Aordering-api) | Webhooks Client | [![Webhooks demo client](https://github.com/zodraz/eShopOnContainersAWS/workflows/webhooks-client/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebhooks-client) |
-| Payment API | [![Payment API](https://github.com/zodraz/eShopOnContainersAWS/workflows/payment-api/badge.svg?branch=aws)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Apayment-api) | Ordering SignalR | [![Ordering SignalR](https://github.com/zodraz/eShopOnContainersAWS/workflows/ordering-signalrhub/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Aordering-signalrhub) | |
+| Web Status |  [![Web Status](https://github.com/zodraz/eShopOnContainersAWS/workflows/webstatus/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebstatus) | Shopping Aggregator (Web) | [![Web Shopping Aggregator](https://github.com/zodraz/eShopOnContainersAWS/workflows/webshoppingagg/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebshoppingagg) |
+| Basket API | [![Basket API](https://github.com/zodraz/eShopOnContainersAWS/workflows/basket-api/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Abasket-api) | Shopping Aggregator (Mobile) | [![Mobile Shopping Aggregator](https://github.com/zodraz/eShopOnContainersAWS/workflows/mobileshoppingagg/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Amobileshoppingagg) |
+| Catalog API | [![Catalog API](https://github.com/zodraz/eShopOnContainersAWS/workflows/catalog-api/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Acatalog-api) | Web Client (MVC) | [![WebMVC Client](https://github.com/zodraz/eShopOnContainersAWS/workflows/webmvc/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebmvc) |
+|Identity API | [![Identity API](https://github.com/zodraz/eShopOnContainersAWS/workflows/identity-api/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Aidentity-api) | Web Client (SPA) | [![WebSPA Client](https://github.com/zodraz/eShopOnContainersAWS/workflows/webspa/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebspa) |
+| Ordering API | [![Ordering API](https://github.com/zodraz/eShopOnContainersAWS/workflows/ordering-api/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Aordering-api) | Webhooks Client | [![Webhooks demo client](https://github.com/zodraz/eShopOnContainersAWS/workflows/webhooks-client/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Awebhooks-client) |
+| Payment API | [![Payment API](https://github.com/zodraz/eShopOnContainersAWS/workflows/payment-api/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Apayment-api) | Ordering SignalR | [![Ordering SignalR](https://github.com/zodraz/eShopOnContainersAWS/workflows/ordering-signalrhub/badge.svg)](https://github.com/zodraz/eShopOnContainersAWS/actions?query=workflow%3Aordering-signalrhub) | |
 
-_**aws** branch contains the latest **beta** code and their images are tagged with `:linux-aws` in our [ECR](https://405110379174.dkr.ecr.eu-central-1.amazonaws.com/eshop)_
+<!--_**aws** branch contains the latest **beta** code and their images are tagged with `:linux-aws` in our ECR.-->
 
-![Last commit](https://img.shields.io/github/last-commit/zodraz/eShopOnContainers?style=plastic)
-![Total downloads](https://img.shields.io/github/downloads/zodraz/eShopOnContainers/total)
+![Last commit](https://img.shields.io/github/last-commit/zodraz/eShopOnContainersAWS?style=plastic)
+<!--![Total downloads](https://img.shields.io/github/downloads/zodraz/eShopOnContainersAWS/total)-->
 
 ## Getting Started
 
@@ -56,13 +111,14 @@ The basic scenario can be run locally using docker-compose, and also deployed to
 - [Docker compose on macOS](https://github.com/dotnet-architecture/eShopOnContainers/wiki/Mac-setup)
 - [Local Kubernetes](https://github.com/dotnet-architecture/eShopOnContainers/wiki/Deploy-to-Local-Kubernetes)
 
-### Advanced scenario
+### AWS scenario
 
-The Advanced scenario can be run only in a Kubernetes cluster. Currently, this scenario is the same as a basic scenario with the following differences:
+- Create all the proper images on ECR from GitHub actions
+- Deploy all the AWS infrastructure through CDK
+- Update all required configurations on inf.yaml
+- Execute post deployment script actions
+- Deploy all charts either from GitHub actions or locally from deploy-all script
 
-- [Deploy to AKS with a Service Mesh for resiliency](<https://github.com/dotnet-architecture/eShopOnContainers/wiki/Deploy-to-Azure-Kubernetes-Service-(AKS)>)
-
-In the future, more features will be implemented in the advanced scenario.
 
 ## IMPORTANT NOTES!
 
@@ -70,54 +126,19 @@ In the future, more features will be implemented in the advanced scenario.
 
 **Note for Pull Requests (PRs)**: We accept pull requests from the community. When doing it, please do it onto the **DEV branch** which is the consolidated work-in-progress branch. Do not request it onto **main** branch.
 
-**NEWS / ANNOUNCEMENTS**
-Do you want to be up-to-date on .NET Architecture guidance and reference apps like eShopOnContainers? --> Subscribe by "WATCHING" this new GitHub repo: https://github.com/dotnet-architecture/News
-
-## Updated for .NET 6
-
-eShopOnContainers is updated to .NET 6 "wave" of technologies. Not just compilation but also new recommended code in EF Core, ASP.NET Core, and other new related versions with several significant changes.
-
-**See more details in the [Release notes](https://github.com/dotnet-architecture/eShopOnContainers/wiki/Release-notes) wiki page**.
 
 > **PLEASE** Read our [branch guide](./branch-guide.md) to know about our branching policy
 >
 > ### DISCLAIMER
 >
-> **IMPORTANT:** The current state of this sample application is **BETA**, because we are constantly evolving towards newly released technologies. Therefore, many areas could be improved and change significantly while refactoring the current code and implementing new features. Feedback with improvements and pull requests from the community will be highly appreciated and accepted.
+> **IMPORTANT:** The current state of this sample application is an opiniated fork from the original eshopOnContainers. And does not tag along from its fork with many differences-
 
 ### Architecture overview
 
 This reference application is cross-platform at the server and client-side, thanks to .NET 6 services capable of running on Linux or Windows containers depending on your Docker host, and to Xamarin for mobile apps running on Android, iOS, or Windows/UWP plus any browser for the client web apps.
+
 The architecture proposes a microservice oriented architecture implementation with multiple autonomous microservices (each one owning its own data/db) and implementing different approaches within each microservice (simple CRUD vs. DDD/CQRS patterns) using HTTP as the communication protocol between the client apps and the microservices and supports asynchronous communication for data updates propagation across multiple services based on Integration Events and an Event Bus (a light message broker, to choose between RabbitMQ or Azure Service Bus, underneath) plus other features defined at the [roadmap](https://github.com/dotnet-architecture/eShopOnContainers/wiki/Roadmap).
 
 ![](img/eshop_logo.png)
 ![](img/eShopOnContainers-architecture.png)
 
-## Related documentation and guidance
-
-You can find the related reference **Guide/eBook** focusing on **architecting and developing containerized and microservice-based .NET Applications** (download link available below) which explains in detail how to develop this kind of architectural style (microservices, Docker containers, Domain-Driven Design for certain microservices) plus other simpler architectural styles, like monolithic apps that can also live as Docker containers.
-
-There are also additional eBooks focusing on Containers/Docker lifecycle (DevOps, CI/CD, etc.) with Microsoft Tools, already published plus an additional eBook focusing on Enterprise Apps Patterns with Xamarin.Forms.
-You can download them and start reviewing these Guides/eBooks here:
-
-| Architecting & Developing                                                          | Containers Lifecycle & CI/CD                                                     | App patterns with Xamarin.Forms                                                                      |
-| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| [![](img/architecture-book-cover-large-we.png)](https://aka.ms/microservicesebook) | [![](img/devops-book-cover-large-we.png)](https://aka.ms/dockerlifecycleebook)   | [![](img/xamarin-enterprise-patterns-ebook-cover-large-we.png)](https://aka.ms/xamarinpatternsebook) |
-| <sup> <a href='https://aka.ms/microservicesebook'>**Download PDF**</a> </sup>      | <sup> <a href='https://aka.ms/dockerlifecycleebook'>**Download PDF** </a> </sup> | <sup> <a href='https://aka.ms/xamarinpatternsebook'>**Download PDF** </a> </sup>                     |
-
-For more free e-Books check out [.NET Architecture center](https://dot.net/architecture). If you have an e-book feedback, let us know by creating a new issue here: <https://github.com/dotnet-architecture/ebooks/issues>
-
-## Are you new to **microservices** and **cloud-native development**?
-
-Take a look at the free course [Create and deploy a cloud-native ASP.NET Core microservice](https://docs.microsoft.com/en-us/learn/modules/microservices-aspnet-core/) on MS Learn. This module explains microservices concepts, cloud-native technologies, and reduces the friction in getting started with `eShopOnContainers`.
-
-## Read further
-
-- [Explore the application](https://github.com/dotnet-architecture/eShopOnContainers/wiki/Explore-the-application)
-- [Explore the code](https://github.com/dotnet-architecture/eShopOnContainers/wiki/Explore-the-code)
-
-## Sending feedback and pull requests
-
-Read the planned [Roadmap](https://github.com/dotnet-architecture/eShopOnContainers/wiki/Roadmap) within the Wiki for further info about possible new implementations and provide feedback at the [ISSUES section](https://github.com/dotnet/eShopOnContainers/issues) if you'd like to see any specific scenario implemented or improved. Also, feel free to discuss on any current issue.
-
-# eShopOnContainersAWS

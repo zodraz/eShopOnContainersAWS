@@ -1,5 +1,5 @@
 Param(
-    [parameter(Mandatory = $false)][string]$registry = "144070732019.dkr.ecr.eu-central-1.amazonaws.com",
+    [parameter(Mandatory = $false)][string]$registry = "111111111111.dkr.ecr.eu-central-1.amazonaws.com",
     [parameter(Mandatory = $false)][string]$dockerUser = "AWS",
     [parameter(Mandatory = $false)][string]$dockerPassword = "",
     [parameter(Mandatory = $false)][string]$externalDns = "eshoponcontainersaws.com",

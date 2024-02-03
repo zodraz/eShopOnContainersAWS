@@ -1,109 +1,236 @@
-version: '3.4'
+version: "3.4"
 
-# The Production docker-compose file has to have the external/real IPs or DNS names for the services
-# The ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP environment variable is taken, by default, from the ".env" file defined like:
-#     ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP=192.168.88.248
+# The default docker-compose.override file can use the "localhost" as the external name for testing web apps within the same dev machine.
+# The ESHOP_EXTERNAL_DNS_NAME_OR_IP environment variable is taken, by default, from the ".env" file defined like:
+#     ESHOP_EXTERNAL_DNS_NAME_OR_IP=localhost
 # but values present in the environment vars at runtime will always override those defined inside the .env file
-# An external IP or DNS name has to be used when testing the Web apps and the Xamarin apps from remote machines/devices using the same WiFi, for instance.
-#
-# IMPORTANT: Note that this compose file uses ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP instead of ESHOP_EXTERNAL_DNS_NAME_OR_IP
-
-# Set ASPNETCORE_ENVIRONMENT= Development or Production, depending if you want to show up errors while testing.
-#
-# You need to start it with the following CLI command:
-# docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+# An external IP or DNS name has to be used (instead localhost and the 10.0.75.1 IP) when testing the Web apps and the Xamarin apps from remote machines/devices using the same WiFi, for instance.
 
 services:
-
-  basket-api:
+  seq:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_REDIS_BASKET_DB:-basket.data}
-      - identityUrl=http://identity-api              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-      - IdentityUrlExternal=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5105
-      - EventBusConnection=${ESHOP_AZURE_SERVICE_BUS:-rabbitmq}
-      - EventBusUserName=${ESHOP_SERVICE_BUS_USERNAME}
-      - EventBusPassword=${ESHOP_SERVICE_BUS_PASSWORD}
-      - AzureServiceBusEnabled=False
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
-      - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
-
+      - ACCEPT_EULA=Y
     ports:
-      - "80"   # The API Gateway redirects and access through the internal port (80).
+      - "5340:80"
 
-  catalog-api:
+  sqldata:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_CATALOG_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word}
-      - PicBaseUrl=${ESHOP_STORAGE_CATALOG_URL}
-      - EventBusConnection=${ESHOP_AZURE_SERVICE_BUS:-rabbitmq}
-      - EventBusUserName=${ESHOP_SERVICE_BUS_USERNAME}
-      - EventBusPassword=${ESHOP_SERVICE_BUS_PASSWORD}
-      - AzureStorageAccountName=${ESHOP_AZURE_STORAGE_CATALOG_NAME}
-      - AzureStorageAccountKey=${ESHOP_AZURE_STORAGE_CATALOG_KEY}
-      - UseCustomizationData=True
-      - AzureServiceBusEnabled=False
-      - S3Enabled=false
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
-      - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - SA_PASSWORD=Pass@word
+      - ACCEPT_EULA=Y
     ports:
-      - "80"   # The API Gateway redirects and access through the internal port (80).
+      - "5433:1433"
+    volumes:
+      - eshop-sqldata:/var/opt/mssql
+
+  nosqldata:
+    ports:
+      - "27017:27017"
+    volumes:
+      - eshop-nosqldata:/data/db
+
+  basketdata:
+    ports:
+      - "6379:6379"
+    volumes:
+      - eshop-basketdata:/data
+  rabbitmq:
+    ports:
+      - "15672:15672"
+      - "5672:5672"
 
   identity-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - SpaClient=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5104
-      - XamarinCallback=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5105/xamarincallback      #localhost do not work for UWP login, so we have to use "external" IP always
-      - ConnectionString=${ESHOP_AWS_IDENTITY_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Service.IdentityDb;User Id=sa;Password=Pass@word}
-      - MvcClient=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5100              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-      - BasketApiClient=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5103
-      - OrderingApiClient=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5102
-      - MobileShoppingAggClient=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5120
-      - WebShoppingAggClient=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5121
+      - SpaClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5104
+      - XamarinCallback=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5105/xamarincallback
+      - ConnectionString=${ESHOP_AWS_IDENTITY_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Service.IdentityDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
+      - MvcClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5100
+      - BasketApiClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5103
+      - OrderingApiClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5102
+      - MobileShoppingAggClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5120
+      - WebShoppingAggClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5121
+      - WebhooksApiClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5113
+      - WebhooksWebClient=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5114
+      - LocationsApi=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5109
+      - MarketingApi=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5110
+      - PublicOrigin=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
       - UseCustomizationData=True
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
     ports:
       - "5105:80"
+
+  basket-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - CacheConnectionString=${ESHOP_AWS_REDIS_BASKET_DB:-basketdata}
+      - identityUrl=http://identity-api
+      - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
+      - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
+      - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
+      - EventBus__IsSecure=${ESHOP_SERVICE_BUS_ISSECURE:-False}
+      - EventBus__OutboxEnabled=${ESHOP_SERVICE_BUS_OUTBOX_ENABLED:-False}
+      - EventBus__EndpointName=Basket
+      - EventBus__RabbitMQEnabled=${ESHOP_SERVICE_BUS_RABBITMQ_ENABLED:-True}
+      - EventBus__RetryCount=${ESHOP_SERVICE_BUS_RETRY_COUNT:-5}
+      - EventBus__AuditEnabled=${ESHOP_SERVICE_BUS_AUDIT_ENABLED:-True}
+      - EventBus__FleetManager__Enabled=${ESHOP_SERVICE_BUS_FLEET_MANAGER_ENABLED:-False}
+      - EventBus__FleetManager__Url=${ESHOP_SERVICE_BUS_FLEET_MANAGER_URL}
+      - EventBus__FleetManager__ApiKey=${ESHOP_SERVICE_BUS_FLEET_MANAGER_API_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopBasketApi}
+      - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - PATH_BASE=/basket-api
+      - GRPC_PORT=81
+      - PORT=80
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+    ports:
+      - "5103:80"
+      - "9103:81"
+
+  catalog-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionString=${ESHOP_AWS_CATALOG_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.CatalogDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
+      - PicBaseUrl=${ESHOP_STORAGE_CATALOG_URL}
+      - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
+      - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
+      - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
+      - EventBus__IsSecure=${ESHOP_SERVICE_BUS_ISSECURE:-False}
+      - EventBus__OutboxEnabled=${ESHOP_SERVICE_BUS_OUTBOX_ENABLED:-True}
+      - EventBus__EndpointName=Catalog
+      - EventBus__RabbitMQEnabled=${ESHOP_SERVICE_BUS_RABBITMQ_ENABLED:-True}
+      - EventBus__RetryCount=${ESHOP_SERVICE_BUS_RETRY_COUNT:-5}
+      - EventBus__AuditEnabled=${ESHOP_SERVICE_BUS_AUDIT_ENABLED:-True}
+      - EventBus__FleetManager__Enabled=${ESHOP_SERVICE_BUS_FLEET_MANAGER_ENABLED:-False}
+      - EventBus__FleetManager__Url=${ESHOP_SERVICE_BUS_FLEET_MANAGER_URL}
+      - EventBus__FleetManager__ApiKey=${ESHOP_SERVICE_BUS_FLEET_MANAGER_API_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - UseCustomizationData=True
+      - S3Enabled=False
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopCatalogApi}
+      - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - GRPC_PORT=81
+      - PORT=80
+      - PATH_BASE=/catalog-api
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+    ports:
+      - "5101:80"
+      - "9101:81"
 
   ordering-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_ORDERING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.OrderingDb;User Id=sa;Password=Pass@word}
-      - identityUrl=http://identity-api              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-      - IdentityUrlExternal=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5105
-      - EventBusConnection=${ESHOP_AZURE_SERVICE_BUS:-rabbitmq}
-      - EventBusUserName=${ESHOP_SERVICE_BUS_USERNAME}
-      - EventBusPassword=${ESHOP_SERVICE_BUS_PASSWORD}
+      - ConnectionString=${ESHOP_AWS_ORDERING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.OrderingDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
+      - identityUrl=http://identity-api
+      - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
+      - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
+      - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
+      - EventBus__IsSecure=${ESHOP_SERVICE_BUS_ISSECURE:-False}
+      - EventBus__OutboxEnabled=${ESHOP_SERVICE_BUS_OUTBOX_ENABLED:-True}
+      - EventBus__EndpointName=Ordering
+      - EventBus__RabbitMQEnabled=${ESHOP_SERVICE_BUS_RABBITMQ_ENABLED:-True}
+      - EventBus__RetryCount=${ESHOP_SERVICE_BUS_RETRY_COUNT:-5}
+      - EventBus__AuditEnabled=${ESHOP_SERVICE_BUS_AUDIT_ENABLED:-True}
+      - EventBus__FleetManager__Enabled=${ESHOP_SERVICE_BUS_FLEET_MANAGER_ENABLED:-False}
+      - EventBus__FleetManager__Url=${ESHOP_SERVICE_BUS_FLEET_MANAGER_URL}
+      - EventBus__FleetManager__ApiKey=${ESHOP_SERVICE_BUS_FLEET_MANAGER_API_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
       - UseCustomizationData=True
-      - AzureServiceBusEnabled=False
-      - CheckUpdateTime=30000
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopOrderingApi}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
+      - Serilog__MinimumLevel__Override__Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ=Verbose
+      - Serilog__MinimumLevel__Override__ordering-api=Verbose
+      - PATH_BASE=/ordering-api
+      - GRPC_PORT=81
+      - PORT=80
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
     ports:
-      - "80"   # The API Gateway redirects and access through the internal port (80).
+      - "5102:80"
+      - "9102:81"
 
-  ordering.backgroundtasks:
+  ordering-backgroundtasks:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_ORDERING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.OrderingDb;User Id=sa;Password=Pass@word}
-      - EventBusConnection=${ESHOP_AZURE_SERVICE_BUS:-rabbitmq}
-      - EventBusUserName=${ESHOP_SERVICE_BUS_USERNAME}
-      - EventBusPassword=${ESHOP_SERVICE_BUS_PASSWORD}
+      - ConnectionString=${ESHOP_AWS_ORDERING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.OrderingDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
+      - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
+      - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
+      - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
+      - EventBus__IsSecure=${ESHOP_SERVICE_BUS_ISSECURE:-False}
+      - EventBus__OutboxEnabled=${ESHOP_SERVICE_BUS_OUTBOX_ENABLED:-False}
+      - EventBus__EndpointName=Ordering-Bkg
+      - EventBus__RabbitMQEnabled=${ESHOP_SERVICE_BUS_RABBITMQ_ENABLED:-True}
+      - EventBus__RetryCount=${ESHOP_SERVICE_BUS_RETRY_COUNT:-5}
+      - EventBus__AuditEnabled=${ESHOP_SERVICE_BUS_AUDIT_ENABLED:-True}
+      - EventBus__FleetManager__Enabled=${ESHOP_SERVICE_BUS_FLEET_MANAGER_ENABLED:-False}
+      - EventBus__FleetManager__Url=${ESHOP_SERVICE_BUS_FLEET_MANAGER_URL}
+      - EventBus__FleetManager__ApiKey=${ESHOP_SERVICE_BUS_FLEET_MANAGER_API_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
       - UseCustomizationData=True
-      - AzureServiceBusEnabled=False
       - CheckUpdateTime=30000
       - GracePeriodTime=1
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopOrderningBkg}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
+      - Serilog__MinimumLevel__Override__Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ=Verbose
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
     ports:
       - "5111:80"
 
@@ -111,40 +238,349 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_MARKETING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.MarketingDb;User Id=sa;Password=Pass@word}
+      - ConnectionString=${ESHOP_AWS_MARKETING_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.MarketingDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
       - MongoConnectionString=${ESHOP_AWS_NOSQL:-mongodb://nosqldata}
       - MongoDatabase=MarketingDb
-      - EventBusConnection=${ESHOP_AZURE_SERVICE_BUS:-rabbitmq}
-      - EventBusUserName=${ESHOP_SERVICE_BUS_USERNAME}
-      - EventBusPassword=${ESHOP_SERVICE_BUS_PASSWORD}
-      - identityUrl=http://identity-api              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-      - IdentityUrlExternal=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
+      - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
+      - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
+      - EventBus__IsSecure=${ESHOP_SERVICE_BUS_ISSECURE:-False}
+      - EventBus__OutboxEnabled=${ESHOP_SERVICE_BUS_OUTBOX_ENABLED:-False}
+      - EventBus__EndpointName=${ESHOP_SERVICE_BUS_ENDPOINT_NAME:-Marketing}
+      - EventBus__RabbitMQEnabled=${ESHOP_SERVICE_BUS_RABBITMQ_ENABLED:-True}
+      - EventBus__RetryCount=${ESHOP_SERVICE_BUS_RETRY_COUNT:-5}
+      - EventBus__AuditEnabled=${ESHOP_SERVICE_BUS_AUDIT_ENABLED:-True}
+      - EventBus__FleetManager__Enabled=${ESHOP_SERVICE_BUS_FLEET_MANAGER_ENABLED:-False}
+      - EventBus__FleetManager__Url=${ESHOP_SERVICE_BUS_FLEET_MANAGER_URL}
+      - EventBus__FleetManager__ApiKey=${ESHOP_SERVICE_BUS_FLEET_MANAGER_API_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - identityUrl=http://identity-api
+      - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
       - CampaignDetailFunctionUri=${ESHOP_AWSFUNC_CAMPAIGN_DETAILS_URI}
       - PicBaseUrl=${ESHOP_STORAGE_MARKETING_URL}
-      - AzureStorageAccountName=${ESHOP_AZURE_STORAGE_MARKETING_NAME}
-      - AzureStorageAccountKey=${ESHOP_AZURE_STORAGE_MARKETING_KEY}
-      - AzureServiceBusEnabled=False
-      - AzureStorageEnabled=False
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
+      - S3Enabled=False
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseDocumentDB=${ESHOP_USE_DOCUMENT_DB}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopMarketigApi}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
+      - PATH_BASE=/marketing-api
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
     ports:
-      - "80"   # The API Gateway redirects and access through the internal port (80).
+      - "5110:80"
 
-  webspa:
+  payment-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - IdentityUrl=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5105              #Local: You need to open your local dev-machine firewall at range 5100-5105.  at range 5100-5105.
-      - PurchaseUrl=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5202
+      - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
+      - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
+      - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
+      - EventBus__IsSecure=${ESHOP_SERVICE_BUS_ISSECURE:-False}
+      - EventBus__OutboxEnabled=${ESHOP_SERVICE_BUS_OUTBOX_ENABLED:-False}
+      - EventBus__EndpointName=${ESHOP_SERVICE_BUS_ENDPOINT_NAME:-Payment}
+      - EventBus__RabbitMQEnabled=${ESHOP_SERVICE_BUS_RABBITMQ_ENABLED:-True}
+      - EventBus__RetryCount=${ESHOP_SERVICE_BUS_RETRY_COUNT:-5}
+      - EventBus__AuditEnabled=${ESHOP_SERVICE_BUS_AUDIT_ENABLED:-True}
+      - EventBus__FleetManager__Enabled=${ESHOP_SERVICE_BUS_FLEET_MANAGER_ENABLED:-False}
+      - EventBus__FleetManager__Url=${ESHOP_SERVICE_BUS_FLEET_MANAGER_URL}
+      - EventBus__FleetManager__ApiKey=${ESHOP_SERVICE_BUS_FLEET_MANAGER_API_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopPaymentApi}
+      - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - Serilog__MinimumLevel__Override__payment-api.IntegrationEvents.EventHandling=Verbose
+      - Serilog__MinimumLevel__Override__Microsoft.eShopOnContainers.BuildingBlocks.EventBusRabbitMQ=Verbose
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+    ports:
+      - "5108:80"
+
+  locations-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ConnectionString=${ESHOP_AWS_NOSQL:-mongodb://nosqldata}
+      - Database=LocationsDb
+      - identityUrl=http://identity-api
+      - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
+      - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
+      - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
+      - EventBus__IsSecure=${ESHOP_SERVICE_BUS_ISSECURE:-False}
+      - EventBus__OutboxEnabled=${ESHOP_SERVICE_BUS_OUTBOX_ENABLED:-False}
+      - EventBus__EndpointName=${ESHOP_SERVICE_BUS_ENDPOINT_NAME:-Locations}
+      - EventBus__RabbitMQEnabled=${ESHOP_SERVICE_BUS_RABBITMQ_ENABLED:-True}
+      - EventBus__RetryCount=${ESHOP_SERVICE_BUS_RETRY_COUNT:-5}
+      - EventBus__AuditEnabled=${ESHOP_SERVICE_BUS_AUDIT_ENABLED:-True}
+      - EventBus__FleetManager__Enabled=${ESHOP_SERVICE_BUS_FLEET_MANAGER_ENABLED:-False}
+      - EventBus__FleetManager__Url=${ESHOP_SERVICE_BUS_FLEET_MANAGER_URL}
+      - EventBus__FleetManager__ApiKey=${ESHOP_SERVICE_BUS_FLEET_MANAGER_API_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseDocumentDB=${ESHOP_USE_DOCUMENT_DB}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopLocationsApi}
+      - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - PATH_BASE=/locations-api
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+    ports:
+      - "5109:80"
+
+  webhooks-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ConnectionString=${ESHOP_AZURE_WEBHOOKS_DB:-Server=sqldata;Database=Microsoft.eShopOnContainers.Services.WebhooksDb;User Id=sa;Password=Pass@word;TrustServerCertificate=True}
+      - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
+      - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
+      - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
+      - EventBus__IsSecure=${ESHOP_SERVICE_BUS_ISSECURE:-False}
+      - EventBus__OutboxEnabled=${ESHOP_SERVICE_BUS_OUTBOX_ENABLED:-False}
+      - EventBus__EndpointName=${ESHOP_SERVICE_BUS_ENDPOINT_NAME:-Webhooks}
+      - EventBus__RabbitMQEnabled=${ESHOP_SERVICE_BUS_RABBITMQ_ENABLED:-True}
+      - EventBus__RetryCount=${ESHOP_SERVICE_BUS_RETRY_COUNT:-5}
+      - EventBus__AuditEnabled=${ESHOP_SERVICE_BUS_AUDIT_ENABLED:-True}
+      - EventBus__FleetManager__Enabled=${ESHOP_SERVICE_BUS_FLEET_MANAGER_ENABLED:-False}
+      - EventBus__FleetManager__Url=${ESHOP_SERVICE_BUS_FLEET_MANAGER_URL}
+      - EventBus__FleetManager__ApiKey=${ESHOP_SERVICE_BUS_FLEET_MANAGER_API_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopWebhookApi}
+      - IdentityUrl=http://identity-api
+      - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+    ports:
+      - "5113:80"
+
+  mobileshoppingapigw:
+    volumes:
+      - ./ApiGateways/Envoy/config/mobileshopping:/etc/envoy
+    ports:
+      - "5200:80"
+      - "15200:8001"
+
+  mobilemarketingapigw:
+    volumes:
+      - ./ApiGateways/Envoy/config/mobileshopping:/etc/envoy
+    ports:
+      - "5201:80"
+      - "15201:8001"
+
+  webshoppingapigw:
+    volumes:
+      - ./ApiGateways/Envoy/config/webshopping:/etc/envoy
+    ports:
+      - "5202:80"
+      - "15202:8001"
+
+  webmarketingapigw:
+    volumes:
+      - ./ApiGateways/Envoy/config/webmarketing:/etc/envoy
+    ports:
+      - "5203:80"
+      - "15203:8001"
+
+  mobileshoppingagg:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - urls__basket=http://basket-api
+      - urls__catalog=http://catalog-api
+      - urls__orders=http://ordering-api
+      - urls__identity=http://identity-api
+      - urls__grpcBasket=http://basket-api:81
+      - urls__grpcCatalog=http://catalog-api:81
+      - urls__grpcOrdering=http://ordering-api:81
       - CatalogUrlHC=http://catalog-api/hc
       - OrderingUrlHC=http://ordering-api/hc
-      - IdentityUrlHC=http://identity-api/hc     #Local: Use ${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}, if using external IP or DNS name from browser.
+      - IdentityUrlHC=http://identity-api/hc
       - BasketUrlHC=http://basket-api/hc
+      - MarketingUrlHC=http://marketing-api/hc
       - PaymentUrlHC=http://payment-api/hc
-      - UseCustomizationData=True
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
+      - LocationUrlHC=http://locations-api/hc
+      - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+    ports:
+      - "5120:80"
+
+  webshoppingagg:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - urls__basket=http://basket-api
+      - urls__catalog=http://catalog-api
+      - urls__orders=http://ordering-api
+      - urls__identity=http://identity-api
+      - urls__grpcBasket=http://basket-api:81
+      - urls__grpcCatalog=http://catalog-api:81
+      - urls__grpcOrdering=http://ordering-api:81
+      - CatalogUrlHC=http://catalog-api/hc
+      - OrderingUrlHC=http://ordering-api/hc
+      - IdentityUrlHC=http://identity-api/hc
+      - BasketUrlHC=http://basket-api/hc
+      - MarketingUrlHC=http://marketing-api/hc
+      - PaymentUrlHC=http://payment-api/hc
+      - LocationUrlHC=http://locations-api/hc
+      - IdentityUrlExternal=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+    ports:
+      - "5121:80"
+
+  ordering-signalrhub:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - EventBus__Host=${ESHOP_SERVICE_BUS_HOST:-rabbitmq}
+      - EventBus__UserName=${ESHOP_SERVICE_BUS_USERNAME}
+      - EventBus__Password=${ESHOP_SERVICE_BUS_PASSWORD}
+      - EventBus__IsSecure=${ESHOP_SERVICE_BUS_ISSECURE:-False}
+      - EventBus__OutboxEnabled=${ESHOP_SERVICE_BUS_OUTBOX_ENABLED:-False}
+      - EventBus__EndpointName=${ESHOP_SERVICE_BUS_ENDPOINT_NAME:-Ordering-SignalR}
+      - EventBus__RabbitMQEnabled=${ESHOP_SERVICE_BUS_RABBITMQ_ENABLED:-True}
+      - EventBus__RetryCount=${ESHOP_SERVICE_BUS_RETRY_COUNT:-5}
+      - EventBus__AuditEnabled=${ESHOP_SERVICE_BUS_AUDIT_ENABLED:-True}
+      - EventBus__FleetManager__Enabled=${ESHOP_SERVICE_BUS_FLEET_MANAGER_ENABLED:-False}
+      - EventBus__FleetManager__Url=${ESHOP_SERVICE_BUS_FLEET_MANAGER_URL}
+      - EventBus__FleetManager__ApiKey=${ESHOP_SERVICE_BUS_FLEET_MANAGER_API_KEY}
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - Vault__SecretGroups=${ESHOP_VAULT_SECRET_GROUPS:-EshopWebhookApi}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - IdentityUrl=http://identity-api
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+    ports:
+      - "5112:80"
+
+  webstatus:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - HealthChecksUI__HealthChecks__0__Name=WebMVC HTTP Check
+      - HealthChecksUI__HealthChecks__0__Uri=http://webmvc/hc
+      - HealthChecksUI__HealthChecks__1__Name=WebSPA HTTP Check
+      - HealthChecksUI__HealthChecks__1__Uri=http://webspa/hc
+      - HealthChecksUI__HealthChecks__2__Name=Web Shopping Aggregator GW HTTP Check
+      - HealthChecksUI__HealthChecks__2__Uri=http://webshoppingagg/hc
+      - HealthChecksUI__HealthChecks__3__Name=Mobile Shopping Aggregator HTTP Check
+      - HealthChecksUI__HealthChecks__3__Uri=http://mobileshoppingagg/hc
+      - HealthChecksUI__HealthChecks__4__Name=Ordering HTTP Check
+      - HealthChecksUI__HealthChecks__4__Uri=http://ordering-api/hc
+      - HealthChecksUI__HealthChecks__5__Name=Basket HTTP Check
+      - HealthChecksUI__HealthChecks__5__Uri=http://basket-api/hc
+      - HealthChecksUI__HealthChecks__6__Name=Catalog HTTP Check
+      - HealthChecksUI__HealthChecks__6__Uri=http://catalog-api/hc
+      - HealthChecksUI__HealthChecks__7__Name=Identity HTTP Check
+      - HealthChecksUI__HealthChecks__7__Uri=http://identity-api/hc
+      - HealthChecksUI__HealthChecks__8__Name=Marketing HTTP Check
+      - HealthChecksUI__HealthChecks__8__Uri=http://marketing-api/hc
+      - HealthChecksUI__HealthChecks__9__Name=Locations HTTP Check
+      - HealthChecksUI__HealthChecks__9__Uri=http://locations-api/hc
+      - HealthChecksUI__HealthChecks__10__Name=Payments HTTP Check
+      - HealthChecksUI__HealthChecks__10__Uri=http://payment-api/hc
+      - HealthChecksUI__HealthChecks__11__Name=Ordering SignalRHub HTTP Check
+      - HealthChecksUI__HealthChecks__11__Uri=http://ordering-signalrhub/hc
+      - HealthChecksUI__HealthChecks__12__Name=Ordering HTTP Background Check
+      - HealthChecksUI__HealthChecks__12__Uri=http://ordering-backgroundtasks/hc
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
+      - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
+    ports:
+      - "5107:80"
+
+  webspa:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - IdentityUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - PurchaseUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5202
+      - MarketingUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5203
+      - IdentityUrlHC=http://identity-api/hc
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseCustomizationData=True
+      - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - SignalrHubUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5112
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
     ports:
       - "5104:80"
 
@@ -153,193 +589,112 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - PurchaseUrl=http://webshoppingapigw
-      - IdentityUrl=http://10.0.75.1:5105  # Local Mac: Use http://docker.for.mac.localhost:5105 || Local Windows:  Use 10.0.75.1 in a "Docker for Windows" environment, if using "localhost" from browser. || #Remote access: Use ${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP} if using external IP or DNS name from browser.
-      - CatalogUrlHC=http://catalog-api/hc
-      - OrderingUrlHC=http://ordering-api/hc
-      - IdentityUrlHC=http://identity-api/hc     #Local: Use ${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}, if using external IP or DNS name from browser.
-      - BasketUrlHC=http://basket-api/hc
-      - PaymentUrlHC=http://payment-api/hc
+      - IdentityUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - MarketingUrl=http://webmarketingapigw
+      - SignalrHubUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5112
+      - IdentityUrlHC=http://identity-api/hc
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
       - UseCustomizationData=True
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
+      - UseAWS=${ESHOP_USE_AWS}
+      - UseVault=${ESHOP_USE_AWS_VAULT}
       - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
     ports:
       - "5100:80"
 
-  webstatus:
+  webhooks-client:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - CatalogUrl=http://catalog-api/hc
-      - OrderingUrl=http://ordering-api/hc
-      - BasketUrl=http://basket-api/hc
-      - IdentityUrl=http://identity-api/hc
-      - PaymentUrl=http://payment-api/hc
-      - mvc=http://webmvc/hc
-      - spa=http://webspa/hc
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
-      - OrchestratorType=${ORCHESTRATOR_TYPE}
+      - Token=6168DB8D-DC58-4094-AF24-483278923590 # Webhooks are registered with this token (any value is valid) but the client won't check it
+      - IdentityUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5105
+      - CallBackUrl=http://${ESHOP_EXTERNAL_DNS_NAME_OR_IP}:5114
+      - WebhooksUrl=http://webhooks-api
+      - Serilog__SeqServerUrl=${ESHOP_SERILOG_SEQ_SERVER_URL}
+      - Serilog__LogstashgUrl=${ESHOP_SERILOG_LOGSTASH_URL}
+      - Serilog__LokiUrl=${ESHOP_SERILOG_LOKI_URL}
+      - SelfUrl=http://webhooks-client/
+      - AWS__Profile=${ESHOP_AWS_PROFILE}
+      - AWS__Region=${ESHOP_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${ESHOP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${ESHOP_AWS_SECRET_ACCESS_KEY}
+      - LocalStack__UseLocalStack=${ESHOP_USE_LOCALSTACK}
+      - LocalStack__LocalStackUrl=${ESHOP_LOCALSTACK_URL}
+      - OtlpEndpoint=${ESHOP_OTLP_ENDPOINT}
     ports:
-      - "5107:80"
+      - "5114:80"
 
-  payment-api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://0.0.0.0:80
-      - EventBusConnection=${ESHOP_AZURE_SERVICE_BUS:-rabbitmq}
-      - EventBusUserName=${ESHOP_SERVICE_BUS_USERNAME}
-      - EventBusPassword=${ESHOP_SERVICE_BUS_PASSWORD}
-      - AzureServiceBusEnabled=False
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
-      - OrchestratorType=${ORCHESTRATOR_TYPE}
-    ports:
-      - "80"   # The API Gateway redirects and access through the internal port (80).
+  #fleetmanager:
+  #  environment:
+  #    # Listen URL - should correspond to mapped port above
+  #    FM_APPSETTINGS__LISTENURL: "http://+:5000"
 
-  locations-api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionString=${ESHOP_AWS_NOSQL:-mongodb://nosqldata}
-      - Database=LocationsDb
-      - identityUrl=http://identity-api              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-      - IdentityUrlExternal=http://${ESHOP_PROD_EXTERNAL_DNS_NAME_OR_IP}:5105
-      - EventBusConnection=${ESHOP_AZURE_SERVICE_BUS:-rabbitmq}
-      - EventBusUserName=${ESHOP_SERVICE_BUS_USERNAME}
-      - EventBusPassword=${ESHOP_SERVICE_BUS_PASSWORD}
-      - AzureServiceBusEnabled=False
-      - ApplicationInsights__InstrumentationKey=${INSTRUMENTATION_KEY}
-      - OrchestratorType=${ORCHESTRATOR_TYPE}
-      - UseLoadTest=${USE_LOADTEST:-False}
-    ports:
-      - "80"   # The API Gateway redirects and access through the internal port (80).
+  #    # Add license details here
+  #    FM_APPSETTINGS__LICENSE__DOCUMENT__ID: ""
+  #    FM_APPSETTINGS__LICENSE__DOCUMENT__ISSUEDON: ""
+  #    FM_APPSETTINGS__LICENSE__DOCUMENT__LICENSEE__NAME: "Your Company Name"
+  #    FM_APPSETTINGS__LICENSE__DOCUMENT__LICENSEE__VAT: ""
+  #    FM_APPSETTINGS__LICENSE__SIGNATURE: ""
 
-  sqldata:
-    environment:
-      - SA_PASSWORD=Pass@word
-      - ACCEPT_EULA=Y
-    ports:
-      - "5433:1433"    # Important: In a production environment your should remove the external port
+  #    # Configuration
+  #    ## Master key which will be used to generate all kinds of tokens - keep secret!
+  #    FM_APPSETTINGS__MASTERKEY: ""
 
-  nosqldata:
-    ports:
-      - "27017:27017"  # Important: In a production environment your should remove the external port
+  #    ## Configures the URL Fleet Manager should advertise to the outside world
+  #    FM_APPSETTINGS__URL: "http://localhostname:5000"
 
-  basket.data:
-    ports:
-      - "6379:6379"    # Important: In a production environment your should remove the external port
+  #    ## Configures the API URL Fleet Manager should advertise to the outside world (i.e. the)
+  #    FM_APPSETTINGS__APIURL: "http://localhostname:5000/api"
 
-  rabbitmq:
-    ports:
-      - "15672:15672"  # Important: In a production environment your should remove the external port
-      - "5672:5672"    # Important: In a production environment your should remove the external port
+  #    ## Configures events database - can be hostname+port (Kafka assumed) or a local directory (embedded events db)
+  #    FM_CONNECTIONSTRINGS__EVENTS: "./.fm-events"
 
-  mobileshoppingapigw:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - IdentityUrl=http://identity-api              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-    ports:
-      - "5200:80"   # Important: In a production environment your should remove the external port (5200) kept here for microservice debugging purposes.
-                    # The API Gateway redirects and access through the internal port (80).
-    volumes:
-      - ./ApiGateways/Mobile.Bff.Shopping/apigw:/app/configuration
+  #    ## Configures other types of storage - master data (can be MongoDB or SQL Server)
+  #    FM_CONNECTIONSTRINGS__MASTER: "mongodb://nosqldata:27017/fm-prod-master?maxIdleTimeMS=60000&maxPoolSize=1000"
+  #    ## Primary projections (can be MongoDB or local directory)
+  #    FM_CONNECTIONSTRINGS__VIEWS: "mongodb://nosqldata:27017/fm-prod-views?maxIdleTimeMS=60000&maxPoolSize=1000"
+  #    ## Secondary projections (can be Azure Storage, directory path, MongoDB, or Amazon S3)
+  #    FM_CONNECTIONSTRINGS__VIEWBLOBS: "mongodb://nosqldata:27017/fm-prod-blobs?maxIdleTimeMS=60000&maxPoolSize=100"
+  #    ## Commands from FM to Rebus instances (can be MongoDB, SQL Server, or local directory)
+  #    FM_CONNECTIONSTRINGS__COMMANDS: "mongodb://nosqldata:27017/fm-prod-commands?maxIdleTimeMS=60000&maxPoolSize=500"
+  #    ## Data bus (can be Azure Storage, directory path, MongoDB, or Amazon S3)
+  #    FM_CONNECTIONSTRINGS__DATABUS: "mongodb://nosqldata:27017/fm-prod-blobs?maxIdleTimeMS=60000&maxPoolSize=100"
+  #    ## Message bus (can be Azure Service Bus, Amazon SQS, or directory path)
+  #    FM_CONNECTIONSTRINGS__SERVICEBUS: "/usr/share/servicebus"
 
-  webshoppingapigw:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - IdentityUrl=http://identity-api              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-    ports:
-      - "5202:80"   # Important: In a production environment your should remove the external port (5202) kept here for microservice debugging purposes.
-                    # The API Gateway redirects and access through the internal port (80).
-    volumes:
-      - ./ApiGateways/Web.Bff.Shopping/apigw:/app/configuration
+  #    ## Configures the topic to use for event streaming (mostly relevant if the 'events' connection string is Kafka)
+  #    FM_APPSETTINGS__KAFKATOPIC: "fm-events-1"
 
-  webmarketingapigw:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - IdentityUrl=http://identity-api              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-    ports:
-      - "5203:80"   # Important: In a production environment your should remove the external port (5203) kept here for microservice debugging purposes.
-                    # The API Gateway redirects and access through the internal port (80).
-    volumes:
-      - ./ApiGateways/Web.Bff.Marketing/apigw:/app/configuration
+  #    ## Override PRODUCER (not consumer) topic - can be used to migrate to a new topic, e.g. when changing number of partitions
+  #    #FM_APPSETTINGS__KAFKATOPICPRODUCEROVERRIDE: "fm-events-1"
 
-  mobileshoppingagg:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - urls__basket=http://basket-api
-      - urls__catalog=http://catalog-api
-      - urls__orders=http://ordering-api
-      - urls__identity=http://identity-api              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-    ports:
-      - "80"   # Important: In a production environment your should remove the external port (5120) kept here for microservice debugging purposes.
-                    # The API Gateway redirects and access through the internal port (80).
+  #    ## Defines how often the view blobs repository should be crawled for expired blobs
+  #    FM_APPSETTINGS__CLEANUPEXPIREDVIEWBLOBSINTERVAL: "01:00:00"
 
-  webshoppingagg:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - urls__basket=http://basket-api
-      - urls__catalog=http://catalog-api
-      - urls__orders=http://ordering-api
-      - urls__identity=http://identity-api              #Local: You need to open your local dev-machine firewall at range 5100-5110.
-    ports:
-      - "80"   # Important: In a production environment your should remove the external port (5121) kept here for microservice debugging purposes.
-                    # The API Gateway redirects and access through the internal port (80).
+  #    ## Set to a valid email address to send ERROR logs to an email address
+  #    FM_APPSETTINGS__LOGERRORMAILS: ""
 
-  fleetmanager:
-    environment:
-      # Listen URL - should correspond to mapped port above
-      FM_APPSETTINGS__LISTENURL: "http://+:5000"
+  #    ## Set to a valid file path pattern (e.g. /var/logs/fm/log.txt) to write logs to rolling files
+  #    FM_APPSETTINGS__LOGPATH: ""
 
-      # Add license details here
-      FM_APPSETTINGS__LICENSE__DOCUMENT__ID: "473897a34bb2233de3f56cb53e6ab563"
-      FM_APPSETTINGS__LICENSE__DOCUMENT__ISSUEDON: "20220907"
-      FM_APPSETTINGS__LICENSE__DOCUMENT__LICENSEE__NAME: "Your Company Name"
-      FM_APPSETTINGS__LICENSE__DOCUMENT__LICENSEE__VAT: "XX33478473.43874"
-      FM_APPSETTINGS__LICENSE__SIGNATURE: "gjg48gj434j7j49j7g8j678954j7grjig498484u5f=="
+  #    ## Configure SMTP settings to FM can send emails (or set the host to a local email pickup directory)
+  #    FM_APPSETTINGS__SMTP__HOST: "your.smtp.server.com"
+  #    FM_APPSETTINGS__SMTP__PORT: "587"
+  #    FM_APPSETTINGS__SMTP__USER: "some-user-name"
+  #    FM_APPSETTINGS__SMTP__PASS: "your-smtp-password"
 
-      # Configuration
-      ## Master key which will be used to generate all kinds of tokens - keep secret!
-      FM_APPSETTINGS__MASTERKEY: "GHUGEIWhukgeusgelksGHUKELHGKELSHUKLgehsuklgesHGUKELHUKGLEWghueghkelw="
-
-      ## Configures the URL Fleet Manager should advertise to the outside world
-      FM_APPSETTINGS__URL: "http://localhostname:5000"
-
-      ## Configures the API URL Fleet Manager should advertise to the outside world (i.e. the)
-      FM_APPSETTINGS__APIURL: "http://localhostname:5000/api"
-
-      ## Configures events database - can be hostname+port (Kafka assumed) or a local directory (embedded events db)      
-      FM_CONNECTIONSTRINGS__EVENTS: "your-kafka-host:9092"
-
-      ## Configures other types of storage - master data (can be MongoDB or SQL Server)
-      FM_CONNECTIONSTRINGS__MASTER: "mongodb://your-mongo-host:27017/fm-prod-master?maxIdleTimeMS=60000&maxPoolSize=1000"
-      ## Primary projections (can be MongoDB or local directory)
-      FM_CONNECTIONSTRINGS__VIEWS: "mongodb://your-mongo-host:27017/fm-prod-views?maxIdleTimeMS=60000&maxPoolSize=1000"
-      ## Secondary projections (can be Azure Storage, directory path, MongoDB, or Amazon S3)
-      FM_CONNECTIONSTRINGS__VIEWBLOBS: "mongodb://your-mongo-host:27017/fm-prod-blobs?maxIdleTimeMS=60000&maxPoolSize=100"
-      ## Commands from FM to Rebus instances (can be MongoDB, SQL Server, or local directory)
-      FM_CONNECTIONSTRINGS__COMMANDS: "mongodb://your-mongo-host:27017/fm-prod-commands?maxIdleTimeMS=60000&maxPoolSize=500"
-      ## Data bus (can be Azure Storage, directory path, MongoDB, or Amazon S3)
-      FM_CONNECTIONSTRINGS__DATABUS: "mongodb://your-mongo-host:27017/fm-prod-blobs?maxIdleTimeMS=60000&maxPoolSize=100"
-      ## Message bus (can be Azure Service Bus, Amazon SQS, or directory path)
-      FM_CONNECTIONSTRINGS__SERVICEBUS: "/usr/share/servicebus"
-
-      ## Configures the topic to use for event streaming (mostly relevant if the 'events' connection string is Kafka)
-      FM_APPSETTINGS__KAFKATOPIC: "fm-events-1"
-
-      ## Override PRODUCER (not consumer) topic - can be used to migrate to a new topic, e.g. when changing number of partitions
-      #FM_APPSETTINGS__KAFKATOPICPRODUCEROVERRIDE: "fm-events-1"
-
-      ## Defines how often the view blobs repository should be crawled for expired blobs
-      FM_APPSETTINGS__CLEANUPEXPIREDVIEWBLOBSINTERVAL: "01:00:00"
-
-      ## Set to a valid email address to send ERROR logs to an email address
-      FM_APPSETTINGS__LOGERRORMAILS: ""
-
-      ## Set to a valid file path pattern (e.g. /var/logs/fm/log.txt) to write logs to rolling files
-      FM_APPSETTINGS__LOGPATH: ""
-
-      ## Configure SMTP settings to FM can send emails (or set the host to a local email pickup directory)
-      FM_APPSETTINGS__SMTP__HOST: "your.smtp.server.com"
-      FM_APPSETTINGS__SMTP__PORT: "587"
-      FM_APPSETTINGS__SMTP__USER: "some-user-name"
-      FM_APPSETTINGS__SMTP__PASS: "your-smtp-password"
+volumes:
+  eshop-sqldata:
+    external: false
+  eshop-nosqldata:
+    external: false
+  eshop-basketdata:
+    external: false
+  servicebus_directory:

@@ -17,5 +17,5 @@ ingress:
 #       alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 80}]'
 #       alb.ingress.kubernetes.io/unhealthy-threshold-count: "3"
 #       alb.ingress.kubernetes.io/scheme: internet-facing
-#       alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-central-1:144070732019:certificate/eef98b5c-50cb-4450-b27d-580207e5a95a
+#       alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-central-1:111111111111:certificate/eef98b5c-50cb-4450-b27d-580207e5a95a
 #       # alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:us-west-2:xxxxx:regional/webacl/xxxxxxx/3ab78708-85b0-49d3-b4e1-7a9615a6613b

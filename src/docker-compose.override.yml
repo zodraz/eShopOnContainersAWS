@@ -637,15 +637,15 @@ services:
   #    FM_APPSETTINGS__LISTENURL: "http://+:5000"
 
   #    # Add license details here
-  #    FM_APPSETTINGS__LICENSE__DOCUMENT__ID: "473897a34bb2233de3f56cb53e6ab563"
-  #    FM_APPSETTINGS__LICENSE__DOCUMENT__ISSUEDON: "20220907"
+  #    FM_APPSETTINGS__LICENSE__DOCUMENT__ID: ""
+  #    FM_APPSETTINGS__LICENSE__DOCUMENT__ISSUEDON: ""
   #    FM_APPSETTINGS__LICENSE__DOCUMENT__LICENSEE__NAME: "Your Company Name"
-  #    FM_APPSETTINGS__LICENSE__DOCUMENT__LICENSEE__VAT: "XX33478473.43874"
-  #    FM_APPSETTINGS__LICENSE__SIGNATURE: "gjg48gj434j7j49j7g8j678954j7grjig498484u5f=="
+  #    FM_APPSETTINGS__LICENSE__DOCUMENT__LICENSEE__VAT: ""
+  #    FM_APPSETTINGS__LICENSE__SIGNATURE: ""
 
   #    # Configuration
   #    ## Master key which will be used to generate all kinds of tokens - keep secret!
-  #    FM_APPSETTINGS__MASTERKEY: "GHUGEIWhukgeusgelksGHUKELHGKELSHUKLgehsuklgesHGUKELHUKGLEWghueghkelw="
+  #    FM_APPSETTINGS__MASTERKEY: ""
 
   #    ## Configures the URL Fleet Manager should advertise to the outside world
   #    FM_APPSETTINGS__URL: "http://localhostname:5000"
