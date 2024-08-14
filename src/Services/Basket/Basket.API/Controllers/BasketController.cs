@@ -28,6 +28,8 @@ public class BasketController : ControllerBase
     {
         var basket = await _repository.GetBasketAsync(id);
 
+        _logger.Debug("Getting by basket id");
+
         return Ok(basket ?? new CustomerBasket(id));
     }
 
